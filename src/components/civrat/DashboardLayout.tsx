@@ -8,7 +8,7 @@ import { Logo } from "./Logo";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-const nav = [
+const nav: { to: string; label: string; icon: typeof LayoutDashboard; exact?: boolean }[] = [
   { to: "/dashboard", label: "Overview", icon: LayoutDashboard, exact: true },
   { to: "/dashboard/tickets", label: "Tickets", icon: Ticket },
   { to: "/dashboard/logs", label: "Logs", icon: ScrollText },
@@ -17,7 +17,8 @@ const nav = [
   { to: "/dashboard/xp", label: "XP System", icon: Sparkles },
   { to: "/dashboard/invitations", label: "Invitations", icon: Link2 },
   { to: "/dashboard/settings", label: "Settings", icon: Settings },
-] as const;
+];
+
 
 export function DashboardLayout({ children }: { children?: ReactNode }) {
   const [collapsed, setCollapsed] = useState(false);
