@@ -9,38 +9,196 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ServersRouteImport } from './routes/servers'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
+import { Route as DashboardXpRouteImport } from './routes/dashboard.xp'
+import { Route as DashboardWelcomeRouteImport } from './routes/dashboard.welcome'
+import { Route as DashboardTicketsRouteImport } from './routes/dashboard.tickets'
+import { Route as DashboardSettingsRouteImport } from './routes/dashboard.settings'
+import { Route as DashboardSecurityRouteImport } from './routes/dashboard.security'
+import { Route as DashboardLogsRouteImport } from './routes/dashboard.logs'
+import { Route as DashboardInvitationsRouteImport } from './routes/dashboard.invitations'
 
+const ServersRoute = ServersRouteImport.update({
+  id: '/servers',
+  path: '/servers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardXpRoute = DashboardXpRouteImport.update({
+  id: '/xp',
+  path: '/xp',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardWelcomeRoute = DashboardWelcomeRouteImport.update({
+  id: '/welcome',
+  path: '/welcome',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardTicketsRoute = DashboardTicketsRouteImport.update({
+  id: '/tickets',
+  path: '/tickets',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardSecurityRoute = DashboardSecurityRouteImport.update({
+  id: '/security',
+  path: '/security',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardLogsRoute = DashboardLogsRouteImport.update({
+  id: '/logs',
+  path: '/logs',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardInvitationsRoute = DashboardInvitationsRouteImport.update({
+  id: '/invitations',
+  path: '/invitations',
+  getParentRoute: () => DashboardRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRouteWithChildren
+  '/login': typeof LoginRoute
+  '/servers': typeof ServersRoute
+  '/dashboard/invitations': typeof DashboardInvitationsRoute
+  '/dashboard/logs': typeof DashboardLogsRoute
+  '/dashboard/security': typeof DashboardSecurityRoute
+  '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/tickets': typeof DashboardTicketsRoute
+  '/dashboard/welcome': typeof DashboardWelcomeRoute
+  '/dashboard/xp': typeof DashboardXpRoute
+  '/dashboard/': typeof DashboardIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/servers': typeof ServersRoute
+  '/dashboard/invitations': typeof DashboardInvitationsRoute
+  '/dashboard/logs': typeof DashboardLogsRoute
+  '/dashboard/security': typeof DashboardSecurityRoute
+  '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/tickets': typeof DashboardTicketsRoute
+  '/dashboard/welcome': typeof DashboardWelcomeRoute
+  '/dashboard/xp': typeof DashboardXpRoute
+  '/dashboard': typeof DashboardIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRouteWithChildren
+  '/login': typeof LoginRoute
+  '/servers': typeof ServersRoute
+  '/dashboard/invitations': typeof DashboardInvitationsRoute
+  '/dashboard/logs': typeof DashboardLogsRoute
+  '/dashboard/security': typeof DashboardSecurityRoute
+  '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/tickets': typeof DashboardTicketsRoute
+  '/dashboard/welcome': typeof DashboardWelcomeRoute
+  '/dashboard/xp': typeof DashboardXpRoute
+  '/dashboard/': typeof DashboardIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/dashboard'
+    | '/login'
+    | '/servers'
+    | '/dashboard/invitations'
+    | '/dashboard/logs'
+    | '/dashboard/security'
+    | '/dashboard/settings'
+    | '/dashboard/tickets'
+    | '/dashboard/welcome'
+    | '/dashboard/xp'
+    | '/dashboard/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/login'
+    | '/servers'
+    | '/dashboard/invitations'
+    | '/dashboard/logs'
+    | '/dashboard/security'
+    | '/dashboard/settings'
+    | '/dashboard/tickets'
+    | '/dashboard/welcome'
+    | '/dashboard/xp'
+    | '/dashboard'
+  id:
+    | '__root__'
+    | '/'
+    | '/dashboard'
+    | '/login'
+    | '/servers'
+    | '/dashboard/invitations'
+    | '/dashboard/logs'
+    | '/dashboard/security'
+    | '/dashboard/settings'
+    | '/dashboard/tickets'
+    | '/dashboard/welcome'
+    | '/dashboard/xp'
+    | '/dashboard/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DashboardRoute: typeof DashboardRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  ServersRoute: typeof ServersRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/servers': {
+      id: '/servers'
+      path: '/servers'
+      fullPath: '/servers'
+      preLoaderRoute: typeof ServersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +206,97 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/xp': {
+      id: '/dashboard/xp'
+      path: '/xp'
+      fullPath: '/dashboard/xp'
+      preLoaderRoute: typeof DashboardXpRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/welcome': {
+      id: '/dashboard/welcome'
+      path: '/welcome'
+      fullPath: '/dashboard/welcome'
+      preLoaderRoute: typeof DashboardWelcomeRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/tickets': {
+      id: '/dashboard/tickets'
+      path: '/tickets'
+      fullPath: '/dashboard/tickets'
+      preLoaderRoute: typeof DashboardTicketsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/settings': {
+      id: '/dashboard/settings'
+      path: '/settings'
+      fullPath: '/dashboard/settings'
+      preLoaderRoute: typeof DashboardSettingsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/security': {
+      id: '/dashboard/security'
+      path: '/security'
+      fullPath: '/dashboard/security'
+      preLoaderRoute: typeof DashboardSecurityRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/logs': {
+      id: '/dashboard/logs'
+      path: '/logs'
+      fullPath: '/dashboard/logs'
+      preLoaderRoute: typeof DashboardLogsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/invitations': {
+      id: '/dashboard/invitations'
+      path: '/invitations'
+      fullPath: '/dashboard/invitations'
+      preLoaderRoute: typeof DashboardInvitationsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
   }
 }
 
+interface DashboardRouteChildren {
+  DashboardInvitationsRoute: typeof DashboardInvitationsRoute
+  DashboardLogsRoute: typeof DashboardLogsRoute
+  DashboardSecurityRoute: typeof DashboardSecurityRoute
+  DashboardSettingsRoute: typeof DashboardSettingsRoute
+  DashboardTicketsRoute: typeof DashboardTicketsRoute
+  DashboardWelcomeRoute: typeof DashboardWelcomeRoute
+  DashboardXpRoute: typeof DashboardXpRoute
+  DashboardIndexRoute: typeof DashboardIndexRoute
+}
+
+const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardInvitationsRoute: DashboardInvitationsRoute,
+  DashboardLogsRoute: DashboardLogsRoute,
+  DashboardSecurityRoute: DashboardSecurityRoute,
+  DashboardSettingsRoute: DashboardSettingsRoute,
+  DashboardTicketsRoute: DashboardTicketsRoute,
+  DashboardWelcomeRoute: DashboardWelcomeRoute,
+  DashboardXpRoute: DashboardXpRoute,
+  DashboardIndexRoute: DashboardIndexRoute,
+}
+
+const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
+  DashboardRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DashboardRoute: DashboardRouteWithChildren,
+  LoginRoute: LoginRoute,
+  ServersRoute: ServersRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
