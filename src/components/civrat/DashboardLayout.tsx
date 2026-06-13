@@ -65,7 +65,7 @@ export function DashboardLayout({ children }: { children?: ReactNode }) {
             return (
               <Link
                 key={item.to}
-                to={item.to}
+                to={item.to as never}
                 className={`group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all ${
                   active
                     ? "bg-primary/10 text-primary shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--primary)_25%,transparent)]"
