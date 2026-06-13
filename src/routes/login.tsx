@@ -1,8 +1,10 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Logo } from "@/components/civrat/Logo";
 import { Button } from "@/components/ui/button";
-import { Shield, Lock, CheckCircle2, Loader2 } from "lucide-react";
-import { useState } from "react";
+import { Shield, Lock, CircleCheck as CheckCircle2, Loader as Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useAuth, getDiscordOAuthUrl, filterAdminGuilds } from "@/lib/auth";
+import { exchangeCode, fetchDiscordUser, fetchUserGuilds } from "@/lib/discord";
 
 export const Route = createFileRoute("/login")({
   head: () => ({ meta: [{ title: "Connexion — CIVRAT" }] }),
@@ -11,11 +13,53 @@ export const Route = createFileRoute("/login")({
 
 function LoginPage() {
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { isAuthenticated, setUser, setAccessToken, setGuilds } = useAuth();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate({ to: "/servers" });
+    }
+  }, [isAuthenticated, navigate]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("code");
+    if (!code) return;
+
+    setLoading(true);
+    setError(null);
+    window.history.replaceState({}, "", "/login");
+
+    exchangeCode(code)
+      .then(async (tokenData) => {
+        const accessToken = tokenData.access_token;
+        setAccessToken(accessToken);
+
+        const [user, guilds] = await Promise.all([
+          fetchDiscordUser(accessToken),
+          fetchUserGuilds(accessToken),
+        ]);
+
+        setUser(user);
+        setGuilds(filterAdminGuilds(guilds));
+        navigate({ to: "/servers" });
+      })
+      .catch((err) => {
+        setError(err.message ?? "Authentication failed");
+        setLoading(false);
+      });
+  }, [setUser, setAccessToken, setGuilds, navigate]);
 
   function handleLogin() {
-    setLoading(true);
-    setTimeout(() => navigate({ to: "/servers" }), 1100);
+    const url = getDiscordOAuthUrl();
+    if (url) {
+      window.location.href = url;
+    } else {
+      setLoading(true);
+      setTimeout(() => navigate({ to: "/servers" }), 1100);
+    }
   }
 
   return (
@@ -35,6 +79,12 @@ function LoginPage() {
             <p className="mt-2 text-sm text-muted-foreground">
               Connectez-vous avec votre compte Discord pour accéder au dashboard CIVRAT.
             </p>
+
+            {error && (
+              <div className="mt-4 w-full rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
+                {error}
+              </div>
+            )}
 
             <Button
               onClick={handleLogin}

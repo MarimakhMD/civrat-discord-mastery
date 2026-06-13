@@ -17,10 +17,15 @@ import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as DashboardXpRouteImport } from './routes/dashboard.xp'
 import { Route as DashboardWelcomeRouteImport } from './routes/dashboard.welcome'
 import { Route as DashboardTicketsRouteImport } from './routes/dashboard.tickets'
+import { Route as DashboardSuggestionsRouteImport } from './routes/dashboard.suggestions'
 import { Route as DashboardSettingsRouteImport } from './routes/dashboard.settings'
 import { Route as DashboardSecurityRouteImport } from './routes/dashboard.security'
 import { Route as DashboardLogsRouteImport } from './routes/dashboard.logs'
+import { Route as DashboardLanguagesRouteImport } from './routes/dashboard.languages'
 import { Route as DashboardInvitationsRouteImport } from './routes/dashboard.invitations'
+import { Route as DashboardGiveawaysRouteImport } from './routes/dashboard.giveaways'
+import { Route as DashboardCaptchaRouteImport } from './routes/dashboard.captcha'
+import { Route as DashboardAutomodRouteImport } from './routes/dashboard.automod'
 
 const ServersRoute = ServersRouteImport.update({
   id: '/servers',
@@ -62,6 +67,11 @@ const DashboardTicketsRoute = DashboardTicketsRouteImport.update({
   path: '/tickets',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardSuggestionsRoute = DashboardSuggestionsRouteImport.update({
+  id: '/suggestions',
+  path: '/suggestions',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -77,9 +87,29 @@ const DashboardLogsRoute = DashboardLogsRouteImport.update({
   path: '/logs',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardLanguagesRoute = DashboardLanguagesRouteImport.update({
+  id: '/languages',
+  path: '/languages',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardInvitationsRoute = DashboardInvitationsRouteImport.update({
   id: '/invitations',
   path: '/invitations',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardGiveawaysRoute = DashboardGiveawaysRouteImport.update({
+  id: '/giveaways',
+  path: '/giveaways',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardCaptchaRoute = DashboardCaptchaRouteImport.update({
+  id: '/captcha',
+  path: '/captcha',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardAutomodRoute = DashboardAutomodRouteImport.update({
+  id: '/automod',
+  path: '/automod',
   getParentRoute: () => DashboardRoute,
 } as any)
 
@@ -88,10 +118,15 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRouteWithChildren
   '/login': typeof LoginRoute
   '/servers': typeof ServersRoute
+  '/dashboard/automod': typeof DashboardAutomodRoute
+  '/dashboard/captcha': typeof DashboardCaptchaRoute
+  '/dashboard/giveaways': typeof DashboardGiveawaysRoute
   '/dashboard/invitations': typeof DashboardInvitationsRoute
+  '/dashboard/languages': typeof DashboardLanguagesRoute
   '/dashboard/logs': typeof DashboardLogsRoute
   '/dashboard/security': typeof DashboardSecurityRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/suggestions': typeof DashboardSuggestionsRoute
   '/dashboard/tickets': typeof DashboardTicketsRoute
   '/dashboard/welcome': typeof DashboardWelcomeRoute
   '/dashboard/xp': typeof DashboardXpRoute
@@ -101,10 +136,15 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/servers': typeof ServersRoute
+  '/dashboard/automod': typeof DashboardAutomodRoute
+  '/dashboard/captcha': typeof DashboardCaptchaRoute
+  '/dashboard/giveaways': typeof DashboardGiveawaysRoute
   '/dashboard/invitations': typeof DashboardInvitationsRoute
+  '/dashboard/languages': typeof DashboardLanguagesRoute
   '/dashboard/logs': typeof DashboardLogsRoute
   '/dashboard/security': typeof DashboardSecurityRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/suggestions': typeof DashboardSuggestionsRoute
   '/dashboard/tickets': typeof DashboardTicketsRoute
   '/dashboard/welcome': typeof DashboardWelcomeRoute
   '/dashboard/xp': typeof DashboardXpRoute
@@ -116,10 +156,15 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRouteWithChildren
   '/login': typeof LoginRoute
   '/servers': typeof ServersRoute
+  '/dashboard/automod': typeof DashboardAutomodRoute
+  '/dashboard/captcha': typeof DashboardCaptchaRoute
+  '/dashboard/giveaways': typeof DashboardGiveawaysRoute
   '/dashboard/invitations': typeof DashboardInvitationsRoute
+  '/dashboard/languages': typeof DashboardLanguagesRoute
   '/dashboard/logs': typeof DashboardLogsRoute
   '/dashboard/security': typeof DashboardSecurityRoute
   '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/suggestions': typeof DashboardSuggestionsRoute
   '/dashboard/tickets': typeof DashboardTicketsRoute
   '/dashboard/welcome': typeof DashboardWelcomeRoute
   '/dashboard/xp': typeof DashboardXpRoute
@@ -132,10 +177,15 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/login'
     | '/servers'
+    | '/dashboard/automod'
+    | '/dashboard/captcha'
+    | '/dashboard/giveaways'
     | '/dashboard/invitations'
+    | '/dashboard/languages'
     | '/dashboard/logs'
     | '/dashboard/security'
     | '/dashboard/settings'
+    | '/dashboard/suggestions'
     | '/dashboard/tickets'
     | '/dashboard/welcome'
     | '/dashboard/xp'
@@ -145,10 +195,15 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/servers'
+    | '/dashboard/automod'
+    | '/dashboard/captcha'
+    | '/dashboard/giveaways'
     | '/dashboard/invitations'
+    | '/dashboard/languages'
     | '/dashboard/logs'
     | '/dashboard/security'
     | '/dashboard/settings'
+    | '/dashboard/suggestions'
     | '/dashboard/tickets'
     | '/dashboard/welcome'
     | '/dashboard/xp'
@@ -159,10 +214,15 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/login'
     | '/servers'
+    | '/dashboard/automod'
+    | '/dashboard/captcha'
+    | '/dashboard/giveaways'
     | '/dashboard/invitations'
+    | '/dashboard/languages'
     | '/dashboard/logs'
     | '/dashboard/security'
     | '/dashboard/settings'
+    | '/dashboard/suggestions'
     | '/dashboard/tickets'
     | '/dashboard/welcome'
     | '/dashboard/xp'
@@ -234,6 +294,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardTicketsRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/suggestions': {
+      id: '/dashboard/suggestions'
+      path: '/suggestions'
+      fullPath: '/dashboard/suggestions'
+      preLoaderRoute: typeof DashboardSuggestionsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/settings': {
       id: '/dashboard/settings'
       path: '/settings'
@@ -255,6 +322,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardLogsRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/languages': {
+      id: '/dashboard/languages'
+      path: '/languages'
+      fullPath: '/dashboard/languages'
+      preLoaderRoute: typeof DashboardLanguagesRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/invitations': {
       id: '/dashboard/invitations'
       path: '/invitations'
@@ -262,14 +336,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardInvitationsRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/giveaways': {
+      id: '/dashboard/giveaways'
+      path: '/giveaways'
+      fullPath: '/dashboard/giveaways'
+      preLoaderRoute: typeof DashboardGiveawaysRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/captcha': {
+      id: '/dashboard/captcha'
+      path: '/captcha'
+      fullPath: '/dashboard/captcha'
+      preLoaderRoute: typeof DashboardCaptchaRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/automod': {
+      id: '/dashboard/automod'
+      path: '/automod'
+      fullPath: '/dashboard/automod'
+      preLoaderRoute: typeof DashboardAutomodRouteImport
+      parentRoute: typeof DashboardRoute
+    }
   }
 }
 
 interface DashboardRouteChildren {
+  DashboardAutomodRoute: typeof DashboardAutomodRoute
+  DashboardCaptchaRoute: typeof DashboardCaptchaRoute
+  DashboardGiveawaysRoute: typeof DashboardGiveawaysRoute
   DashboardInvitationsRoute: typeof DashboardInvitationsRoute
+  DashboardLanguagesRoute: typeof DashboardLanguagesRoute
   DashboardLogsRoute: typeof DashboardLogsRoute
   DashboardSecurityRoute: typeof DashboardSecurityRoute
   DashboardSettingsRoute: typeof DashboardSettingsRoute
+  DashboardSuggestionsRoute: typeof DashboardSuggestionsRoute
   DashboardTicketsRoute: typeof DashboardTicketsRoute
   DashboardWelcomeRoute: typeof DashboardWelcomeRoute
   DashboardXpRoute: typeof DashboardXpRoute
@@ -277,10 +377,15 @@ interface DashboardRouteChildren {
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardAutomodRoute: DashboardAutomodRoute,
+  DashboardCaptchaRoute: DashboardCaptchaRoute,
+  DashboardGiveawaysRoute: DashboardGiveawaysRoute,
   DashboardInvitationsRoute: DashboardInvitationsRoute,
+  DashboardLanguagesRoute: DashboardLanguagesRoute,
   DashboardLogsRoute: DashboardLogsRoute,
   DashboardSecurityRoute: DashboardSecurityRoute,
   DashboardSettingsRoute: DashboardSettingsRoute,
+  DashboardSuggestionsRoute: DashboardSuggestionsRoute,
   DashboardTicketsRoute: DashboardTicketsRoute,
   DashboardWelcomeRoute: DashboardWelcomeRoute,
   DashboardXpRoute: DashboardXpRoute,
@@ -300,3 +405,23 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

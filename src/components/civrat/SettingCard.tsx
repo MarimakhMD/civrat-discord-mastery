@@ -1,10 +1,10 @@
 import type { ReactNode } from "react";
 
 export function SettingCard({
-  title, description, children, accent = "neon",
-}: { title: string; description?: string; children?: ReactNode; accent?: "neon" | "gold" }) {
+  title, description, children, accent = "neon", className,
+}: { title: string; description?: string; children?: ReactNode; accent?: "neon" | "gold"; className?: string }) {
   return (
-    <section className="glass relative overflow-hidden rounded-2xl p-6 transition-all hover:border-primary/40">
+    <section className={`glass relative overflow-hidden rounded-2xl p-6 transition-all hover:border-primary/40 ${className ?? ""}`}>
       <div
         className={`pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full blur-3xl ${
           accent === "gold" ? "bg-gold/10" : "bg-primary/10"
