@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AlertTriangle } from 'lucide-react';
+import { TriangleAlert as AlertTriangle } from 'lucide-react';
 import { ModuleHeader } from '@/components/ui/ModuleHeader';
 import { Toggle } from '@/components/ui/Toggle';
 import { FormField } from '@/components/ui/FormField';
