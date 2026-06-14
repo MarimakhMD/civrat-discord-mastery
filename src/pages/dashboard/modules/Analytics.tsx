@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BarChart3 } from 'lucide-react';
+import { ChartBar as BarChart3 } from 'lucide-react';
 import { StatCard } from '@/components/ui/StatCard';
 import { ModuleHeader } from '@/components/ui/ModuleHeader';
 import {
