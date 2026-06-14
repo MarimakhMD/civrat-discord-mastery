@@ -1,4 +1,4 @@
-import { Save, RotateCcw, AlertCircle } from 'lucide-react';
+import { Save, RotateCcw, CircleAlert as AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface SaveBarProps { isDirty: boolean; isSaving?: boolean; onSave: () => void; onReset: () => void; error?: string | null; }
