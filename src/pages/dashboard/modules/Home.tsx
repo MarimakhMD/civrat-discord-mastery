@@ -1,111 +1,19 @@
-import { Activity, Users, MessageSquare, Ticket } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Activity, ArrowRight, BellRing, CheckCircle2, MessageSquare, Settings2, ShieldCheck, Ticket, Users } from 'lucide-react';
 import { StatCard } from '@/components/ui/StatCard';
+import { useAuth } from '@/context/AuthContext';
+import { useGuild } from '@/context/GuildContext';
 
-const mockActivityFeed = [
-  { id: 1, type: 'member_join', user: 'Alex#1234', time: '2 minutes ago' },
-  { id: 2, type: 'message', user: 'Jordan#5678', time: '5 minutes ago' },
-  { id: 3, type: 'ticket_created', user: 'Sam#9012', time: '10 minutes ago' },
-  { id: 4, type: 'member_join', user: 'Casey#3456', time: '15 minutes ago' },
-  { id: 5, type: 'role_added', user: 'Morgan#7890', time: '20 minutes ago' },
-  { id: 6, type: 'message', user: 'Riley#2345', time: '25 minutes ago' },
-  { id: 7, type: 'ticket_resolved', user: 'Bailey#6789', time: '30 minutes ago' },
-  { id: 8, type: 'member_join', user: 'Avery#0123', time: '35 minutes ago' },
-  { id: 9, type: 'warning', user: 'Quinn#4567', time: '40 minutes ago' },
-  { id: 10, type: 'message', user: 'Taylor#8901', time: '45 minutes ago' },
-];
-
-const quickActions = [
-  { label: 'Ban User', color: 'bg-red-600' },
-  { label: 'Kick User', color: 'bg-orange-600' },
-  { label: 'Add Role', color: 'bg-blue-600' },
-  { label: 'Create Ticket', color: 'bg-green-600' },
-];
-
-const moduleStatus = [
-  { name: 'Welcome', enabled: true },
-  { name: 'Tickets', enabled: true },
-  { name: 'Logs', enabled: false },
-  { name: 'AutoMod', enabled: true },
-  { name: 'XP Levels', enabled: true },
-  { name: 'Captcha', enabled: false },
-];
+const modules = [{ name: 'Bienvenue', path: 'welcome', enabled: 'welcome_enabled' }, { name: 'Tickets', path: 'tickets', enabled: 'tickets_enabled' }, { name: 'Logs', path: 'logs', enabled: 'logs_enabled' }, { name: 'AutoMod', path: 'automod', enabled: 'automod_enabled' }, { name: 'XP & niveaux', path: 'xplevels', enabled: 'xp_enabled' }, { name: 'Sécurité', path: 'security', enabled: 'security_enabled' }] as const;
+const activity = [{ label: 'Configuration du serveur synchronisée', time: 'À l’instant', color: 'bg-neon-green' }, { label: 'Consultez les paramètres de modération', time: 'Prêt à configurer', color: 'bg-neon-yellow' }, { label: 'Personnalisez l’expérience des membres', time: 'Bienvenue & XP', color: 'bg-info' }];
 
 export default function Home() {
-  return (
-    <div className="space-y-6">
-      <div className="rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 p-8 text-white">
-        <h1 className="text-3xl font-bold">Welcome back!</h1>
-        <p className="mt-2 text-blue-100">Your server is running smoothly. Keep it up!</p>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <StatCard icon={Users} label="Members" value="2,543" trend={{ value: 12, isPositive: true }} />
-        <StatCard icon={Activity} label="Online" value="348" trend={{ value: 8, isPositive: true }} />
-        <StatCard icon={MessageSquare} label="Messages" value="12.5K" trend={{ value: 5.2, isPositive: true }} />
-        <StatCard icon={Ticket} label="Tickets" value="24" trend={{ value: 3, isPositive: true }} />
-      </div>
-
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <div className="module-card !cursor-default p-6">
-            <h2 className="mb-4 text-lg font-semibold">Activity Feed</h2>
-            <div className="space-y-3">
-              {mockActivityFeed.map((event) => (
-                <div
-                  key={event.id}
-                  className="flex items-center justify-between border-b border-white/5 pb-3 last:border-0"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="h-2 w-2 rounded-full bg-blue-600" />
-                    <div>
-                      <p className="text-sm font-medium capitalize">
-                        {event.type.replace('_', ' ')}
-                      </p>
-                      <p className="text-xs text-dark-300">{event.user}</p>
-                    </div>
-                  </div>
-                  <span className="text-xs text-dark-300">{event.time}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <div className="module-card !cursor-default p-6">
-            <h2 className="mb-4 text-lg font-semibold">Quick Actions</h2>
-            <div className="space-y-2">
-              {quickActions.map((action) => (
-                <button
-                  key={action.label}
-                  className={`btn-primary w-full ${action.color}`}
-                >
-                  {action.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="module-card !cursor-default p-6">
-            <h2 className="mb-4 text-lg font-semibold">Module Status</h2>
-            <div className="space-y-2">
-              {moduleStatus.map((mod) => (
-                <div
-                  key={mod.name}
-                  className="flex items-center justify-between text-sm"
-                >
-                  <span>{mod.name}</span>
-                  <div
-                    className={`h-2 w-2 rounded-full ${
-                      mod.enabled ? 'bg-green-600' : 'bg-slate-300'
-                    }`}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  const { guilds } = useAuth(); const { selectedGuildId, config } = useGuild(); const guild = guilds.find((item) => item.id === selectedGuildId);
+  const enabled = modules.filter((module) => config[module.enabled]).length;
+  return <div className="space-y-6"><section className="relative overflow-hidden rounded-3xl border border-neon-green/20 bg-gradient-to-br from-neon-green/12 via-dark-800 to-dark-800 p-7 sm:p-9"><div className="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-neon-green/15 blur-3xl" /><div className="relative flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between"><div><div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-neon-green"><CheckCircle2 className="h-4 w-4" />Espace serveur</div><h1 className="mt-3 text-3xl font-black sm:text-4xl">Bonjour, {guild?.name ?? 'communauté'}.</h1><p className="mt-2 max-w-xl text-sm leading-6 text-dark-300">Retrouvez les réglages essentiels, l’état de vos modules et les prochaines étapes pour votre serveur.</p></div><Link to="/dashboard/settings" className="btn-primary inline-flex shrink-0 items-center justify-center gap-2"><Settings2 className="h-4 w-4" />Configurer le serveur</Link></div></section>
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"><StatCard icon={Users} label="Membres" value={guild?.member_count || '—'} trend={{ value: 0, isPositive: true }} /><StatCard icon={Activity} label="Modules actifs" value={`${enabled}/${modules.length}`} /><StatCard icon={MessageSquare} label="Messages" value="—" /><StatCard icon={Ticket} label="Tickets ouverts" value="—" /></div>
+    <div className="grid gap-6 xl:grid-cols-5"><section className="module-card !cursor-default xl:col-span-3"><div className="flex items-center justify-between"><div><p className="text-xs font-bold uppercase tracking-widest text-neon-green">Vue d’ensemble</p><h2 className="mt-1 text-xl font-bold">Modules de votre serveur</h2></div><span className="rounded-full border border-white/10 px-3 py-1 text-xs text-dark-300">{enabled} actifs</span></div><div className="mt-6 grid gap-2 sm:grid-cols-2">{modules.map((module) => <Link to={`/dashboard/${module.path}`} key={module.path} className="group flex items-center justify-between rounded-xl border border-white/8 bg-dark-700/50 p-3 transition hover:border-neon-green/25 hover:bg-dark-700"><span className="font-semibold text-sm">{module.name}</span><span className="flex items-center gap-2 text-xs"><i className={`h-2 w-2 rounded-full ${config[module.enabled] ? 'bg-neon-green shadow-[0_0_8px_#39ff14]' : 'bg-dark-400'}`} />{config[module.enabled] ? 'Actif' : 'Inactif'}<ArrowRight className="h-3.5 w-3.5 opacity-0 transition group-hover:opacity-100" /></span></Link>)}</div></section>
+      <section className="module-card !cursor-default xl:col-span-2"><div className="flex items-center gap-2"><BellRing className="h-4 w-4 text-neon-yellow" /><h2 className="font-bold">Centre d’activité</h2></div><div className="mt-5 space-y-4">{activity.map((event) => <div key={event.label} className="flex gap-3"><i className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${event.color}`} /><div><p className="text-sm font-medium">{event.label}</p><p className="mt-0.5 text-xs text-dark-300">{event.time}</p></div></div>)}</div><div className="mt-6 border-t border-white/8 pt-4"><Link to="/dashboard/logs" className="text-sm font-bold text-neon-green hover:underline">Ouvrir les journaux <ArrowRight className="ml-1 inline h-3.5 w-3.5" /></Link></div></section></div>
+    <section className="module-card !cursor-default flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><div className="flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-xl bg-neon-green/10 text-neon-green"><ShieldCheck className="h-5 w-5" /></span><div><h2 className="font-bold">Votre serveur est prêt à être personnalisé</h2><p className="text-sm text-dark-300">Activez vos modules un à un et sauvegardez vos réglages.</p></div></div><Link to="/dashboard/welcome" className="btn-secondary inline-flex justify-center gap-2 !px-4">Commencer <ArrowRight className="h-4 w-4" /></Link></section>
+  </div>;
 }
