@@ -1,179 +1,31 @@
 import { useState } from 'react';
-import { Ticket } from 'lucide-react';
+import { Archive, CheckCircle2, FileText, FolderKanban, MessageSquareText, Plus, Ticket, UsersRound } from 'lucide-react';
 import { ModuleHeader } from '@/components/ui/ModuleHeader';
-import { Toggle } from '@/components/ui/Toggle';
 import { FormField } from '@/components/ui/FormField';
 import { SaveBar } from '@/components/ui/SaveBar';
 import { Select } from '@/components/ui/Select';
+import { Toggle } from '@/components/ui/Toggle';
 import { useGuild } from '@/context/GuildContext';
 
-const channels = [
-  { value: 'ch-1', label: '#general' },
-  { value: 'ch-2', label: '#welcome' },
-  { value: 'ch-3', label: '#logs' },
-  { value: 'ch-4', label: '#moderation' },
-];
-
-const roles = [
-  { value: 'r-1', label: '@Admin' },
-  { value: 'r-2', label: '@Moderator' },
-  { value: 'r-3', label: '@Member' },
-  { value: 'r-4', label: '@Muted' },
-];
-
-const mockTickets = [
-  { id: 1, user: 'Alex#1234', subject: 'Unable to verify', status: 'open', created: '2 hours ago' },
-  { id: 2, user: 'Jordan#5678', subject: 'Role request', status: 'open', created: '1 day ago' },
-  { id: 3, user: 'Sam#9012', subject: 'Ban appeal', status: 'pending', created: '3 days ago' },
-  { id: 4, user: 'Casey#3456', subject: 'Question about rules', status: 'resolved', created: '1 week ago' },
-];
+const channels = [{ value: 'ch-1', label: '#general' }, { value: 'ch-2', label: '#bienvenue' }, { value: 'ch-3', label: '#logs' }, { value: 'ch-4', label: '#support' }];
+const roles = [{ value: 'r-1', label: '@Administrateur' }, { value: 'r-2', label: '@Modérateur' }, { value: 'r-3', label: '@Support' }, { value: 'r-4', label: '@Membre' }];
+const tickets = [{ user: 'Alex', subject: 'Problème de vérification', status: 'Ouvert', date: 'Il y a 2 h' }, { user: 'Jordan', subject: 'Demande de rôle', status: 'En attente', date: 'Hier' }, { user: 'Sam', subject: 'Appel de sanction', status: 'Résolu', date: 'Il y a 3 j' }];
 
 export default function Tickets() {
-  const { config, updateConfig } = useGuild();
-  const [isDirty, setIsDirty] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const [enabled, setEnabled] = useState(config.tickets_enabled);
-  const [category, setCategory] = useState(config.tickets_category_id ?? '');
-  const [supportRole, setSupportRole] = useState(config.tickets_support_role_id ?? '');
-  const [transcriptChannel, setTranscriptChannel] = useState(config.tickets_transcript_channel ?? '');
-
-  const handleSave = async () => {
-    try {
-      setIsSaving(true);
-      setError(null);
-      await updateConfig({
-        tickets_enabled: enabled,
-        tickets_category_id: category || null,
-        tickets_support_role_id: supportRole || null,
-        tickets_transcript_channel: transcriptChannel || null,
-      });
-      setIsDirty(false);
-    } catch (err) {
-      setError('Failed to save ticket settings');
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const handleReset = () => {
-    setEnabled(config.tickets_enabled);
-    setCategory(config.tickets_category_id ?? '');
-    setSupportRole(config.tickets_support_role_id ?? '');
-    setTranscriptChannel(config.tickets_transcript_channel ?? '');
-    setIsDirty(false);
-  };
-
-  const handleToggle = (checked: boolean) => {
-    setEnabled(checked);
-    setIsDirty(true);
-  };
-
-  return (
-    <div className="space-y-6">
-      <ModuleHeader
-        icon={Ticket}
-        title="Tickets System"
-        description="Configure support ticket system"
-        toggleEnabled={enabled}
-        onToggle={handleToggle}
-      />
-
-      {enabled && (
-        <div className="space-y-6">
-          <div className="module-card !cursor-default p-6">
-            <h3 className="mb-4 text-lg font-semibold">Configuration</h3>
-            <div className="space-y-4">
-              <FormField label="Ticket Category">
-                <Select
-                  options={[
-                    { value: 'cat-1', label: 'Support' },
-                    { value: 'cat-2', label: 'Reports' },
-                    { value: 'cat-3', label: 'Appeals' },
-                  ]}
-                  value={category}
-                  onChange={(val) => {
-                    setCategory(val);
-                    setIsDirty(true);
-                  }}
-                  placeholder="Select category"
-                />
-              </FormField>
-
-              <FormField label="Support Role">
-                <Select
-                  options={roles}
-                  value={supportRole}
-                  onChange={(val) => {
-                    setSupportRole(val);
-                    setIsDirty(true);
-                  }}
-                  placeholder="Select role"
-                />
-              </FormField>
-
-              <FormField label="Transcript Channel">
-                <Select
-                  options={channels}
-                  value={transcriptChannel}
-                  onChange={(val) => {
-                    setTranscriptChannel(val);
-                    setIsDirty(true);
-                  }}
-                  placeholder="Select channel"
-                />
-              </FormField>
-            </div>
-          </div>
-
-          <div className="module-card !cursor-default p-6">
-            <h3 className="mb-4 text-lg font-semibold">Active Tickets</h3>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-white/10">
-                    <th className="px-4 py-2 text-left font-medium">User</th>
-                    <th className="px-4 py-2 text-left font-medium">Subject</th>
-                    <th className="px-4 py-2 text-left font-medium">Status</th>
-                    <th className="px-4 py-2 text-left font-medium">Created</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {mockTickets.map((ticket) => (
-                    <tr key={ticket.id} className="border-b border-white/5 hover:bg-white/5">
-                      <td className="px-4 py-2">{ticket.user}</td>
-                      <td className="px-4 py-2">{ticket.subject}</td>
-                      <td className="px-4 py-2">
-                        <span
-                          className={`inline-block rounded px-2 py-1 text-xs font-medium ${
-                            ticket.status === 'open'
-                              ? 'bg-blue-100 text-blue-800'
-                              : ticket.status === 'pending'
-                                ? 'bg-yellow-100 text-yellow-800'
-                                : 'bg-green-100 text-green-800'
-                          }`}
-                        >
-                          {ticket.status}
-                        </span>
-                      </td>
-                      <td className="px-4 py-2 text-dark-300">{ticket.created}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <SaveBar
-        isDirty={isDirty}
-        isSaving={isSaving}
-        onSave={handleSave}
-        onReset={handleReset}
-        error={error}
-      />
-    </div>
-  );
+  const { config, updateConfig } = useGuild(); const [isDirty, setIsDirty] = useState(false); const [isSaving, setIsSaving] = useState(false); const [error, setError] = useState<string | null>(null);
+  const [enabled, setEnabled] = useState(config.tickets_enabled); const [category, setCategory] = useState(config.tickets_category_id ?? ''); const [supportRole, setSupportRole] = useState(config.tickets_support_role_id ?? ''); const [transcriptChannel, setTranscriptChannel] = useState(config.tickets_transcript_channel ?? '');
+  const [panelTitle, setPanelTitle] = useState('Centre d’assistance'); const [autoClose, setAutoClose] = useState(true); const [transcripts, setTranscripts] = useState(true);
+  const change = (fn: () => void) => { fn(); setIsDirty(true); };
+  const save = async () => { try { setIsSaving(true); setError(null); await updateConfig({ tickets_enabled: enabled, tickets_category_id: category || null, tickets_support_role_id: supportRole || null, tickets_transcript_channel: transcriptChannel || null }); setIsDirty(false); } catch { setError('Impossible d’enregistrer la configuration des tickets.'); } finally { setIsSaving(false); } };
+  const reset = () => { setEnabled(config.tickets_enabled); setCategory(config.tickets_category_id ?? ''); setSupportRole(config.tickets_support_role_id ?? ''); setTranscriptChannel(config.tickets_transcript_channel ?? ''); setIsDirty(false); };
+  return <div className="space-y-6"><ModuleHeader icon={Ticket} title="Centre de tickets" description="Construisez une expérience de support claire pour vos membres." toggleEnabled={enabled} onToggle={(value) => change(() => setEnabled(value))} />
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"><Metric icon={MessageSquareText} value="—" label="Tickets ouverts" /><Metric icon={CheckCircle2} value="—" label="Résolus ce mois" /><Metric icon={UsersRound} value="—" label="Temps de réponse" /><Metric icon={Archive} value={transcripts ? 'Actifs' : 'Désactivés'} label="Transcripts" /></div>
+    <div className="grid gap-6 xl:grid-cols-5"><section className="space-y-6 xl:col-span-3"><div className="module-card !cursor-default"><div className="flex items-center justify-between"><div><p className="text-xs font-bold uppercase tracking-widest text-neon-green">Configuration</p><h2 className="mt-1 text-xl font-bold">Panel d’assistance</h2></div><button onClick={() => setPanelTitle('Nouveau panel')} className="btn-secondary inline-flex gap-2 !px-3 !py-2 text-sm"><Plus className="h-4 w-4" />Nouveau panel</button></div><div className="mt-6 grid gap-5 sm:grid-cols-2"><FormField label="Catégorie des tickets"><Select options={[{ value: 'cat-1', label: 'Support' }, { value: 'cat-2', label: 'Signalements' }, { value: 'cat-3', label: 'Appels' }]} value={category} onChange={(value) => change(() => setCategory(value))} placeholder="Choisir une catégorie" /></FormField><FormField label="Rôle support"><Select options={roles} value={supportRole} onChange={(value) => change(() => setSupportRole(value))} placeholder="Choisir un rôle" /></FormField><FormField label="Salon des transcripts"><Select options={channels} value={transcriptChannel} onChange={(value) => change(() => setTranscriptChannel(value))} placeholder="Choisir un salon" /></FormField><FormField label="Titre du panel"><input value={panelTitle} onChange={(event) => change(() => setPanelTitle(event.target.value))} className="input-field" maxLength={80} /></FormField></div><div className="mt-6 grid gap-3 rounded-2xl border border-white/8 bg-dark-700/40 p-4 sm:grid-cols-2"><Setting label="Créer un transcript à la fermeture" description="Archive les échanges dans le salon choisi." checked={transcripts} onChange={(value) => change(() => setTranscripts(value))} /><Setting label="Fermeture automatique" description="Prêt à être relié au bot Discord." checked={autoClose} onChange={(value) => change(() => setAutoClose(value))} /></div></div>
+      <div className="module-card !cursor-default"><div className="flex items-center justify-between"><div><h2 className="text-xl font-bold">Activité des tickets</h2><p className="mt-1 text-sm text-dark-300">Les données en direct apparaîtront lorsque le bot les synchronisera.</p></div><span className="rounded-full bg-neon-green/10 px-3 py-1 text-xs font-bold text-neon-green">En attente de données</span></div><div className="mt-5 overflow-x-auto"><table className="w-full text-left text-sm"><thead className="text-xs uppercase tracking-wider text-dark-300"><tr className="border-b border-white/10"><th className="pb-3">Membre</th><th className="pb-3">Sujet</th><th className="pb-3">État</th><th className="pb-3">Créé</th></tr></thead><tbody>{tickets.map((ticket) => <tr key={ticket.user} className="border-b border-white/6 last:border-0"><td className="py-4 font-semibold">{ticket.user}</td><td className="py-4 text-dark-300">{ticket.subject}</td><td className="py-4"><span className="rounded-full bg-neon-green/10 px-2.5 py-1 text-xs font-bold text-neon-green">{ticket.status}</span></td><td className="py-4 text-dark-300">{ticket.date}</td></tr>)}</tbody></table></div></div></section>
+      <aside className="xl:col-span-2"><div className="sticky top-24 module-card !cursor-default"><div className="flex items-center gap-2"><FileText className="h-4 w-4 text-neon-yellow" /><h2 className="font-bold">Aperçu Discord</h2></div><p className="mt-1 text-xs text-dark-300">Prévisualisation du panel, non envoyée.</p><div className="mt-5 rounded-xl bg-[#313338] p-4"><div className="rounded-md border-l-4 border-neon-green bg-[#2b2d31] p-4 shadow-lg"><h3 className="font-bold text-white">{panelTitle || 'Centre d’assistance'}</h3><p className="mt-2 text-sm leading-6 text-[#dbdee1]">Besoin d’aide ? Ouvrez un ticket et notre équipe vous répondra dès que possible.</p><button className="mt-4 inline-flex items-center gap-2 rounded bg-[#5865f2] px-3 py-2 text-sm font-semibold text-white"><Ticket className="h-4 w-4" />Créer un ticket</button></div><p className="mt-3 text-xs text-[#949ba4]"># support · CIVRAT</p></div><div className="mt-5 space-y-3 border-t border-white/8 pt-4"><p className="text-sm font-semibold">Inclus dans ce panel</p><Item text="Catégorie et rôles support" /><Item text="Transcripts et historique" /><Item text="Fermeture et renommage prêts" /><Item text="Liste noire prête à connecter" /></div></div></aside></div>
+    <SaveBar isDirty={isDirty} isSaving={isSaving} onSave={save} onReset={reset} error={error} />
+  </div>;
 }
+function Metric({ icon: Icon, value, label }: { icon: typeof Ticket; value: string; label: string }) { return <div className="module-card !cursor-default"><Icon className="h-5 w-5 text-neon-green" /><strong className="mt-4 block text-2xl">{value}</strong><span className="text-sm text-dark-300">{label}</span></div>; }
+function Setting({ label, description, checked, onChange }: { label: string; description: string; checked: boolean; onChange: (value: boolean) => void }) { return <div className="flex gap-3"><Toggle checked={checked} onChange={onChange} /><div><p className="text-sm font-semibold">{label}</p><p className="mt-1 text-xs text-dark-300">{description}</p></div></div>; }
+function Item({ text }: { text: string }) { return <p className="flex items-center gap-2 text-sm text-dark-300"><FolderKanban className="h-3.5 w-3.5 text-neon-green" />{text}</p>; }

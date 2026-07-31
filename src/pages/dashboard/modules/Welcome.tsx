@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { LogIn } from 'lucide-react';
+import { Image, LogIn, Mail, Palette, Send, UserPlus } from 'lucide-react';
 import { ModuleHeader } from '@/components/ui/ModuleHeader';
 import { Toggle } from '@/components/ui/Toggle';
 import { FormField } from '@/components/ui/FormField';
@@ -7,165 +7,18 @@ import { SaveBar } from '@/components/ui/SaveBar';
 import { Select } from '@/components/ui/Select';
 import { useGuild } from '@/context/GuildContext';
 
-const channels = [
-  { value: 'ch-1', label: '#general' },
-  { value: 'ch-2', label: '#welcome' },
-  { value: 'ch-3', label: '#logs' },
-  { value: 'ch-4', label: '#moderation' },
-];
-
+const channels = [{ value: 'ch-1', label: '#général' }, { value: 'ch-2', label: '#bienvenue' }, { value: 'ch-3', label: '#logs' }, { value: 'ch-4', label: '#départs' }];
+const variables = ['{user}', '{username}', '{server}', '{memberCount}'];
 export default function Welcome() {
-  const { config, updateConfig } = useGuild();
-  const [isDirty, setIsDirty] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const [welcomeEnabled, setWelcomeEnabled] = useState(config.welcome_enabled);
-  const [goodbyeEnabled, setGoodbyeEnabled] = useState(config.goodbye_enabled);
-  const [welcomeChannel, setWelcomeChannel] = useState(config.welcome_channel_id ?? '');
-  const [goodbyeChannel, setGoodbyeChannel] = useState(config.goodbye_channel_id ?? '');
-  const [welcomeMessage, setWelcomeMessage] = useState(config.welcome_message ?? '');
-  const [goodbyeMessage, setGoodbyeMessage] = useState(config.goodbye_message ?? '');
-
-  const handleWelcomeToggle = (checked: boolean) => {
-    setWelcomeEnabled(checked);
-    setIsDirty(true);
-  };
-
-  const handleGoodbyeToggle = (checked: boolean) => {
-    setGoodbyeEnabled(checked);
-    setIsDirty(true);
-  };
-
-  const handleSave = async () => {
-    try {
-      setIsSaving(true);
-      setError(null);
-      await updateConfig({
-        welcome_enabled: welcomeEnabled,
-        welcome_channel_id: welcomeChannel || null,
-        welcome_message: welcomeMessage || null,
-        goodbye_enabled: goodbyeEnabled,
-        goodbye_channel_id: goodbyeChannel || null,
-        goodbye_message: goodbyeMessage || null,
-      });
-      setIsDirty(false);
-    } catch (err) {
-      setError('Failed to save welcome settings');
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const handleReset = () => {
-    setWelcomeEnabled(config.welcome_enabled);
-    setGoodbyeEnabled(config.goodbye_enabled);
-    setWelcomeChannel(config.welcome_channel_id ?? '');
-    setGoodbyeChannel(config.goodbye_channel_id ?? '');
-    setWelcomeMessage(config.welcome_message ?? '');
-    setGoodbyeMessage(config.goodbye_message ?? '');
-    setIsDirty(false);
-  };
-
-  return (
-    <div className="space-y-6">
-      <ModuleHeader
-        icon={LogIn}
-        title="Welcome & Goodbye"
-        description="Configure welcome and goodbye messages for members"
-        toggleEnabled={welcomeEnabled || goodbyeEnabled}
-        onToggle={() => {}}
-      />
-
-      <div className="space-y-6">
-        <div className="module-card !cursor-default p-6">
-          <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-lg font-semibold">Welcome Message</h3>
-            <Toggle checked={welcomeEnabled} onChange={handleWelcomeToggle} />
-          </div>
-
-          {welcomeEnabled && (
-            <div className="space-y-4">
-              <FormField label="Welcome Channel">
-                <Select
-                  options={channels}
-                  value={welcomeChannel}
-                  onChange={(val) => {
-                    setWelcomeChannel(val);
-                    setIsDirty(true);
-                  }}
-                  placeholder="Select channel"
-                />
-              </FormField>
-
-              <FormField label="Welcome Message">
-                <textarea
-                  value={welcomeMessage}
-                  onChange={(e) => {
-                    setWelcomeMessage(e.target.value);
-                    setIsDirty(true);
-                  }}
-                  placeholder="Welcome message text..."
-                  className="h-24 w-full rounded border border-slate-300 p-2"
-                />
-              </FormField>
-
-              <div className="rounded-xl border border-white/10 bg-dark-700/60 p-4">
-                <p className="text-sm font-semibold text-white">Preview</p>
-                <p className="mt-2 text-sm">{welcomeMessage || 'No message set'}</p>
-              </div>
-            </div>
-          )}
-        </div>
-
-        <div className="module-card !cursor-default p-6">
-          <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-lg font-semibold">Goodbye Message</h3>
-            <Toggle checked={goodbyeEnabled} onChange={handleGoodbyeToggle} />
-          </div>
-
-          {goodbyeEnabled && (
-            <div className="space-y-4">
-              <FormField label="Goodbye Channel">
-                <Select
-                  options={channels}
-                  value={goodbyeChannel}
-                  onChange={(val) => {
-                    setGoodbyeChannel(val);
-                    setIsDirty(true);
-                  }}
-                  placeholder="Select channel"
-                />
-              </FormField>
-
-              <FormField label="Goodbye Message">
-                <textarea
-                  value={goodbyeMessage}
-                  onChange={(e) => {
-                    setGoodbyeMessage(e.target.value);
-                    setIsDirty(true);
-                  }}
-                  placeholder="Goodbye message text..."
-                  className="h-24 w-full rounded border border-slate-300 p-2"
-                />
-              </FormField>
-
-              <div className="rounded-xl border border-white/10 bg-dark-700/60 p-4">
-                <p className="text-sm font-semibold text-white">Preview</p>
-                <p className="mt-2 text-sm">{goodbyeMessage || 'No message set'}</p>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      <SaveBar
-        isDirty={isDirty}
-        isSaving={isSaving}
-        onSave={handleSave}
-        onReset={handleReset}
-        error={error}
-      />
-    </div>
-  );
+  const { config, updateConfig } = useGuild(); const [isDirty, setIsDirty] = useState(false); const [isSaving, setIsSaving] = useState(false); const [error, setError] = useState<string | null>(null);
+  const [welcomeEnabled, setWelcomeEnabled] = useState(config.welcome_enabled); const [goodbyeEnabled, setGoodbyeEnabled] = useState(config.goodbye_enabled); const [welcomeChannel, setWelcomeChannel] = useState(config.welcome_channel_id ?? ''); const [goodbyeChannel, setGoodbyeChannel] = useState(config.goodbye_channel_id ?? ''); const [welcomeMessage, setWelcomeMessage] = useState(config.welcome_message ?? ''); const [goodbyeMessage, setGoodbyeMessage] = useState(config.goodbye_message ?? ''); const [embed, setEmbed] = useState(config.welcome_embed_enabled); const [color, setColor] = useState('#39ff14'); const [dm, setDm] = useState(false);
+  const change = (fn: () => void) => { fn(); setIsDirty(true); }; const save = async () => { try { setIsSaving(true); setError(null); await updateConfig({ welcome_enabled: welcomeEnabled, welcome_channel_id: welcomeChannel || null, welcome_message: welcomeMessage || null, welcome_embed_enabled: embed, goodbye_enabled: goodbyeEnabled, goodbye_channel_id: goodbyeChannel || null, goodbye_message: goodbyeMessage || null }); setIsDirty(false); } catch { setError('Impossible d’enregistrer les messages.'); } finally { setIsSaving(false); } };
+  const reset = () => { setWelcomeEnabled(config.welcome_enabled); setGoodbyeEnabled(config.goodbye_enabled); setWelcomeChannel(config.welcome_channel_id ?? ''); setGoodbyeChannel(config.goodbye_channel_id ?? ''); setWelcomeMessage(config.welcome_message ?? ''); setGoodbyeMessage(config.goodbye_message ?? ''); setEmbed(config.welcome_embed_enabled); setIsDirty(false); };
+  const insert = (value: string) => change(() => setWelcomeMessage((current) => `${current}${current ? ' ' : ''}${value}`));
+  return <div className="space-y-6"><ModuleHeader icon={LogIn} title="Bienvenue & départ" description="Créez une première impression mémorable pour chaque membre." toggleEnabled={welcomeEnabled || goodbyeEnabled} onToggle={(value) => change(() => { setWelcomeEnabled(value); setGoodbyeEnabled(value); })} />
+    <div className="grid gap-6 xl:grid-cols-5"><section className="space-y-6 xl:col-span-3"><div className="module-card !cursor-default"><div className="flex items-center justify-between"><div><p className="text-xs font-bold uppercase tracking-widest text-neon-green">Éditeur</p><h2 className="mt-1 text-xl font-bold">Message de bienvenue</h2></div><Toggle checked={welcomeEnabled} onChange={(value) => change(() => setWelcomeEnabled(value))} /></div><div className="mt-6 grid gap-5 sm:grid-cols-2"><FormField label="Salon de bienvenue"><Select options={channels} value={welcomeChannel} onChange={(value) => change(() => setWelcomeChannel(value))} placeholder="Choisir un salon" /></FormField><FormField label="Couleur de l’embed"><div className="flex items-center gap-3"><input aria-label="Couleur de l’embed" type="color" value={color} onChange={(event) => change(() => setColor(event.target.value))} className="h-10 w-12 rounded-lg border border-white/10 bg-transparent" /><code className="text-sm text-dark-300">{color}</code></div></FormField></div><FormField label="Contenu du message" className="mt-5"><textarea value={welcomeMessage} onChange={(event) => change(() => setWelcomeMessage(event.target.value))} className="input-field min-h-28 resize-y" placeholder="Bienvenue {user} sur {server} !" /></FormField><div className="mt-3 flex flex-wrap gap-2">{variables.map((variable) => <button key={variable} onClick={() => insert(variable)} className="rounded-lg border border-white/10 bg-dark-700 px-2.5 py-1.5 text-xs font-semibold text-neon-green hover:border-neon-green/30">{variable}</button>)}</div><div className="mt-6 grid gap-3 border-t border-white/8 pt-5 sm:grid-cols-2"><Row icon={Palette} label="Envoyer comme embed" text="Présentation enrichie dans Discord." checked={embed} onChange={(value) => change(() => setEmbed(value))} /><Row icon={Mail} label="Message privé" text="Prêt à relier à votre bot." checked={dm} onChange={(value) => change(() => setDm(value))} /></div></div>
+      <div className="module-card !cursor-default"><div className="flex items-center justify-between"><div><h2 className="text-xl font-bold">Message de départ</h2><p className="mt-1 text-sm text-dark-300">Un dernier message configurable pour votre communauté.</p></div><Toggle checked={goodbyeEnabled} onChange={(value) => change(() => setGoodbyeEnabled(value))} /></div><div className="mt-5 grid gap-5 sm:grid-cols-2"><FormField label="Salon de départ"><Select options={channels} value={goodbyeChannel} onChange={(value) => change(() => setGoodbyeChannel(value))} placeholder="Choisir un salon" /></FormField><FormField label="Message"><input value={goodbyeMessage} onChange={(event) => change(() => setGoodbyeMessage(event.target.value))} className="input-field" placeholder="Au revoir {user} !" /></FormField></div></div></section>
+      <aside className="xl:col-span-2"><div className="sticky top-24 module-card !cursor-default"><div className="flex items-center gap-2"><Image className="h-4 w-4 text-neon-yellow" /><h2 className="font-bold">Aperçu en direct</h2></div><p className="mt-1 text-xs text-dark-300">Aucun message n’est envoyé pendant la prévisualisation.</p><div className="mt-5 rounded-xl bg-[#313338] p-4"><p className="mb-3 text-xs font-semibold text-[#b5bac1]"># bienvenue</p><div className="flex gap-3"><div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-neon-green font-bold text-dark-900">C</div><div className="min-w-0"><p className="text-sm font-semibold text-white">CIVRAT <span className="rounded bg-[#5865f2] px-1 text-[9px]">BOT</span></p><div className="mt-1 overflow-hidden rounded border-l-4 bg-[#2b2d31]" style={{ borderColor: color }}><div className="p-3"><p className="font-semibold text-white">Bienvenue !</p><p className="mt-1 whitespace-pre-wrap text-sm text-[#dbdee1]">{(welcomeMessage || 'Bienvenue {user} sur {server} !').replace('{user}', '@Nouveau membre').replace('{server}', 'CIVRAT')}</p></div></div></div></div></div><button className="btn-secondary mt-5 inline-flex w-full items-center justify-center gap-2"><Send className="h-4 w-4" />Tester le message</button><p className="mt-2 text-center text-xs text-dark-300">Le test sera disponible via le bot Discord.</p></div></aside></div>
+    <SaveBar isDirty={isDirty} isSaving={isSaving} onSave={save} onReset={reset} error={error} /></div>;
 }
+function Row({ icon: Icon, label, text, checked, onChange }: { icon: typeof UserPlus; label: string; text: string; checked: boolean; onChange: (value: boolean) => void }) { return <div className="flex gap-3 rounded-xl bg-dark-700/50 p-3"><Icon className="mt-0.5 h-4 w-4 text-neon-green" /><div className="flex-1"><p className="text-sm font-semibold">{label}</p><p className="mt-1 text-xs text-dark-300">{text}</p></div><Toggle checked={checked} onChange={onChange} /></div>; }
