@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ShieldAlert } from 'lucide-react';
+import { BadgeAlert, Ban, Link2Off, ShieldAlert, Timer, Trash2 } from 'lucide-react';
 import { ModuleHeader } from '@/components/ui/ModuleHeader';
 import { Toggle } from '@/components/ui/Toggle';
 import { FormField } from '@/components/ui/FormField';
@@ -7,239 +7,21 @@ import { SaveBar } from '@/components/ui/SaveBar';
 import { Select } from '@/components/ui/Select';
 import { useGuild } from '@/context/GuildContext';
 
-const roles = [
-  { value: 'r-1', label: '@Admin' },
-  { value: 'r-2', label: '@Moderator' },
-  { value: 'r-3', label: '@Member' },
-  { value: 'r-4', label: '@Muted' },
-];
-
+const rules = [{ key: 'spam', title: 'Anti-spam', description: 'Détecte les messages répétitifs et les rafales.', badge: 'Messages', icon: BadgeAlert }, { key: 'invite', title: 'Invitations Discord', description: 'Contrôle les invitations discord.gg.', badge: 'Liens', icon: Link2Off }, { key: 'links', title: 'Anti-liens', description: 'Bloque les domaines non autorisés.', badge: 'Prioritaire', icon: Link2Off }, { key: 'mentions', title: 'Spam de mentions', description: 'Limite les mentions dans un message.', badge: 'Limite', icon: BadgeAlert }, { key: 'emoji', title: 'Spam d’emojis', description: 'Limite les emojis dans un message.', badge: 'Limite', icon: BadgeAlert }];
+const actions = [{ value: 'ignore', label: 'Ignorer' }, { value: 'delete', label: 'Supprimer le message' }, { value: 'warn', label: 'Avertir le membre' }, { value: 'timeout', label: 'Timeout automatique' }, { value: 'kick', label: 'Expulser' }, { value: 'ban', label: 'Bannir' }];
 export default function AutoMod() {
-  const { config, updateConfig } = useGuild();
-  const [isDirty, setIsDirty] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const [enabled, setEnabled] = useState(config.automod_enabled);
-  const [maxMentions, setMaxMentions] = useState(config.automod_max_mentions);
-  const [maxEmojis, setMaxEmojis] = useState(config.automod_max_emojis);
-  const [antiSpam, setAntiSpam] = useState(config.automod_anti_spam);
-  const [antiInvite, setAntiInvite] = useState(config.automod_anti_invite);
-  const [antiLink, setAntiLink] = useState(config.automod_anti_link);
-  const [badWordsList, setBadWordsList] = useState<string[]>(config.automod_bad_words);
-  const [newBadWord, setNewBadWord] = useState('');
-  const [punishment, setPunishment] = useState('warn');
-  const [exemptRoles, setExemptRoles] = useState<string[]>([]);
-
-  const handleSave = async () => {
-    try {
-      setIsSaving(true);
-      setError(null);
-      await updateConfig({
-        automod_enabled: enabled,
-        automod_max_mentions: maxMentions,
-        automod_max_emojis: maxEmojis,
-        automod_anti_spam: antiSpam,
-        automod_anti_invite: antiInvite,
-        automod_anti_link: antiLink,
-        automod_bad_words: badWordsList,
-      });
-      setIsDirty(false);
-    } catch (err) {
-      setError('Failed to save automod settings');
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const handleReset = () => {
-    setEnabled(config.automod_enabled);
-    setMaxMentions(config.automod_max_mentions);
-    setMaxEmojis(config.automod_max_emojis);
-    setAntiSpam(config.automod_anti_spam);
-    setAntiInvite(config.automod_anti_invite);
-    setAntiLink(config.automod_anti_link);
-    setBadWordsList(config.automod_bad_words);
-    setPunishment('warn');
-    setExemptRoles([]);
-    setIsDirty(false);
-  };
-
-  const addBadWord = () => {
-    if (newBadWord.trim()) {
-      setBadWordsList([...badWordsList, newBadWord.trim()]);
-      setNewBadWord('');
-      setIsDirty(true);
-    }
-  };
-
-  const removeBadWord = (word: string) => {
-    setBadWordsList(badWordsList.filter((w) => w !== word));
-    setIsDirty(true);
-  };
-
-  return (
-    <div className="space-y-6">
-      <ModuleHeader
-        icon={ShieldAlert}
-        title="Auto Moderation"
-        description="Automatic content moderation settings"
-        toggleEnabled={enabled}
-        onToggle={(checked) => {
-          setEnabled(checked);
-          setIsDirty(true);
-        }}
-      />
-
-      {enabled && (
-        <div className="space-y-6">
-          <div className="module-card !cursor-default p-6">
-            <h3 className="mb-4 text-lg font-semibold">Limits</h3>
-            <div className="space-y-4">
-              <FormField label="Max Mentions per Message">
-                <input
-                  type="number"
-                  value={maxMentions}
-                  onChange={(e) => {
-                    setMaxMentions(parseInt(e.target.value));
-                    setIsDirty(true);
-                  }}
-                  className="w-full rounded border border-slate-300 px-3 py-2"
-                  min="1"
-                />
-              </FormField>
-
-              <FormField label="Max Emojis per Message">
-                <input
-                  type="number"
-                  value={maxEmojis}
-                  onChange={(e) => {
-                    setMaxEmojis(parseInt(e.target.value));
-                    setIsDirty(true);
-                  }}
-                  className="w-full rounded border border-slate-300 px-3 py-2"
-                  min="1"
-                />
-              </FormField>
-            </div>
-          </div>
-
-          <div className="module-card !cursor-default p-6">
-            <h3 className="mb-4 text-lg font-semibold">Filters</h3>
-            <div className="space-y-3">
-              <label className="flex items-center gap-3">
-                <Toggle
-                  checked={antiSpam}
-                  onChange={(checked) => {
-                    setAntiSpam(checked);
-                    setIsDirty(true);
-                  }}
-                />
-                <span className="text-sm">Anti-Spam</span>
-              </label>
-              <label className="flex items-center gap-3">
-                <Toggle
-                  checked={antiInvite}
-                  onChange={(checked) => {
-                    setAntiInvite(checked);
-                    setIsDirty(true);
-                  }}
-                />
-                <span className="text-sm">Anti-Invite</span>
-              </label>
-              <label className="flex items-center gap-3">
-                <Toggle
-                  checked={antiLink}
-                  onChange={(checked) => {
-                    setAntiLink(checked);
-                    setIsDirty(true);
-                  }}
-                />
-                <span className="text-sm">Anti-Link</span>
-              </label>
-            </div>
-          </div>
-
-          <div className="module-card !cursor-default p-6">
-            <h3 className="mb-4 text-lg font-semibold">Bad Words</h3>
-            <div className="space-y-3">
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={newBadWord}
-                  onChange={(e) => setNewBadWord(e.target.value)}
-                  placeholder="Add a bad word..."
-                  className="flex-1 rounded border border-slate-300 px-3 py-2"
-                  onKeyDown={(e) => e.key === 'Enter' && addBadWord()}
-                />
-                <button
-                  onClick={addBadWord}
-                  className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-                >
-                  Add
-                </button>
-              </div>
-
-              <div className="flex flex-wrap gap-2">
-                {badWordsList.map((word) => (
-                  <div
-                    key={word}
-                    className="flex items-center gap-2 rounded bg-slate-100 px-3 py-1"
-                  >
-                    <span className="text-sm">{word}</span>
-                    <button
-                      onClick={() => removeBadWord(word)}
-                      className="text-red-600 hover:text-red-700"
-                    >
-                      x
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="module-card !cursor-default p-6">
-            <h3 className="mb-4 text-lg font-semibold">Settings</h3>
-            <div className="space-y-4">
-              <FormField label="Punishment Action">
-                <Select
-                  options={[
-                    { value: 'warn', label: 'Warning' },
-                    { value: 'mute', label: 'Mute' },
-                    { value: 'kick', label: 'Kick' },
-                  ]}
-                  value={punishment}
-                  onChange={(val) => {
-                    setPunishment(val);
-                    setIsDirty(true);
-                  }}
-                />
-              </FormField>
-
-              <FormField label="Exempt Roles">
-                <Select
-                  options={roles}
-                  value={exemptRoles.join(',')}
-                  onChange={(val) => {
-                    setExemptRoles(val ? [val] : []);
-                    setIsDirty(true);
-                  }}
-                  placeholder="Select exempt roles"
-                />
-              </FormField>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <SaveBar
-        isDirty={isDirty}
-        isSaving={isSaving}
-        onSave={handleSave}
-        onReset={handleReset}
-        error={error}
-      />
-    </div>
-  );
+  const { config, updateConfig } = useGuild(); const [isDirty, setIsDirty] = useState(false); const [isSaving, setIsSaving] = useState(false); const [error, setError] = useState<string | null>(null);
+  const [enabled, setEnabled] = useState(config.automod_enabled); const [antiSpam, setAntiSpam] = useState(config.automod_anti_spam); const [antiInvite, setAntiInvite] = useState(config.automod_anti_invite); const [antiLink, setAntiLink] = useState(config.automod_anti_link); const [maxMentions, setMaxMentions] = useState(config.automod_max_mentions); const [maxEmojis, setMaxEmojis] = useState(config.automod_max_emojis); const [action, setAction] = useState('timeout'); const [duration, setDuration] = useState('10'); const [domains, setDomains] = useState(['youtube.com', 'youtu.be', 'twitch.tv']); const [domain, setDomain] = useState(''); const [discordInvites, setDiscordInvites] = useState(true); const [logActions, setLogActions] = useState(true);
+  const change = (fn: () => void) => { fn(); setIsDirty(true); }; const save = async () => { try { setIsSaving(true); setError(null); await updateConfig({ automod_enabled: enabled, automod_max_mentions: maxMentions, automod_max_emojis: maxEmojis, automod_anti_spam: antiSpam, automod_anti_invite: antiInvite, automod_anti_link: antiLink }); setIsDirty(false); } catch { setError('Impossible d’enregistrer AutoMod.'); } finally { setIsSaving(false); } };
+  const reset = () => { setEnabled(config.automod_enabled); setAntiSpam(config.automod_anti_spam); setAntiInvite(config.automod_anti_invite); setAntiLink(config.automod_anti_link); setMaxMentions(config.automod_max_mentions); setMaxEmojis(config.automod_max_emojis); setIsDirty(false); };
+  const toggle = (key: string, value: boolean) => change(() => { if (key === 'spam') setAntiSpam(value); if (key === 'invite') setAntiInvite(value); if (key === 'links') setAntiLink(value); });
+  return <div className="space-y-6"><ModuleHeader icon={ShieldAlert} title="Centre AutoMod" description="Définissez les protections et visualisez leur comportement avant de les connecter au bot." toggleEnabled={enabled} onToggle={(value) => change(() => setEnabled(value))} />
+    <div className="grid gap-4 md:grid-cols-3"><Status label="Protections actives" value={[antiSpam, antiInvite, antiLink].filter(Boolean).length.toString()} color="text-neon-green" /><Status label="Action par défaut" value={actions.find((item) => item.value === action)?.label ?? '—'} color="text-neon-yellow" /><Status label="Journalisation" value={logActions ? 'Activée' : 'Désactivée'} color="text-info" /></div>
+    <div className="grid gap-6 xl:grid-cols-5"><section className="space-y-6 xl:col-span-3"><div className="module-card !cursor-default"><p className="text-xs font-bold uppercase tracking-widest text-neon-green">Règles de protection</p><h2 className="mt-1 text-xl font-bold">Filtres actifs</h2><div className="mt-5 space-y-2">{rules.map((rule) => { const checked = rule.key === 'spam' ? antiSpam : rule.key === 'invite' ? antiInvite : rule.key === 'links' ? antiLink : true; const Icon = rule.icon; return <div key={rule.key} className="flex items-center gap-4 rounded-xl border border-white/8 bg-dark-700/45 p-4"><span className="grid h-10 w-10 place-items-center rounded-xl bg-neon-green/10 text-neon-green"><Icon className="h-5 w-5" /></span><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><h3 className="font-semibold">{rule.title}</h3><span className="rounded-full border border-white/10 px-2 py-0.5 text-[10px] font-bold uppercase text-dark-300">{rule.badge}</span></div><p className="mt-1 text-xs text-dark-300">{rule.description}</p></div><Toggle checked={checked} onChange={(value) => toggle(rule.key, value)} /></div>; })}</div></div>
+      <div className="module-card !cursor-default"><div className="flex flex-wrap items-center justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-widest text-neon-yellow">Anti-liens</p><h2 className="mt-1 text-xl font-bold">Règle détaillée</h2></div><span className="rounded-full bg-neon-green/10 px-3 py-1 text-xs font-bold text-neon-green">Prête à relier au bot</span></div><div className="mt-6 grid gap-5 sm:grid-cols-2"><FormField label="Action lors d’un lien non autorisé"><Select options={actions} value={action} onChange={(value) => change(() => setAction(value))} /></FormField><FormField label="Durée du timeout (minutes)"><input type="number" min="1" value={duration} onChange={(event) => change(() => setDuration(event.target.value))} disabled={action !== 'timeout'} className="input-field disabled:opacity-40" /></FormField></div><div className="mt-5 grid gap-3 sm:grid-cols-2"><Option label="Contrôler discord.gg" text="Bloque aussi les invitations Discord externes." checked={discordInvites} onChange={(value) => change(() => setDiscordInvites(value))} /><Option label="Journaliser chaque action" text="Envoie un détail dans les logs de modération." checked={logActions} onChange={(value) => change(() => setLogActions(value))} /></div><div className="mt-6 border-t border-white/8 pt-5"><div className="flex items-center justify-between"><h3 className="font-semibold">Domaines autorisés</h3><span className="text-xs text-dark-300">Liste blanche locale</span></div><div className="mt-3 flex gap-2"><input value={domain} onChange={(event) => setDomain(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter' && domain.trim()) change(() => { setDomains([...domains, domain.trim()]); setDomain(''); }); }} className="input-field" placeholder="ex. monsite.fr" /><button onClick={() => domain.trim() && change(() => { setDomains([...domains, domain.trim()]); setDomain(''); })} className="btn-secondary !px-4">Ajouter</button></div><div className="mt-3 flex flex-wrap gap-2">{domains.map((item) => <button onClick={() => change(() => setDomains(domains.filter((value) => value !== item)))} key={item} className="rounded-lg border border-white/10 bg-dark-700 px-2.5 py-1.5 text-xs text-dark-300 hover:border-error/40 hover:text-error">{item} ×</button>)}</div></div></div></section>
+      <aside className="xl:col-span-2"><div className="sticky top-24 module-card !cursor-default"><div className="flex items-center gap-2"><Trash2 className="h-4 w-4 text-neon-yellow" /><h2 className="font-bold">Aperçu de l’action</h2></div><div className="mt-5 rounded-xl bg-[#313338] p-4"><p className="text-xs text-[#b5bac1]"># moderation-logs</p><div className="mt-3 rounded-md border-l-4 border-[#ed4245] bg-[#2b2d31] p-3"><p className="text-sm font-bold text-white">Lien non autorisé détecté</p><p className="mt-2 text-xs leading-5 text-[#dbdee1]">Membre : @Utilisateur<br />Lien : example.com<br />Action : {actions.find((item) => item.value === action)?.label}{action === 'timeout' ? ` (${duration || 10} min)` : ''}</p></div></div><div className="mt-5 space-y-3 border-t border-white/8 pt-4"><Limit label="Mentions maximum" value={maxMentions} onChange={(value) => change(() => setMaxMentions(value))} /><Limit label="Emojis maximum" value={maxEmojis} onChange={(value) => change(() => setMaxEmojis(value))} /><p className="rounded-lg bg-neon-yellow/8 p-3 text-xs leading-5 text-dark-300">Les exclusions administrateurs, rôles et salons sont affichées comme prêtes à être connectées : elles ne sont pas encore exposées par les données actuelles.</p></div></div></aside></div>
+    <SaveBar isDirty={isDirty} isSaving={isSaving} onSave={save} onReset={reset} error={error} /></div>;
 }
+function Status({ label, value, color }: { label: string; value: string; color: string }) { return <div className="module-card !cursor-default"><p className="text-sm text-dark-300">{label}</p><strong className={`mt-2 block truncate text-2xl ${color}`}>{value}</strong></div>; }
+function Option({ label, text, checked, onChange }: { label: string; text: string; checked: boolean; onChange: (value: boolean) => void }) { return <div className="flex gap-3 rounded-xl bg-dark-700/50 p-3"><Toggle checked={checked} onChange={onChange} /><div><p className="text-sm font-semibold">{label}</p><p className="mt-1 text-xs text-dark-300">{text}</p></div></div>; }
+function Limit({ label, value, onChange }: { label: string; value: number; onChange: (value: number) => void }) { return <label className="flex items-center justify-between gap-3 text-sm font-semibold"><span>{label}</span><input type="number" min="1" value={value} onChange={(event) => onChange(Number(event.target.value) || 1)} className="w-20 rounded-lg border border-white/10 bg-dark-700 px-2 py-1.5 text-right" /></label>; }
