@@ -83,7 +83,7 @@ export default function Backup() {
       />
 
       <div className="space-y-6">
-        <div className="rounded-lg border border-slate-200 bg-white p-6">
+        <div className="module-card !cursor-default p-6">
           <h3 className="mb-4 text-lg font-semibold">Backup Management</h3>
           <div className="mb-6 flex gap-3">
             <button onClick={handleCreateBackup} className="btn-primary">
@@ -103,12 +103,12 @@ export default function Backup() {
           </label>
         </div>
 
-        <div className="rounded-lg border border-slate-200 bg-white p-6">
+        <div className="module-card !cursor-default p-6">
           <h3 className="mb-4 text-lg font-semibold">Backup List</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-slate-200">
+                <tr className="border-b border-white/10">
                   <th className="px-4 py-2 text-left font-medium">
                     <input type="checkbox" className="h-4 w-4 rounded border-slate-300" />
                   </th>
@@ -121,7 +121,7 @@ export default function Backup() {
               </thead>
               <tbody>
                 {mockBackups.map((backup) => (
-                  <tr key={backup.id} className="border-b border-slate-100 hover:bg-slate-50">
+                  <tr key={backup.id} className="border-b border-white/5 hover:bg-white/5">
                     <td className="px-4 py-2">
                       <input
                         type="checkbox"
@@ -131,7 +131,7 @@ export default function Backup() {
                       />
                     </td>
                     <td className="px-4 py-2 font-medium">{backup.name}</td>
-                    <td className="px-4 py-2 text-slate-600">{backup.date}</td>
+                    <td className="px-4 py-2 text-dark-300">{backup.date}</td>
                     <td className="px-4 py-2">{backup.size}</td>
                     <td className="px-4 py-2">
                       <span className="inline-block rounded bg-green-100 px-2 py-1 text-xs font-medium text-green-800">

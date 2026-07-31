@@ -93,7 +93,7 @@ export default function AutoMod() {
 
       {enabled && (
         <div className="space-y-6">
-          <div className="rounded-lg border border-slate-200 bg-white p-6">
+          <div className="module-card !cursor-default p-6">
             <h3 className="mb-4 text-lg font-semibold">Limits</h3>
             <div className="space-y-4">
               <FormField label="Max Mentions per Message">
@@ -124,7 +124,7 @@ export default function AutoMod() {
             </div>
           </div>
 
-          <div className="rounded-lg border border-slate-200 bg-white p-6">
+          <div className="module-card !cursor-default p-6">
             <h3 className="mb-4 text-lg font-semibold">Filters</h3>
             <div className="space-y-3">
               <label className="flex items-center gap-3">
@@ -160,7 +160,7 @@ export default function AutoMod() {
             </div>
           </div>
 
-          <div className="rounded-lg border border-slate-200 bg-white p-6">
+          <div className="module-card !cursor-default p-6">
             <h3 className="mb-4 text-lg font-semibold">Bad Words</h3>
             <div className="space-y-3">
               <div className="flex gap-2">
@@ -199,7 +199,7 @@ export default function AutoMod() {
             </div>
           </div>
 
-          <div className="rounded-lg border border-slate-200 bg-white p-6">
+          <div className="module-card !cursor-default p-6">
             <h3 className="mb-4 text-lg font-semibold">Settings</h3>
             <div className="space-y-4">
               <FormField label="Punishment Action">

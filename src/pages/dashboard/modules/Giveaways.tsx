@@ -72,7 +72,7 @@ export default function Giveaways() {
       />
 
       <div className="space-y-6">
-        <div className="rounded-lg border border-slate-200 bg-white p-6">
+        <div className="module-card !cursor-default p-6">
           <h3 className="mb-4 text-lg font-semibold">Create Giveaway</h3>
           <div className="space-y-4">
             <FormField label="Prize">
@@ -128,12 +128,12 @@ export default function Giveaways() {
           </div>
         </div>
 
-        <div className="rounded-lg border border-slate-200 bg-white p-6">
+        <div className="module-card !cursor-default p-6">
           <h3 className="mb-4 text-lg font-semibold">Active Giveaways</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-slate-200">
+                <tr className="border-b border-white/10">
                   <th className="px-4 py-2 text-left font-medium">Prize</th>
                   <th className="px-4 py-2 text-left font-medium">Winners</th>
                   <th className="px-4 py-2 text-left font-medium">Participants</th>
@@ -142,11 +142,11 @@ export default function Giveaways() {
               </thead>
               <tbody>
                 {mockGiveaways.map((giveaway) => (
-                  <tr key={giveaway.id} className="border-b border-slate-100 hover:bg-slate-50">
+                  <tr key={giveaway.id} className="border-b border-white/5 hover:bg-white/5">
                     <td className="px-4 py-2 font-medium">{giveaway.prize}</td>
                     <td className="px-4 py-2">{giveaway.winners}</td>
                     <td className="px-4 py-2">{giveaway.participants}</td>
-                    <td className="px-4 py-2 text-slate-600">{giveaway.endsIn}</td>
+                    <td className="px-4 py-2 text-dark-300">{giveaway.endsIn}</td>
                   </tr>
                 ))}
               </tbody>
@@ -154,12 +154,12 @@ export default function Giveaways() {
           </div>
         </div>
 
-        <div className="rounded-lg border border-slate-200 bg-white p-6">
+        <div className="module-card !cursor-default p-6">
           <h3 className="mb-4 text-lg font-semibold">Giveaway History</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-slate-200">
+                <tr className="border-b border-white/10">
                   <th className="px-4 py-2 text-left font-medium">Prize</th>
                   <th className="px-4 py-2 text-left font-medium">Winners</th>
                   <th className="px-4 py-2 text-left font-medium">Participants</th>
@@ -168,11 +168,11 @@ export default function Giveaways() {
               </thead>
               <tbody>
                 {mockHistory.map((item) => (
-                  <tr key={item.id} className="border-b border-slate-100 hover:bg-slate-50">
+                  <tr key={item.id} className="border-b border-white/5 hover:bg-white/5">
                     <td className="px-4 py-2 font-medium">{item.prize}</td>
                     <td className="px-4 py-2">{item.winners}</td>
                     <td className="px-4 py-2">{item.participants}</td>
-                    <td className="px-4 py-2 text-slate-500">{item.completedAt}</td>
+                    <td className="px-4 py-2 text-dark-300">{item.completedAt}</td>
                   </tr>
                 ))}
               </tbody>

@@ -84,7 +84,7 @@ export default function Moderation() {
       />
 
       <div className="space-y-6">
-        <div className="rounded-lg border border-slate-200 bg-white p-6">
+        <div className="module-card !cursor-default p-6">
           <h3 className="mb-4 text-lg font-semibold">Search & Filter</h3>
           <div className="grid gap-4 md:grid-cols-2">
             <FormField label="Search User or Reason">
@@ -113,12 +113,12 @@ export default function Moderation() {
           </div>
         </div>
 
-        <div className="rounded-lg border border-slate-200 bg-white p-6">
+        <div className="module-card !cursor-default p-6">
           <h3 className="mb-4 text-lg font-semibold">Moderation History</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-slate-200">
+                <tr className="border-b border-white/10">
                   <th className="px-4 py-2 text-left font-medium">User</th>
                   <th className="px-4 py-2 text-left font-medium">Action</th>
                   <th className="px-4 py-2 text-left font-medium">Moderator</th>
@@ -128,7 +128,7 @@ export default function Moderation() {
               </thead>
               <tbody>
                 {filteredActions.map((action) => (
-                  <tr key={action.id} className="border-b border-slate-100 hover:bg-slate-50">
+                  <tr key={action.id} className="border-b border-white/5 hover:bg-white/5">
                     <td className="px-4 py-2 font-medium">{action.user}</td>
                     <td className="px-4 py-2">
                       <span
@@ -138,8 +138,8 @@ export default function Moderation() {
                       </span>
                     </td>
                     <td className="px-4 py-2">{action.moderator}</td>
-                    <td className="px-4 py-2 text-slate-600">{action.reason}</td>
-                    <td className="px-4 py-2 text-slate-500">{action.timestamp}</td>
+                    <td className="px-4 py-2 text-dark-300">{action.reason}</td>
+                    <td className="px-4 py-2 text-dark-300">{action.timestamp}</td>
                   </tr>
                 ))}
               </tbody>
@@ -147,16 +147,16 @@ export default function Moderation() {
           </div>
 
           {filteredActions.length === 0 && (
-            <div className="py-8 text-center text-slate-500">
+            <div className="py-8 text-center text-dark-300">
               No moderation actions found matching your search.
             </div>
           )}
         </div>
 
-        <div className="rounded-lg border border-slate-200 bg-white p-6">
+        <div className="module-card !cursor-default p-6">
           <h3 className="mb-4 text-lg font-semibold">Quick Actions</h3>
           <div className="grid gap-3 md:grid-cols-2">
-            <div className="rounded border border-slate-200 p-4">
+            <div className="rounded border border-white/10 p-4">
               <label className="block text-sm font-medium mb-2">Lookup User</label>
               <input
                 type="text"
@@ -168,7 +168,7 @@ export default function Moderation() {
               </button>
             </div>
 
-            <div className="rounded border border-slate-200 p-4">
+            <div className="rounded border border-white/10 p-4">
               <label className="block text-sm font-medium mb-2">Mass Action</label>
               <select className="w-full rounded border border-slate-300 px-3 py-2 mb-2">
                 <option>Select action</option>

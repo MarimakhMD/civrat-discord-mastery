@@ -84,7 +84,7 @@ export default function Logs() {
 
       {enabled && (
         <div className="space-y-6">
-          <div className="rounded-lg border border-slate-200 bg-white p-6">
+          <div className="module-card !cursor-default p-6">
             <h3 className="mb-4 text-lg font-semibold">Log Channel</h3>
             <FormField label="Channel">
               <Select
@@ -99,7 +99,7 @@ export default function Logs() {
             </FormField>
           </div>
 
-          <div className="rounded-lg border border-slate-200 bg-white p-6">
+          <div className="module-card !cursor-default p-6">
             <h3 className="mb-4 text-lg font-semibold">Log Events</h3>
             <div className="grid gap-4 md:grid-cols-2">
               {logEvents.map((event) => (

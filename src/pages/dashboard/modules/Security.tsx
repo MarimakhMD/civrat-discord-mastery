@@ -74,7 +74,7 @@ export default function Security() {
 
       {enabled && (
         <div className="space-y-6">
-          <div className="rounded-lg border border-slate-200 bg-white p-6">
+          <div className="module-card !cursor-default p-6">
             <h3 className="mb-4 text-lg font-semibold">Threat Protection</h3>
             <div className="space-y-3">
               <label className="flex items-center gap-3">
@@ -100,7 +100,7 @@ export default function Security() {
             </div>
           </div>
 
-          <div className="rounded-lg border border-slate-200 bg-white p-6">
+          <div className="module-card !cursor-default p-6">
             <h3 className="mb-4 text-lg font-semibold">Quarantine</h3>
             <FormField label="Quarantine Role">
               <Select
@@ -115,7 +115,7 @@ export default function Security() {
             </FormField>
           </div>
 
-          <div className="rounded-lg border border-slate-200 bg-white p-6">
+          <div className="module-card !cursor-default p-6">
             <h3 className="mb-4 text-lg font-semibold">Whitelist Roles</h3>
             <div className="space-y-2">
               {roles.map((role) => (
@@ -139,7 +139,7 @@ export default function Security() {
             </div>
           </div>
 
-          <div className="rounded-lg border border-slate-200 bg-white p-6">
+          <div className="module-card !cursor-default p-6">
             <h3 className="mb-4 text-lg font-semibold">Recent Security Events</h3>
             <div className="space-y-2">
               {mockSecurityEvents.map((event) => (
@@ -149,7 +149,7 @@ export default function Security() {
                 >
                   <div>
                     <p className="font-medium text-slate-900">{event.type}</p>
-                    <p className="text-sm text-slate-600">{event.time}</p>
+                    <p className="text-sm text-dark-300">{event.time}</p>
                   </div>
                   <span
                     className={`rounded px-2 py-1 text-xs font-medium ${

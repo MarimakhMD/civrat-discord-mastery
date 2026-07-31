@@ -67,7 +67,7 @@ export default function EmbedBuilder() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="space-y-4">
-          <div className="rounded-lg border border-slate-200 bg-white p-6">
+          <div className="module-card !cursor-default p-6">
             <h3 className="mb-4 text-lg font-semibold">Embed Content</h3>
             <div className="space-y-4">
               <FormField label="Title">
@@ -106,7 +106,7 @@ export default function EmbedBuilder() {
                     }}
                     className="h-10 w-16 rounded border border-slate-300"
                   />
-                  <code className="text-sm text-slate-600">{color}</code>
+                  <code className="text-sm text-dark-300">{color}</code>
                 </div>
               </FormField>
 
@@ -138,7 +138,7 @@ export default function EmbedBuilder() {
             </div>
           </div>
 
-          <div className="rounded-lg border border-slate-200 bg-white p-6">
+          <div className="module-card !cursor-default p-6">
             <h3 className="mb-4 text-lg font-semibold">Fields</h3>
             <div className="mb-4 space-y-3">
               <div className="flex gap-2">
@@ -170,7 +170,7 @@ export default function EmbedBuilder() {
                 <div key={idx} className="flex items-start justify-between rounded bg-slate-100 p-3">
                   <div className="flex-1">
                     <p className="font-medium text-sm">{field.name}</p>
-                    <p className="text-xs text-slate-600">{field.value}</p>
+                    <p className="text-xs text-dark-300">{field.value}</p>
                   </div>
                   <button
                     onClick={() => removeField(idx)}
@@ -184,7 +184,7 @@ export default function EmbedBuilder() {
           </div>
         </div>
 
-        <div className="rounded-lg border border-slate-200 bg-white p-6">
+        <div className="module-card !cursor-default p-6">
           <h3 className="mb-4 text-lg font-semibold">Preview</h3>
           <div
             className="rounded-lg border-l-4 p-4 text-white"

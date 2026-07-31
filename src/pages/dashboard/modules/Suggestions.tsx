@@ -74,7 +74,7 @@ export default function Suggestions() {
 
       {enabled && (
         <div className="space-y-6">
-          <div className="rounded-lg border border-slate-200 bg-white p-6">
+          <div className="module-card !cursor-default p-6">
             <h3 className="mb-4 text-lg font-semibold">Configuration</h3>
             <FormField label="Suggestions Channel">
               <Select
@@ -89,7 +89,7 @@ export default function Suggestions() {
             </FormField>
           </div>
 
-          <div className="rounded-lg border border-slate-200 bg-white p-6">
+          <div className="module-card !cursor-default p-6">
             <h3 className="mb-4 text-lg font-semibold">Suggestions</h3>
 
             <div className="mb-4 flex gap-2">
@@ -100,7 +100,7 @@ export default function Suggestions() {
                   className={`rounded px-3 py-1 text-sm font-medium capitalize ${
                     filterStatus === status
                       ? 'bg-blue-600 text-white'
-                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                      : 'bg-slate-100 text-white hover:bg-slate-200'
                   }`}
                 >
                   {status}
@@ -112,12 +112,12 @@ export default function Suggestions() {
               {filteredSuggestions.map((suggestion) => (
                 <div
                   key={suggestion.id}
-                  className="rounded border border-slate-200 p-4 hover:bg-slate-50"
+                  className="rounded border border-white/10 p-4 hover:bg-white/5"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <p className="font-medium">{suggestion.text}</p>
-                      <p className="mt-1 text-sm text-slate-500">by {suggestion.user}</p>
+                      <p className="mt-1 text-sm text-dark-300">by {suggestion.user}</p>
                     </div>
                     <div className="flex items-center gap-3">
                       <span

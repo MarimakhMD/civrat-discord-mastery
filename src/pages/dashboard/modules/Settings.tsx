@@ -60,7 +60,7 @@ export default function Settings() {
       />
 
       <div className="space-y-6">
-        <div className="rounded-lg border border-slate-200 bg-white p-6">
+        <div className="module-card !cursor-default p-6">
           <h3 className="mb-4 text-lg font-semibold">Bot Configuration</h3>
           <div className="space-y-4">
             <FormField label="Command Prefix">
@@ -99,7 +99,7 @@ export default function Settings() {
                   }}
                   className="h-10 w-20 rounded border border-slate-300"
                 />
-                <code className="text-sm text-slate-600">{embedColor}</code>
+                <code className="text-sm text-dark-300">{embedColor}</code>
               </div>
             </FormField>
 
@@ -121,7 +121,7 @@ export default function Settings() {
           </div>
         </div>
 
-        <div className="rounded-lg border border-slate-200 bg-white p-6">
+        <div className="module-card !cursor-default p-6">
           <h3 className="mb-4 text-lg font-semibold">Features</h3>
           <label className="flex items-center gap-3">
             <Toggle
@@ -135,7 +135,7 @@ export default function Settings() {
           </label>
         </div>
 
-        <div className="rounded-lg border border-slate-200 bg-white p-6">
+        <div className="module-card !cursor-default p-6">
           <h3 className="mb-4 text-lg font-semibold">Preview</h3>
           <div
             className="rounded p-4 text-white"

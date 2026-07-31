@@ -19,7 +19,7 @@ export function TopBar() {
   ];
 
   return (
-    <header className="glass fixed top-0 right-0 left-0 lg:left-60 h-16 border-b border-white/10 z-30">
+    <header className="glass fixed top-0 right-0 left-0 lg:left-16 h-16 border-b border-white/10 z-30">
       <div className="h-full px-4 lg:px-6 flex items-center justify-between">
         <div className="flex items-center gap-2 text-sm">
           {breadcrumbs.map((crumb, i) => (

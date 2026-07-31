@@ -100,7 +100,7 @@ export default function XPLevels() {
 
       {enabled && (
         <div className="space-y-6">
-          <div className="rounded-lg border border-slate-200 bg-white p-6">
+          <div className="module-card !cursor-default p-6">
             <h3 className="mb-4 text-lg font-semibold">XP Settings</h3>
             <div className="space-y-4">
               <FormField label="XP Per Message">
@@ -143,7 +143,7 @@ export default function XPLevels() {
             </div>
           </div>
 
-          <div className="rounded-lg border border-slate-200 bg-white p-6">
+          <div className="module-card !cursor-default p-6">
             <h3 className="mb-4 text-lg font-semibold">Level Roles</h3>
             <div className="mb-4 space-y-3">
               <div className="flex gap-2">
@@ -173,7 +173,7 @@ export default function XPLevels() {
                 {levelRoles.map((lr, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center justify-between rounded bg-slate-100 px-3 py-2"
+                    className="flex items-center justify-between rounded-xl border border-white/10 bg-dark-700/60 px-3 py-2"
                   >
                     <span className="text-sm">
                       Level {lr.level} → {lr.role_id}
@@ -190,12 +190,12 @@ export default function XPLevels() {
             </div>
           </div>
 
-          <div className="rounded-lg border border-slate-200 bg-white p-6">
+          <div className="module-card !cursor-default p-6">
             <h3 className="mb-4 text-lg font-semibold">Leaderboard Preview</h3>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-slate-200">
+                  <tr className="border-b border-white/10">
                     <th className="px-4 py-2 text-left font-medium">Rank</th>
                     <th className="px-4 py-2 text-left font-medium">User</th>
                     <th className="px-4 py-2 text-left font-medium">XP</th>
@@ -204,7 +204,7 @@ export default function XPLevels() {
                 </thead>
                 <tbody>
                   {mockLeaderboard.map((entry) => (
-                    <tr key={entry.rank} className="border-b border-slate-100 hover:bg-slate-50">
+                    <tr key={entry.rank} className="border-b border-white/5 hover:bg-white/5">
                       <td className="px-4 py-2 font-medium">#{entry.rank}</td>
                       <td className="px-4 py-2">{entry.user}</td>
                       <td className="px-4 py-2">{entry.xp.toLocaleString()}</td>

@@ -78,7 +78,7 @@ export default function Welcome() {
       />
 
       <div className="space-y-6">
-        <div className="rounded-lg border border-slate-200 bg-white p-6">
+        <div className="module-card !cursor-default p-6">
           <div className="mb-4 flex items-center justify-between">
             <h3 className="text-lg font-semibold">Welcome Message</h3>
             <Toggle checked={welcomeEnabled} onChange={handleWelcomeToggle} />
@@ -110,15 +110,15 @@ export default function Welcome() {
                 />
               </FormField>
 
-              <div className="rounded bg-slate-100 p-4">
-                <p className="text-sm font-semibold text-slate-700">Preview</p>
+              <div className="rounded-xl border border-white/10 bg-dark-700/60 p-4">
+                <p className="text-sm font-semibold text-white">Preview</p>
                 <p className="mt-2 text-sm">{welcomeMessage || 'No message set'}</p>
               </div>
             </div>
           )}
         </div>
 
-        <div className="rounded-lg border border-slate-200 bg-white p-6">
+        <div className="module-card !cursor-default p-6">
           <div className="mb-4 flex items-center justify-between">
             <h3 className="text-lg font-semibold">Goodbye Message</h3>
             <Toggle checked={goodbyeEnabled} onChange={handleGoodbyeToggle} />
@@ -150,8 +150,8 @@ export default function Welcome() {
                 />
               </FormField>
 
-              <div className="rounded bg-slate-100 p-4">
-                <p className="text-sm font-semibold text-slate-700">Preview</p>
+              <div className="rounded-xl border border-white/10 bg-dark-700/60 p-4">
+                <p className="text-sm font-semibold text-white">Preview</p>
                 <p className="mt-2 text-sm">{goodbyeMessage || 'No message set'}</p>
               </div>
             </div>

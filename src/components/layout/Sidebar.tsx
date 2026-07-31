@@ -29,6 +29,7 @@ const NAV_ITEMS = [
 
 export function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const location = useLocation();
   const { user, logout } = useAuth();
   const isActive = (module: string) => location.pathname.includes(`/dashboard/${module}`);
@@ -40,31 +41,31 @@ export function Sidebar() {
           <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-neon-green to-neon-yellow flex items-center justify-center neon-glow">
             <Crown className="w-6 h-6 text-dark-900" />
           </div>
-          <span className="text-xl font-bold text-neon-green neon-text tracking-wider">CIVRAT</span>
+          {(isExpanded || isOpen) && <span className="text-xl font-bold text-neon-green neon-text tracking-wider">CIVRAT</span>}
         </Link>
       </div>
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
         {NAV_ITEMS.map(({ icon: Icon, label, module }) => (
           <Link key={module} to={`/dashboard/${module}`} onClick={() => setIsOpen(false)}
             className={isActive(module) ? 'sidebar-link-active' : 'sidebar-link'}>
-            <Icon className="w-5 h-5 shrink-0" /><span className="text-sm">{label}</span>
+            <Icon className="w-5 h-5 shrink-0" /><span className={cn("text-sm whitespace-nowrap transition-opacity", (isExpanded || isOpen) ? "opacity-100" : "hidden opacity-0")}>{label}</span>
           </Link>
         ))}
       </nav>
-      <div className="px-3 py-3 border-t border-white/10">
+      {(isExpanded || isOpen) && <div className="px-3 py-3 border-t border-white/10">
         <div className="glass rounded-lg p-3 mb-3">
           <div className="flex items-center gap-2 mb-1"><Crown className="w-4 h-4 text-neon-yellow" /><span className="text-xs font-semibold text-neon-yellow">Premium</span></div>
           <p className="text-[11px] text-dark-300">Unlock all features</p>
         </div>
-      </div>
+      </div>}
       {user && (
         <div className="px-3 py-3 border-t border-white/10">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-9 h-9 rounded-full bg-dark-500 flex items-center justify-center text-neon-green font-bold text-sm border border-neon-green/30">{user.username.charAt(0)}</div>
-            <div className="flex-1 min-w-0"><p className="text-sm font-semibold text-white truncate">{user.username}</p><p className="text-xs text-dark-300">#{user.discriminator}</p></div>
+            {(isExpanded || isOpen) && <div className="flex-1 min-w-0"><p className="text-sm font-semibold text-white truncate">{user.username}</p><p className="text-xs text-dark-300">#{user.discriminator}</p></div>}
           </div>
           <button onClick={() => { logout(); setIsOpen(false); }} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-dark-300 hover:text-error hover:bg-error/10 transition-colors">
-            <LogOut className="w-4 h-4" />Logout
+            <LogOut className="w-4 h-4" />{(isExpanded || isOpen) && "Logout"}
           </button>
         </div>
       )}
@@ -77,7 +78,7 @@ export function Sidebar() {
         {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
       </button>
       {isOpen && <div className="lg:hidden fixed inset-0 bg-black/60 z-40" onClick={() => setIsOpen(false)} />}
-      <aside className="hidden lg:flex flex-col w-60 bg-dark-800/80 backdrop-blur-xl border-r border-white/10 fixed h-screen left-0 top-0 z-40">{content}</aside>
+      <aside onMouseEnter={() => setIsExpanded(true)} onMouseLeave={() => setIsExpanded(false)} className={cn("hidden lg:flex flex-col bg-dark-800/90 backdrop-blur-xl border-r border-white/10 fixed h-screen left-0 top-0 z-40 overflow-hidden transition-[width] duration-300", isExpanded ? "w-60" : "w-16")}>{content}</aside>
       <aside className={cn('lg:hidden flex flex-col fixed h-screen w-60 left-0 top-0 z-40 bg-dark-800/95 backdrop-blur-xl border-r border-white/10 transition-transform duration-300', isOpen ? 'translate-x-0' : '-translate-x-full')}>{content}</aside>
     </>
   );

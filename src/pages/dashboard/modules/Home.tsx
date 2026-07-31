@@ -47,13 +47,13 @@ export default function Home() {
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <div className="rounded-lg border border-slate-200 bg-white p-6">
+          <div className="module-card !cursor-default p-6">
             <h2 className="mb-4 text-lg font-semibold">Activity Feed</h2>
             <div className="space-y-3">
               {mockActivityFeed.map((event) => (
                 <div
                   key={event.id}
-                  className="flex items-center justify-between border-b border-slate-100 pb-3 last:border-0"
+                  className="flex items-center justify-between border-b border-white/5 pb-3 last:border-0"
                 >
                   <div className="flex items-center gap-3">
                     <div className="h-2 w-2 rounded-full bg-blue-600" />
@@ -61,10 +61,10 @@ export default function Home() {
                       <p className="text-sm font-medium capitalize">
                         {event.type.replace('_', ' ')}
                       </p>
-                      <p className="text-xs text-slate-500">{event.user}</p>
+                      <p className="text-xs text-dark-300">{event.user}</p>
                     </div>
                   </div>
-                  <span className="text-xs text-slate-500">{event.time}</span>
+                  <span className="text-xs text-dark-300">{event.time}</span>
                 </div>
               ))}
             </div>
@@ -72,7 +72,7 @@ export default function Home() {
         </div>
 
         <div className="space-y-4">
-          <div className="rounded-lg border border-slate-200 bg-white p-6">
+          <div className="module-card !cursor-default p-6">
             <h2 className="mb-4 text-lg font-semibold">Quick Actions</h2>
             <div className="space-y-2">
               {quickActions.map((action) => (
@@ -86,7 +86,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="rounded-lg border border-slate-200 bg-white p-6">
+          <div className="module-card !cursor-default p-6">
             <h2 className="mb-4 text-lg font-semibold">Module Status</h2>
             <div className="space-y-2">
               {moduleStatus.map((mod) => (

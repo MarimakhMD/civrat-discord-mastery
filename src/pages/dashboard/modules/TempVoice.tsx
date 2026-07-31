@@ -65,7 +65,7 @@ export default function TempVoice() {
 
       {enabled && (
         <div className="space-y-6">
-          <div className="rounded-lg border border-slate-200 bg-white p-6">
+          <div className="module-card !cursor-default p-6">
             <h3 className="mb-4 text-lg font-semibold">Configuration</h3>
             <div className="space-y-4">
               <FormField label="Voice Category">
@@ -95,7 +95,7 @@ export default function TempVoice() {
                   placeholder="{user}'s Voice"
                   className="w-full rounded border border-slate-300 px-3 py-2"
                 />
-                <p className="mt-1 text-xs text-slate-500">Use {'{user}'} for username</p>
+                <p className="mt-1 text-xs text-dark-300">Use {'{user}'} for username</p>
               </FormField>
 
               <FormField label="Max Channels">
@@ -124,17 +124,17 @@ export default function TempVoice() {
             </div>
           </div>
 
-          <div className="rounded-lg border border-slate-200 bg-white p-6">
+          <div className="module-card !cursor-default p-6">
             <h3 className="mb-4 text-lg font-semibold">Active Channels</h3>
             <div className="space-y-2">
               {mockChannels.map((channel) => (
                 <div
                   key={channel.id}
-                  className="flex items-center justify-between rounded border border-slate-200 p-3 hover:bg-slate-50"
+                  className="flex items-center justify-between rounded border border-white/10 p-3 hover:bg-white/5"
                 >
                   <div>
                     <p className="font-medium">{channel.name}</p>
-                    <p className="text-sm text-slate-600">Created by {channel.createdBy}</p>
+                    <p className="text-sm text-dark-300">Created by {channel.createdBy}</p>
                   </div>
                   <div className="text-right">
                     <p className="font-bold text-blue-600">{channel.users} users</p>

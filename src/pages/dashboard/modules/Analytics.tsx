@@ -74,7 +74,7 @@ export default function Analytics() {
         <StatCard icon={BarChart3} label="Module Usage" value="94.2%" trend={{ value: 2.1, isPositive: true }} />
       </div>
 
-      <div className="rounded-lg border border-slate-200 bg-white p-6">
+      <div className="module-card !cursor-default p-6">
         <div className="mb-4 flex items-center justify-between">
           <h3 className="text-lg font-semibold">Member Growth</h3>
           <select
@@ -105,7 +105,7 @@ export default function Analytics() {
         </ResponsiveContainer>
       </div>
 
-      <div className="rounded-lg border border-slate-200 bg-white p-6">
+      <div className="module-card !cursor-default p-6">
         <h3 className="mb-4 text-lg font-semibold">Messages (24h)</h3>
         <ResponsiveContainer width="100%" height={300}>
           <AreaChart data={messageData}>
@@ -124,7 +124,7 @@ export default function Analytics() {
         </ResponsiveContainer>
       </div>
 
-      <div className="rounded-lg border border-slate-200 bg-white p-6">
+      <div className="module-card !cursor-default p-6">
         <h3 className="mb-4 text-lg font-semibold">Top Commands</h3>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={commandData}>
@@ -137,7 +137,7 @@ export default function Analytics() {
         </ResponsiveContainer>
       </div>
 
-      <div className="rounded-lg border border-slate-200 bg-white p-6">
+      <div className="module-card !cursor-default p-6">
         <h3 className="mb-4 text-lg font-semibold">Module Usage</h3>
         <ResponsiveContainer width="100%" height={300}>
           <PieChart>

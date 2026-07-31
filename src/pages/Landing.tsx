@@ -1,104 +1,33 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Shield, Users, Zap, Ticket, AlertTriangle, Gift, Lock, BarChart3, ArrowRight, MessageCircle } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { AlertTriangle, ArrowRight, BarChart3, Bot, Check, Gift, Globe2, Lock, MessageCircle, Shield, Ticket, Users, Zap } from 'lucide-react';
 
-const features = [
-  { icon: Shield, title: 'Auto Moderation', description: 'Intelligent content filtering and spam prevention' },
-  { icon: Users, title: 'Welcome System', description: 'Customizable welcome messages and member roles' },
-  { icon: Zap, title: 'XP & Levels', description: 'Gamification system to boost member engagement' },
-  { icon: Ticket, title: 'Ticket System', description: 'Professional support ticket management' },
-  { icon: AlertTriangle, title: 'Anti-Nuke Protection', description: 'Advanced protection against raids and attacks' },
-  { icon: Gift, title: 'Giveaways', description: 'Easy to set up and manage server giveaways' },
-  { icon: Lock, title: 'Captcha Verification', description: 'Prevent bots with advanced verification' },
-  { icon: BarChart3, title: 'Analytics', description: 'Real-time insights into server activity' },
-];
-
-const stats = [{ label: 'Servers', value: '50K+' }, { label: 'Users', value: '2M+' }, { label: 'Commands', value: '100+' }];
-
-const containerVariants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } };
-const itemVariants = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
+const BOT_INVITE = 'https://discord.com/oauth2/authorize?client_id=1478877109538652371&permissions=8&integration_type=0&scope=bot';
+type Locale = 'fr' | 'en';
+const copy = {
+  fr: { features: 'Fonctionnalités', documentation: 'Documentation', support: 'Support Discord', login: 'Connexion Discord', add: 'Ajouter le bot', badge: 'LA GESTION DISCORD, RÉINVENTÉE', titleA: 'Votre communauté.', titleB: 'Votre contrôle.', description: 'Une expérience de gestion Discord rapide, élégante et pensée pour les communautés qui veulent aller plus loin.', explore: 'Découvrir le dashboard', trusted: 'Tout ce dont votre serveur a besoin', stats: [['Serveurs', '50K+'], ['Membres protégés', '2M+'], ['Modules', '20+']], product: 'Produit', community: 'Communauté', legal: 'Légal', coming: 'À venir', rights: 'Tous droits réservés.' },
+  en: { features: 'Features', documentation: 'Documentation', support: 'Discord Support', login: 'Discord Login', add: 'Add the bot', badge: 'DISCORD MANAGEMENT, REIMAGINED', titleA: 'Your community.', titleB: 'Your control.', description: 'A fast, elegant Discord management experience built for communities that want to go further.', explore: 'Explore dashboard', trusted: 'Everything your server needs', stats: [['Servers', '50K+'], ['Members protected', '2M+'], ['Modules', '20+']], product: 'Product', community: 'Community', legal: 'Legal', coming: 'Coming soon', rights: 'All rights reserved.' },
+} as const;
+const features = [{ icon: Shield, title: 'Auto Moderation', text: 'Filters, anti-spam and intelligent protection.' }, { icon: Users, title: 'Welcome & Roles', text: 'A polished member journey from the first message.' }, { icon: Ticket, title: 'Tickets', text: 'A focused workspace for your support team.' }, { icon: Zap, title: 'XP & Levels', text: 'Reward activity and keep your community engaged.' }, { icon: Gift, title: 'Giveaways', text: 'Create memorable moments in a few clicks.' }, { icon: Lock, title: 'Security', text: 'Keep your community safe from raids and abuse.' }, { icon: BarChart3, title: 'Analytics', text: 'Turn activity into useful, clear insights.' }, { icon: AlertTriangle, title: 'Anti-Nuke', text: 'Additional protection for your Discord server.' }];
 
 export default function Landing() {
-  return (
-    <div className="min-h-screen bg-dark-900 text-white overflow-hidden">
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <motion.div className="absolute top-0 left-1/4 w-96 h-96 bg-neon-green opacity-5 rounded-full blur-3xl" animate={{ y: [0, -100, 0] }} transition={{ duration: 8, repeat: Infinity }} />
-        <motion.div className="absolute bottom-0 right-1/4 w-96 h-96 bg-neon-yellow opacity-5 rounded-full blur-3xl" animate={{ y: [0, 100, 0] }} transition={{ duration: 10, repeat: Infinity }} />
-      </div>
-      <nav className="relative z-10 glass border-b border-neon-green/20 sticky top-0">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <motion.div className="text-2xl font-bold tracking-wider" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-            <span className="text-neon-green neon-text">CIV</span><span className="text-neon-yellow neon-text-yellow">RAT</span>
-          </motion.div>
-          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-            <Link to="/login" className="btn-primary">Login</Link>
-          </motion.div>
-        </div>
-      </nav>
-      <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
-        <motion.div className="text-center" variants={containerVariants} initial="hidden" animate="visible">
-          <motion.h1 variants={itemVariants} className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 tracking-tight">
-            <span className="text-white">The Ultimate</span><br />
-            <span className="text-neon-green neon-text">Discord Bot</span><br />
-            <span className="text-neon-yellow neon-text-yellow">Dashboard</span>
-          </motion.h1>
-          <motion.p variants={itemVariants} className="text-lg sm:text-xl text-dark-300 mb-8 max-w-2xl mx-auto">
-            Manage your server with powerful tools. Moderation, giveaways, levels, tickets, and more - all in one place.
-          </motion.p>
-          <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/dashboard" className="btn-primary flex items-center gap-2 text-lg px-8 py-4 group">
-              Get Started <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </motion.div>
-        </motion.div>
-      </section>
-      <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <motion.div className="grid grid-cols-1 sm:grid-cols-3 gap-8" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}>
-          {stats.map((stat, i) => (
-            <motion.div key={i} className="module-card text-center" whileHover={{ scale: 1.05 }}>
-              <div className="text-4xl font-bold text-neon-green mb-2">{stat.value}</div><div className="text-dark-300">{stat.label}</div>
-            </motion.div>
-          ))}
-        </motion.div>
-      </section>
-      <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="text-center mb-16"><h2 className="text-4xl font-bold mb-4"><span className="text-neon-green">Powerful</span> Features</h2></div>
-        <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" variants={containerVariants} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-          {features.map((f, i) => {
-            const Icon = f.icon;
-            return (
-              <motion.div key={i} variants={itemVariants} className="module-card" whileHover={{ scale: 1.05, y: -5 }}>
-                <div className="w-12 h-12 rounded-lg bg-neon-green/20 flex items-center justify-center mb-4"><Icon className="w-6 h-6 text-neon-green" /></div>
-                <h3 className="text-lg font-semibold text-white mb-2">{f.title}</h3><p className="text-dark-300 text-sm">{f.description}</p>
-              </motion.div>
-            );
-          })}
-        </motion.div>
-      </section>
-      <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="text-center mb-16"><h2 className="text-4xl font-bold mb-4">Simple <span className="text-neon-yellow">Pricing</span></h2></div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="card"><h3 className="text-2xl font-bold text-white mb-2">Free</h3><p className="text-dark-300 mb-6">Perfect for getting started</p><div className="text-3xl font-bold text-neon-green mb-8">$0</div>
-            <ul className="space-y-3 mb-8">{['Auto Moderation', 'Welcome System', 'Basic Analytics'].map((f, i) => <li key={i} className="flex items-center gap-3 text-dark-300"><div className="w-2 h-2 rounded-full bg-neon-green" />{f}</li>)}</ul>
-            <button className="btn-secondary w-full">Get Started</button>
-          </div>
-          <div className="card border-neon-green/30 bg-gradient-to-br from-neon-green/5 to-neon-yellow/5 relative overflow-hidden">
-            <div className="absolute top-4 right-4 bg-neon-yellow text-dark-900 px-3 py-1 rounded-full text-sm font-semibold">Popular</div>
-            <h3 className="text-2xl font-bold text-white mb-2">Premium</h3><p className="text-dark-300 mb-6">For serious server management</p><div className="text-3xl font-bold text-neon-yellow mb-8">$4.99/mo</div>
-            <ul className="space-y-3 mb-8">{['Everything in Free', 'XP & Levels', 'Anti-Nuke', 'Advanced Analytics', 'Priority Support'].map((f, i) => <li key={i} className="flex items-center gap-3 text-dark-300"><div className="w-2 h-2 rounded-full bg-neon-yellow" />{f}</li>)}</ul>
-            <button className="btn-primary w-full">Upgrade Now</button>
-          </div>
-        </div>
-      </section>
-      <footer className="relative z-10 border-t border-neon-green/20 glass mt-20">
-        <div className="max-w-7xl mx-auto px-4 py-12">
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div className="text-xl font-bold tracking-wider"><span className="text-neon-green">CIV</span><span className="text-neon-yellow">RAT</span></div>
-            <p className="text-dark-300 text-sm">2024 CIVRAT. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
-    </div>
-  );
+  const [locale, setLocale] = useState<Locale>(() => localStorage.getItem('civrat-locale') === 'fr' || navigator.language.startsWith('fr') ? 'fr' : 'en');
+  useEffect(() => { localStorage.setItem('civrat-locale', locale); document.documentElement.lang = locale; }, [locale]);
+  const t = copy[locale];
+  return <div className="min-h-screen overflow-hidden bg-dark-900 text-white selection:bg-neon-green selection:text-dark-900">
+    <div className="pointer-events-none fixed inset-0 civrat-grid" /><div className="pointer-events-none fixed -top-56 left-1/2 h-[38rem] w-[38rem] -translate-x-1/2 rounded-full bg-neon-green/10 blur-[120px]" />
+    <header className="relative z-20 border-b border-white/8 bg-dark-900/70 backdrop-blur-xl"><nav className="mx-auto flex h-18 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <Link to="/" className="flex items-center gap-2 font-black tracking-[.18em]"><span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-neon-green to-neon-yellow text-dark-900"><Bot className="h-5 w-5" /></span><span><b className="text-neon-green">CIV</b><b className="text-neon-yellow">RAT</b></span></Link>
+      <div className="hidden items-center gap-6 text-sm text-dark-300 lg:flex"><a href="#features" className="hover:text-white">{t.features}</a><a href="#documentation" className="hover:text-white">{t.documentation}</a><a href="https://discord.gg/BA3aDFqtXr" target="_blank" rel="noreferrer" className="hover:text-white">{t.support}</a></div>
+      <div className="flex items-center gap-2"><button onClick={() => setLocale(locale === 'fr' ? 'en' : 'fr')} aria-label="Change language" className="rounded-lg border border-white/10 px-2.5 py-2 text-xs font-bold text-dark-300 hover:text-white">{locale.toUpperCase()}</button><Link to="/login" className="btn-secondary hidden sm:block !px-4 !py-2">{t.login}</Link><a href={BOT_INVITE} className="btn-primary !px-4 !py-2">{t.add}</a></div>
+    </nav></header>
+    <main className="relative z-10"><section className="mx-auto max-w-7xl px-4 pb-20 pt-24 text-center sm:px-6 lg:px-8 lg:pb-32 lg:pt-32"><motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="mx-auto inline-flex items-center gap-2 rounded-full border border-neon-green/25 bg-neon-green/8 px-3 py-1.5 text-xs font-bold tracking-wider text-neon-green"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-neon-green" />{t.badge}</motion.div><motion.h1 initial={{ opacity: 0, y: 25 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .1 }} className="mx-auto mt-7 max-w-5xl text-5xl font-black leading-[.95] tracking-tight sm:text-7xl lg:text-8xl">{t.titleA}<br /><span className="text-gradient-gold">{t.titleB}</span></motion.h1><motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: .2 }} className="mx-auto mt-7 max-w-2xl text-base leading-7 text-dark-300 sm:text-lg">{t.description}</motion.p><motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: .3 }} className="mt-9 flex flex-col justify-center gap-3 sm:flex-row"><Link to="/login" className="btn-primary inline-flex items-center justify-center gap-2 !px-6 !py-3.5">{t.explore}<ArrowRight className="h-4 w-4" /></Link><a href="https://discord.gg/BA3aDFqtXr" target="_blank" rel="noreferrer" className="btn-secondary inline-flex items-center justify-center gap-2 !py-3.5"><MessageCircle className="h-4 w-4" />{t.support}</a></motion.div></section>
+      <section className="mx-auto grid max-w-5xl grid-cols-1 gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10 sm:grid-cols-3">{t.stats.map(([label, value]) => <div key={label} className="bg-dark-800/80 px-7 py-6 text-center"><strong className="block text-3xl font-black text-neon-green">{value}</strong><span className="mt-1 text-sm text-dark-300">{label}</span></div>)}</section>
+      <section id="features" className="mx-auto max-w-7xl px-4 py-28 sm:px-6 lg:px-8"><div className="mb-12 max-w-xl"><p className="text-sm font-bold uppercase tracking-widest text-neon-green">CIVRAT</p><h2 className="mt-3 text-4xl font-black">{t.trusted}</h2></div><div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{features.map(({ icon: Icon, title, text }) => <motion.article whileHover={{ y: -5 }} key={title} className="module-card group !cursor-default"><div className="mb-5 grid h-11 w-11 place-items-center rounded-xl bg-neon-green/10 text-neon-green ring-1 ring-neon-green/20 group-hover:bg-neon-green group-hover:text-dark-900"><Icon className="h-5 w-5" /></div><h3 className="font-bold">{title}</h3><p className="mt-2 text-sm leading-6 text-dark-300">{text}</p></motion.article>)}</div></section>
+      <section id="documentation" className="mx-auto max-w-5xl px-4 pb-28 sm:px-6"><div className="relative overflow-hidden rounded-3xl border border-neon-green/20 bg-gradient-to-br from-neon-green/10 via-dark-800 to-neon-yellow/8 p-8 text-center sm:p-14"><Globe2 className="mx-auto h-8 w-8 text-neon-yellow" /><h2 className="mt-4 text-3xl font-black">CIVRAT, built for every community.</h2><p className="mx-auto mt-3 max-w-xl text-dark-300">Documentation and guides are being prepared. Join our Discord to get help from the community.</p><a href="https://discord.gg/BA3aDFqtXr" target="_blank" rel="noreferrer" className="btn-primary mt-7 inline-flex gap-2">{t.support}<ArrowRight className="h-4 w-4" /></a></div></section>
+    </main>
+    <footer className="relative z-10 border-t border-white/10 bg-dark-800/50"><div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:grid-cols-2 lg:grid-cols-5 sm:px-6"><div><div className="font-black tracking-[.18em]"><b className="text-neon-green">CIV</b><b className="text-neon-yellow">RAT</b></div><p className="mt-3 text-sm text-dark-300">Discord, elevated.</p></div><FooterGroup title={t.product} links={[t.features, 'Dashboard', t.add, t.documentation]} /><FooterGroup title={t.community} links={[t.support]} /><FooterGroup title={t.legal} links={[`${locale === 'fr' ? 'Politique de confidentialité' : 'Privacy policy'} (${t.coming})`, `${locale === 'fr' ? 'Conditions d’utilisation' : 'Terms of service'} (${t.coming})`]} /><FooterGroup title="Social" links={['Twitter (X)', 'TikTok', 'Instagram']} /></div><div className="border-t border-white/8 py-5 text-center text-xs text-dark-300">© {new Date().getFullYear()} CIVRAT. {t.rights}</div></footer>
+  </div>;
 }
+function FooterGroup({ title, links }: { title: string; links: readonly string[] }) { return <div><h3 className="text-sm font-bold">{title}</h3><ul className="mt-4 space-y-2.5">{links.map((link) => <li key={link}><a href="#" onClick={(event) => event.preventDefault()} className="text-sm text-dark-300 hover:text-neon-green">{link}</a></li>)}</ul></div>; }

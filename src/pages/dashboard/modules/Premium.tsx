@@ -46,12 +46,12 @@ export default function Premium() {
         description="Unlock advanced features with premium subscription"
       />
 
-      <div className="rounded-lg border border-slate-200 bg-white p-6">
+      <div className="module-card !cursor-default p-6">
         <h3 className="mb-6 text-lg font-semibold">Feature Comparison</h3>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-slate-200">
+              <tr className="border-b border-white/10">
                 <th className="px-4 py-2 text-left font-medium">Feature</th>
                 <th className="px-4 py-2 text-center font-medium">Free</th>
                 <th className="px-4 py-2 text-center font-medium">Premium</th>
@@ -59,7 +59,7 @@ export default function Premium() {
             </thead>
             <tbody>
               {features.map((feature) => (
-                <tr key={feature.name} className="border-b border-slate-100 hover:bg-slate-50">
+                <tr key={feature.name} className="border-b border-white/5 hover:bg-white/5">
                   <td className="px-4 py-3">{feature.name}</td>
                   <td className="px-4 py-3 text-center">
                     {feature.free ? (
@@ -85,7 +85,7 @@ export default function Premium() {
             className={`rounded-lg border p-6 ${
               plan.popular
                 ? 'border-blue-600 bg-gradient-to-br from-blue-50 to-white shadow-lg'
-                : 'border-slate-200 bg-white'
+                : 'border-white/10 bg-white'
             }`}
           >
             {plan.popular && (
@@ -97,7 +97,7 @@ export default function Premium() {
             <h3 className="mb-2 text-xl font-bold">{plan.name}</h3>
             <div className="mb-4">
               <span className="text-3xl font-bold">{plan.price}</span>
-              <span className="text-slate-600">/{plan.period}</span>
+              <span className="text-dark-300">/{plan.period}</span>
             </div>
 
             <button

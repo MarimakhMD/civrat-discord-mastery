@@ -76,7 +76,7 @@ export default function AntiNuke() {
 
       {enabled && (
         <div className="space-y-6">
-          <div className="rounded-lg border border-slate-200 bg-white p-6">
+          <div className="module-card !cursor-default p-6">
             <h3 className="mb-4 text-lg font-semibold">Action Thresholds</h3>
             <div className="space-y-4">
               <FormField label="Channel Delete Threshold">
@@ -133,7 +133,7 @@ export default function AntiNuke() {
             </div>
           </div>
 
-          <div className="rounded-lg border border-slate-200 bg-white p-6">
+          <div className="module-card !cursor-default p-6">
             <h3 className="mb-4 text-lg font-semibold">Punishment</h3>
             <FormField label="Action on Threshold">
               <Select
@@ -152,7 +152,7 @@ export default function AntiNuke() {
             </FormField>
           </div>
 
-          <div className="rounded-lg border border-slate-200 bg-white p-6">
+          <div className="module-card !cursor-default p-6">
             <h3 className="mb-4 text-lg font-semibold">Trusted Roles</h3>
             <div className="space-y-2">
               {roles.map((role) => (
@@ -176,7 +176,7 @@ export default function AntiNuke() {
             </div>
           </div>
 
-          <div className="rounded-lg border border-slate-200 bg-white p-6">
+          <div className="module-card !cursor-default p-6">
             <h3 className="mb-4 text-lg font-semibold">Recent Attempts</h3>
             <div className="space-y-2">
               {mockAttempts.map((attempt) => (
@@ -186,11 +186,11 @@ export default function AntiNuke() {
                 >
                   <div>
                     <p className="font-medium">{attempt.type}</p>
-                    <p className="text-sm text-slate-600">{attempt.user}</p>
+                    <p className="text-sm text-dark-300">{attempt.user}</p>
                   </div>
                   <div className="text-right">
                     <p className="font-bold text-red-600">{attempt.count}</p>
-                    <p className="text-xs text-slate-500">{attempt.timestamp}</p>
+                    <p className="text-xs text-dark-300">{attempt.timestamp}</p>
                   </div>
                 </div>
               ))}

@@ -82,7 +82,7 @@ export default function Tickets() {
 
       {enabled && (
         <div className="space-y-6">
-          <div className="rounded-lg border border-slate-200 bg-white p-6">
+          <div className="module-card !cursor-default p-6">
             <h3 className="mb-4 text-lg font-semibold">Configuration</h3>
             <div className="space-y-4">
               <FormField label="Ticket Category">
@@ -127,12 +127,12 @@ export default function Tickets() {
             </div>
           </div>
 
-          <div className="rounded-lg border border-slate-200 bg-white p-6">
+          <div className="module-card !cursor-default p-6">
             <h3 className="mb-4 text-lg font-semibold">Active Tickets</h3>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-slate-200">
+                  <tr className="border-b border-white/10">
                     <th className="px-4 py-2 text-left font-medium">User</th>
                     <th className="px-4 py-2 text-left font-medium">Subject</th>
                     <th className="px-4 py-2 text-left font-medium">Status</th>
@@ -141,7 +141,7 @@ export default function Tickets() {
                 </thead>
                 <tbody>
                   {mockTickets.map((ticket) => (
-                    <tr key={ticket.id} className="border-b border-slate-100 hover:bg-slate-50">
+                    <tr key={ticket.id} className="border-b border-white/5 hover:bg-white/5">
                       <td className="px-4 py-2">{ticket.user}</td>
                       <td className="px-4 py-2">{ticket.subject}</td>
                       <td className="px-4 py-2">
@@ -157,7 +157,7 @@ export default function Tickets() {
                           {ticket.status}
                         </span>
                       </td>
-                      <td className="px-4 py-2 text-slate-500">{ticket.created}</td>
+                      <td className="px-4 py-2 text-dark-300">{ticket.created}</td>
                     </tr>
                   ))}
                 </tbody>

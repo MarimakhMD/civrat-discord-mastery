@@ -63,7 +63,7 @@ export default function Languages() {
         description="Configure bot language and localization"
       />
 
-      <div className="rounded-lg border border-slate-200 bg-white p-6">
+      <div className="module-card !cursor-default p-6">
         <h3 className="mb-4 text-lg font-semibold">Select Language</h3>
         <FormField label="Bot Language">
           <Select
@@ -74,10 +74,10 @@ export default function Languages() {
         </FormField>
       </div>
 
-      <div className="rounded-lg border border-slate-200 bg-white p-6">
+      <div className="module-card !cursor-default p-6">
         <h3 className="mb-4 text-lg font-semibold">Message Preview</h3>
         <div className="rounded bg-slate-50 p-4">
-          <p className="text-sm text-slate-600">Example welcome message:</p>
+          <p className="text-sm text-dark-300">Example welcome message:</p>
           <p className="mt-2 text-sm font-medium">
             {messagePreviewMap[selectedLanguage] || messagePreviewMap['en']}
           </p>

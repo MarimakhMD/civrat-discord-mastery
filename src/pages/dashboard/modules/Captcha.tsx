@@ -79,7 +79,7 @@ export default function Captcha() {
 
       {enabled && (
         <div className="space-y-6">
-          <div className="rounded-lg border border-slate-200 bg-white p-6">
+          <div className="module-card !cursor-default p-6">
             <h3 className="mb-4 text-lg font-semibold">Verification Settings</h3>
             <div className="space-y-4">
               <FormField label="Verification Channel">
