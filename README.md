@@ -77,3 +77,7 @@ When `invitations_enabled` is enabled, CIVRAT caches guild invites at startup an
 ## XP & Levels (bot)
 
 When `xp_enabled` is enabled, CIVRAT stores member XP in the `UserXP` MongoDB collection. It uses `xp_per_message`, `xp_cooldown`, `xp_announce_channel_id` and `role_rewards` from `guild_configs`. The stable formula is `100 × level²` total XP. `/niveau` displays a member profile and `/classement` displays the top ten. XP level announcements and configured role rewards are sent/applied only when Discord permissions allow them.
+
+## Giveaways (bot)
+
+The existing Supabase `giveaways` table is the giveaway source of truth. CIVRAT manages active rows with `giveaways_enabled`, durable giveaway entries in the minimal `GiveawayEntry` MongoDB collection, a restart-safe one-minute end scheduler, and the `/giveaway` management command. Entry buttons query the persisted giveaway row, so participation survives bot restarts. Giveaway creation, completion, rerolls, and cancellation are logged through `log_moderation_channel_id`.

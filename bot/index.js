@@ -15,6 +15,7 @@ const { loadCommands } = require("./src/handlers/commandHandler");
 const { loadEvents } = require("./src/handlers/eventHandler");
 const guildConfigService = require("./src/services/guildConfig");
 const logger = require("./src/utils/logger");
+const giveawayService = require("./src/services/giveawayService");
 
 // ═══════════════════════════════════════════════════
 // VALIDATE CONFIG
@@ -63,8 +64,9 @@ async function start() {
   // 5. Login to Discord
   await client.login(config.token);
 
-  // 6. Start counting auto-continue interval
+  // 6. Start module schedulers after the Discord client is available
   startCountingInterval();
+  startGiveawayInterval();
 }
 
 // ═══════════════════════════════════════════════════
@@ -100,6 +102,12 @@ function startCountingInterval() {
       logger.error("Counting interval error:", err.message);
     }
   }, 60000);
+}
+
+function startGiveawayInterval() {
+  // The query is persisted in Supabase, so active giveaways are resumed after a restart.
+  giveawayService.endDueGiveaways(client);
+  setInterval(() => giveawayService.endDueGiveaways(client), 60_000);
 }
 
 // ═══════════════════════════════════════════════════

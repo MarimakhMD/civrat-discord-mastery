@@ -332,3 +332,22 @@ Un départ issu d’un kick détecté via Audit Logs n’est pas décrémenté c
 | Analytics XP dashboard | aucun endpoint API actif | Prêt à connecter |
 
 Le modèle Mongo `UserXP` est la seule collection ajoutée pour XP : il contient guildId, userId, xp, level, lastXpAt et totalMessages, avec index unique `(guildId, userId)` et index de classement `(guildId, xp)`.
+
+---
+
+## Giveaways — état réel
+
+| Fonctionnalité | Source | État |
+|---|---|---|
+| Activation | `giveaways_enabled` | Opérationnelle |
+| Données giveaway | table Supabase existante `giveaways` | Opérationnelle |
+| Participations | modèle Mongo minimal `GiveawayEntry` | Opérationnelle |
+| Bouton participer | interaction `giveaway_join:<id>` | Opérationnelle |
+| Fin automatique après redémarrage | requête Supabase toutes les minutes | Opérationnelle |
+| Création / fin / reroll / annulation staff | `/giveaway` | Opérationnelle |
+| Logs | `log_moderation_channel_id` | Opérationnelle |
+| Modification d’un giveaway publié | aucun `message_id` existant | Prêt à connecter |
+| Suppression physique / édition du message Discord | aucun `message_id` existant | Prêt à connecter |
+| Conditions de participation avancées | champ `requirements` texte non interprété | Prêt à connecter |
+
+La table existante ne possède pas de `message_id`; le bot envoie donc le résultat dans le salon à la fin sans modifier le message initial. Les entrées sont uniques par `(giveawayId, userId)` et persistent après redémarrage.

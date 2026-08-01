@@ -7,6 +7,7 @@ const commandHandler = require("../handlers/commandHandler");
 const guildConfigService = require("../services/guildConfig");
 const { supabase } = require("../config/database");
 const logger = require("../utils/logger");
+const giveawayService = require("../services/giveawayService");
 
 const TICKET_TOPIC_PREFIX = "civrat-ticket:";
 
@@ -19,7 +20,10 @@ module.exports = {
       if (interaction.customId === "ticket_create") return handleTicketCreate(interaction);
       if (interaction.customId === "ticket_options") return handleTicketOption(interaction);
     }
-    if (interaction.isButton()) return handleTicketButton(interaction);
+    if (interaction.isButton()) {
+    if (interaction.customId.startsWith("giveaway_join:")) return giveawayService.joinGiveaway(interaction, Number(interaction.customId.split(":")[1]));
+    return handleTicketButton(interaction);
+  }
     if (interaction.isModalSubmit()) return handleTicketModal(interaction);
   },
 };
