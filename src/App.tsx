@@ -1,68 +1,9 @@
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from '@/context/AuthContext';
 import { GuildProvider } from '@/context/GuildContext';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import Landing from '@/pages/Landing';
-import Login from '@/pages/auth/Login';
-import Callback from '@/pages/auth/Callback';
-import GuildSelect from '@/pages/dashboard/GuildSelect';
-import Home from '@/pages/dashboard/modules/Home';
-import Welcome from '@/pages/dashboard/modules/Welcome';
-import Tickets from '@/pages/dashboard/modules/Tickets';
-import Logs from '@/pages/dashboard/modules/Logs';
-import AutoMod from '@/pages/dashboard/modules/AutoMod';
-import Captcha from '@/pages/dashboard/modules/Captcha';
-import XPLevels from '@/pages/dashboard/modules/XPLevels';
-import Giveaways from '@/pages/dashboard/modules/Giveaways';
-import Languages from '@/pages/dashboard/modules/Languages';
-import Suggestions from '@/pages/dashboard/modules/Suggestions';
-import Security from '@/pages/dashboard/modules/Security';
-import Invites from '@/pages/dashboard/modules/Invites';
-import Settings from '@/pages/dashboard/modules/Settings';
-import AntiNuke from '@/pages/dashboard/modules/AntiNuke';
-import TempVoice from '@/pages/dashboard/modules/TempVoice';
-import Analytics from '@/pages/dashboard/modules/Analytics';
-import Premium from '@/pages/dashboard/modules/Premium';
-import Backup from '@/pages/dashboard/modules/Backup';
-import EmbedBuilder from '@/pages/dashboard/modules/EmbedBuilder';
-import Moderation from '@/pages/dashboard/modules/Moderation';
-
-export default function App() {
-  return (
-    <BrowserRouter>
-      <AuthProvider>
-        <GuildProvider>
-          <Routes>
-            <Route path="/" element={<Landing />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/auth/callback" element={<Callback />} />
-            <Route path="/dashboard/guilds" element={<GuildSelect />} />
-            <Route path="/dashboard" element={<DashboardLayout />}>
-              <Route index element={<Navigate to="home" replace />} />
-              <Route path="home" element={<Home />} />
-              <Route path="welcome" element={<Welcome />} />
-              <Route path="tickets" element={<Tickets />} />
-              <Route path="logs" element={<Logs />} />
-              <Route path="automod" element={<AutoMod />} />
-              <Route path="captcha" element={<Captcha />} />
-              <Route path="xplevels" element={<XPLevels />} />
-              <Route path="giveaways" element={<Giveaways />} />
-              <Route path="languages" element={<Languages />} />
-              <Route path="suggestions" element={<Suggestions />} />
-              <Route path="security" element={<Security />} />
-              <Route path="invites" element={<Invites />} />
-              <Route path="settings" element={<Settings />} />
-              <Route path="antinuke" element={<AntiNuke />} />
-              <Route path="tempvoice" element={<TempVoice />} />
-              <Route path="analytics" element={<Analytics />} />
-              <Route path="premium" element={<Premium />} />
-              <Route path="backup" element={<Backup />} />
-              <Route path="embedbuilder" element={<EmbedBuilder />} />
-              <Route path="moderation" element={<Moderation />} />
-            </Route>
-          </Routes>
-        </GuildProvider>
-      </AuthProvider>
-    </BrowserRouter>
-  );
-}
+const Landing = lazy(() => import('@/pages/Landing')); const Login = lazy(() => import('@/pages/auth/Login')); const Callback = lazy(() => import('@/pages/auth/Callback')); const GuildSelect = lazy(() => import('@/pages/dashboard/GuildSelect'));
+const Home = lazy(() => import('@/pages/dashboard/modules/Home')); const Welcome = lazy(() => import('@/pages/dashboard/modules/Welcome')); const Tickets = lazy(() => import('@/pages/dashboard/modules/Tickets')); const Logs = lazy(() => import('@/pages/dashboard/modules/Logs')); const AutoMod = lazy(() => import('@/pages/dashboard/modules/AutoMod')); const Captcha = lazy(() => import('@/pages/dashboard/modules/Captcha')); const XPLevels = lazy(() => import('@/pages/dashboard/modules/XPLevels')); const Giveaways = lazy(() => import('@/pages/dashboard/modules/Giveaways')); const Languages = lazy(() => import('@/pages/dashboard/modules/Languages')); const Suggestions = lazy(() => import('@/pages/dashboard/modules/Suggestions')); const Security = lazy(() => import('@/pages/dashboard/modules/Security')); const Invites = lazy(() => import('@/pages/dashboard/modules/Invites')); const Settings = lazy(() => import('@/pages/dashboard/modules/Settings')); const AntiNuke = lazy(() => import('@/pages/dashboard/modules/AntiNuke')); const TempVoice = lazy(() => import('@/pages/dashboard/modules/TempVoice')); const Analytics = lazy(() => import('@/pages/dashboard/modules/Analytics')); const Premium = lazy(() => import('@/pages/dashboard/modules/Premium')); const Backup = lazy(() => import('@/pages/dashboard/modules/Backup')); const EmbedBuilder = lazy(() => import('@/pages/dashboard/modules/EmbedBuilder')); const Moderation = lazy(() => import('@/pages/dashboard/modules/Moderation'));
+function LoadingScreen() { return <div className="grid min-h-[50vh] place-items-center"><div className="h-9 w-9 animate-spin rounded-full border-2 border-neon-green/20 border-t-neon-green" aria-label="Chargement" /></div>; }
+export default function App() { return <BrowserRouter><AuthProvider><GuildProvider><Suspense fallback={<LoadingScreen />}><Routes><Route path="/" element={<Landing />} /><Route path="/login" element={<Login />} /><Route path="/auth/callback" element={<Callback />} /><Route path="/dashboard/guilds" element={<GuildSelect />} /><Route path="/dashboard" element={<DashboardLayout />}><Route index element={<Navigate to="home" replace />} /><Route path="home" element={<Home />} /><Route path="welcome" element={<Welcome />} /><Route path="tickets" element={<Tickets />} /><Route path="logs" element={<Logs />} /><Route path="automod" element={<AutoMod />} /><Route path="captcha" element={<Captcha />} /><Route path="xplevels" element={<XPLevels />} /><Route path="giveaways" element={<Giveaways />} /><Route path="languages" element={<Languages />} /><Route path="suggestions" element={<Suggestions />} /><Route path="security" element={<Security />} /><Route path="invites" element={<Invites />} /><Route path="settings" element={<Settings />} /><Route path="antinuke" element={<AntiNuke />} /><Route path="tempvoice" element={<TempVoice />} /><Route path="analytics" element={<Analytics />} /><Route path="premium" element={<Premium />} /><Route path="backup" element={<Backup />} /><Route path="embedbuilder" element={<EmbedBuilder />} /><Route path="moderation" element={<Moderation />} /></Route></Routes></Suspense></GuildProvider></AuthProvider></BrowserRouter>; }
