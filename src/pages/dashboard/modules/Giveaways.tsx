@@ -26,7 +26,7 @@ const mockHistory = [
 ];
 
 export default function Giveaways() {
-  const { config, updateConfig } = useGuild();
+  const { updateConfig } = useGuild();
   const [isDirty, setIsDirty] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -48,7 +48,7 @@ export default function Giveaways() {
       setDuration('24');
       setChannel('');
       setIsDirty(false);
-    } catch (err) {
+    } catch {
       setError('Failed to create giveaway');
     } finally {
       setIsSaving(false);

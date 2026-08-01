@@ -38,7 +38,7 @@ export default function Languages() {
       setError(null);
       await updateConfig({ language: selectedLanguage });
       setIsDirty(false);
-    } catch (err) {
+    } catch {
       setError('Failed to save language settings');
     } finally {
       setIsSaving(false);

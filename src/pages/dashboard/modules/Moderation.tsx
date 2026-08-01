@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Gavel } from 'lucide-react';
 import { ModuleHeader } from '@/components/ui/ModuleHeader';
 import { FormField } from '@/components/ui/FormField';
-import { useGuild } from '@/context/GuildContext';
 
 const mockActions = [
   {
@@ -63,7 +62,6 @@ const getActionColor = (action: string) => {
 };
 
 export default function Moderation() {
-  const { config } = useGuild();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterAction, setFilterAction] = useState('all');
 

@@ -28,7 +28,7 @@ export default function Backup() {
       setError(null);
       await updateConfig({});
       setIsDirty(false);
-    } catch (err) {
+    } catch {
       setError('Failed to save backup settings');
     } finally {
       setIsSaving(false);
@@ -45,7 +45,7 @@ export default function Backup() {
       setIsSaving(true);
       await new Promise((resolve) => setTimeout(resolve, 1000));
       alert('Backup created successfully!');
-    } catch (err) {
+    } catch {
       setError('Failed to create backup');
     } finally {
       setIsSaving(false);
@@ -67,7 +67,7 @@ export default function Backup() {
       await new Promise((resolve) => setTimeout(resolve, 2000));
       alert('Backup restored successfully!');
       setSelectedBackup(null);
-    } catch (err) {
+    } catch {
       setError('Failed to restore backup');
     } finally {
       setRestoring(false);

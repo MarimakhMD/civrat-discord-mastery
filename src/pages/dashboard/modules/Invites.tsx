@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'lucide-react';
 import { ModuleHeader } from '@/components/ui/ModuleHeader';
-import { Toggle } from '@/components/ui/Toggle';
 import { FormField } from '@/components/ui/FormField';
 import { SaveBar } from '@/components/ui/SaveBar';
 import { Select } from '@/components/ui/Select';
@@ -47,7 +46,7 @@ export default function Invites() {
         invtrack_channel: logChannel || null,
       });
       setIsDirty(false);
-    } catch (err) {
+    } catch {
       setError('Failed to save invite settings');
     } finally {
       setIsSaving(false);

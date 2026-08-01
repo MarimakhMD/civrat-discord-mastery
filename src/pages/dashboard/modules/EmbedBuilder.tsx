@@ -26,7 +26,7 @@ export default function EmbedBuilder() {
       setError(null);
       await updateConfig({});
       setIsDirty(false);
-    } catch (err) {
+    } catch {
       setError('Failed to save embed');
     } finally {
       setIsSaving(false);

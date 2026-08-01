@@ -34,7 +34,7 @@ export default function TempVoice() {
         temp_voice_category: category || null,
       });
       setIsDirty(false);
-    } catch (err) {
+    } catch {
       setError('Failed to save temp voice settings');
     } finally {
       setIsSaving(false);

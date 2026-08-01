@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { TriangleAlert as AlertTriangle } from 'lucide-react';
 import { ModuleHeader } from '@/components/ui/ModuleHeader';
-import { Toggle } from '@/components/ui/Toggle';
 import { FormField } from '@/components/ui/FormField';
 import { SaveBar } from '@/components/ui/SaveBar';
 import { Select } from '@/components/ui/Select';
@@ -43,7 +42,7 @@ export default function AntiNuke() {
         security_enabled: true,
       });
       setIsDirty(false);
-    } catch (err) {
+    } catch {
       setError('Failed to save anti-nuke settings');
     } finally {
       setIsSaving(false);

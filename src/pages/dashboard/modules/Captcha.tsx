@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Lock } from 'lucide-react';
 import { ModuleHeader } from '@/components/ui/ModuleHeader';
-import { Toggle } from '@/components/ui/Toggle';
 import { FormField } from '@/components/ui/FormField';
 import { SaveBar } from '@/components/ui/SaveBar';
 import { Select } from '@/components/ui/Select';
@@ -46,7 +45,7 @@ export default function Captcha() {
         captcha_type: type,
       });
       setIsDirty(false);
-    } catch (err) {
+    } catch {
       setError('Failed to save captcha settings');
     } finally {
       setIsSaving(false);

@@ -35,7 +35,7 @@ export default function Settings() {
         language,
       });
       setIsDirty(false);
-    } catch (err) {
+    } catch {
       setError('Failed to save global settings');
     } finally {
       setIsSaving(false);
