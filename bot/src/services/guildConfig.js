@@ -21,6 +21,8 @@ const defaultConfig = {
   welcome_embed_enabled: false,
   welcome_embed_color: "#00e85c",
   welcome_image_enabled: false,
+  welcome_dm_enabled: false,
+  welcome_dm_message: null,
   goodbye_enabled: false,
   goodbye_channel_id: null,
   goodbye_message: "Goodbye {username}! We now have {memberCount} members.",

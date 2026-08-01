@@ -11,7 +11,7 @@ const GuildContext = createContext<GuildState | null>(null);
 /** Must remain byte-for-byte semantically aligned with bot/src/services/guildConfig.js. */
 const defaultConfig: GuildConfig = {
   id: 0, guild_id: '', bot_prefix: '!', bot_name: 'CIVRAT', language: 'fr',
-  welcome_enabled: false, welcome_channel_id: null, welcome_message: 'Welcome {user} to {server}! We now have {memberCount} members.', welcome_embed_enabled: false, welcome_embed_color: '#00e85c', welcome_image_enabled: false,
+  welcome_enabled: false, welcome_channel_id: null, welcome_message: 'Welcome {user} to {server}! We now have {memberCount} members.', welcome_embed_enabled: false, welcome_embed_color: '#00e85c', welcome_image_enabled: false, welcome_dm_enabled: false, welcome_dm_message: null,
   goodbye_enabled: false, goodbye_channel_id: null, goodbye_message: 'Goodbye {username}! We now have {memberCount} members.', goodbye_embed_enabled: false, goodbye_embed_color: '#ff4444',
   tickets_enabled: false, ticket_category_id: null, ticket_support_role_id: null, ticket_panel_title: 'Create a Ticket', ticket_panel_description: 'Click the button below to create a support ticket.', ticket_panel_color: '#00e85c', ticket_log_channel_id: null,
   logs_enabled: false, log_message_delete_channel_id: null, log_message_edit_channel_id: null, log_member_join_channel_id: null, log_member_leave_channel_id: null, log_role_update_channel_id: null, log_channel_update_channel_id: null, log_moderation_channel_id: null,

@@ -6,7 +6,7 @@
 const { EmbedBuilder } = require("discord.js");
 const guildConfigService = require("../services/guildConfig");
 const inviteService = require("../services/inviteService");
-const placeholder = require("../services/placeholder");
+const welcomeService = require("../services/welcomeService");
 const { fetchAuditLog } = require("../utils/auditLogCache");
 const logger = require("../utils/logger");
 
@@ -26,37 +26,7 @@ module.exports = {
 };
 
 async function handleGoodbye(member, config) {
-  if (!config.goodbye_enabled) return;
-
-  // Fallback: find by name (original behavior)
-  const channelId = config.goodbye_channel_id;
-  let channel = channelId ? member.guild.channels.cache.get(channelId) : null;
-
-  if (!channel) {
-    channel = member.guild.channels.cache.find((c) => c.name === "「👋」au-revoir");
-  }
-  if (!channel) return;
-
-  try {
-    const message = placeholder.parse(config.goodbye_message, {
-      user: member.user,
-      member,
-      guild: member.guild,
-    });
-
-    if (config.goodbye_embed_enabled) {
-      const embed = new EmbedBuilder()
-        .setColor(config.goodbye_embed_color || "#ED4245")
-        .setDescription(message)
-        .setThumbnail(member.user.displayAvatarURL())
-        .setTimestamp();
-      channel.send({ embeds: [embed] });
-    } else {
-      channel.send(message);
-    }
-  } catch (err) {
-    logger.error(`Goodbye failed for ${member.user.tag}:`, err.message);
-  }
+  await welcomeService.sendGoodbye(member, config);
 }
 
 async function handleLeaveLog(member, config) {

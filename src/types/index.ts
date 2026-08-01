@@ -12,7 +12,7 @@ export interface Guild {
 /** Canonical `guild_configs` contract shared by React, Supabase and the bot. */
 export interface GuildConfig {
   id: number; guild_id: string; bot_prefix: string; bot_name: string; language: string;
-  welcome_enabled: boolean; welcome_channel_id: string | null; welcome_message: string | null; welcome_embed_enabled: boolean; welcome_embed_color: string; welcome_image_enabled: boolean;
+  welcome_enabled: boolean; welcome_channel_id: string | null; welcome_message: string | null; welcome_embed_enabled: boolean; welcome_embed_color: string; welcome_image_enabled: boolean; welcome_dm_enabled: boolean; welcome_dm_message: string | null;
   goodbye_enabled: boolean; goodbye_channel_id: string | null; goodbye_message: string | null; goodbye_embed_enabled: boolean; goodbye_embed_color: string;
   tickets_enabled: boolean; ticket_category_id: string | null; ticket_support_role_id: string | null; ticket_panel_title: string; ticket_panel_description: string; ticket_panel_color: string; ticket_log_channel_id: string | null;
   logs_enabled: boolean; log_message_delete_channel_id: string | null; log_message_edit_channel_id: string | null; log_member_join_channel_id: string | null; log_member_leave_channel_id: string | null; log_role_update_channel_id: string | null; log_channel_update_channel_id: string | null; log_moderation_channel_id: string | null;

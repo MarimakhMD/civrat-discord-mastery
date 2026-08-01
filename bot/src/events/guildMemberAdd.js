@@ -6,7 +6,7 @@
 const { EmbedBuilder } = require("discord.js");
 const guildConfigService = require("../services/guildConfig");
 const inviteService = require("../services/inviteService");
-const placeholder = require("../services/placeholder");
+const welcomeService = require("../services/welcomeService");
 const logger = require("../utils/logger");
 
 // Anti-raid tracking per guild
@@ -50,33 +50,8 @@ async function handleAutoRole(member, config) {
 }
 
 async function handleWelcome(member, config) {
-  if (!config.welcome_enabled) return;
-
-  // Use configured channel or fallback to original
-  const channelId = config.welcome_channel_id || "1320817768970584155";
-  const channel = member.guild.channels.cache.get(channelId);
-  if (!channel) return;
-
-  try {
-    const message = placeholder.parse(config.welcome_message, {
-      user: member.user,
-      member,
-      guild: member.guild,
-    });
-
-    if (config.welcome_embed_enabled) {
-      const embed = new EmbedBuilder()
-        .setColor(config.welcome_embed_color || "#FFD700")
-        .setTitle("✨ Bienvenue !")
-        .setDescription(message)
-        .setImage("https://i.imgur.com/s3LxiOk.jpeg");
-      await channel.send({ embeds: [embed] });
-    } else {
-      await channel.send(message);
-    }
-  } catch (err) {
-    logger.error(`Welcome failed for ${member.user.tag}:`, err.message);
-  }
+  await welcomeService.sendWelcome(member, config);
+  await welcomeService.sendWelcomeDm(member, config);
 }
 
 async function handleInviteTracking(member, config) {

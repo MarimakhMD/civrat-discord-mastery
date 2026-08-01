@@ -11,6 +11,8 @@ export interface GuildConfig {
   welcome_embed_enabled: boolean;
   welcome_embed_color: string;
   welcome_image_enabled: boolean;
+  welcome_dm_enabled: boolean;
+  welcome_dm_message: string | null;
   goodbye_enabled: boolean;
   goodbye_channel_id: string | null;
   goodbye_message: string;
@@ -82,6 +84,8 @@ const defaultConfig: GuildConfig = {
   welcome_embed_enabled: false,
   welcome_embed_color: "#00e85c",
   welcome_image_enabled: false,
+  welcome_dm_enabled: false,
+  welcome_dm_message: null,
   goodbye_enabled: false,
   goodbye_channel_id: null,
   goodbye_message: "Goodbye {username}! We now have {memberCount} members.",

@@ -23,6 +23,8 @@ CREATE TABLE IF NOT EXISTS guild_configs (
   welcome_embed_enabled BOOLEAN DEFAULT FALSE,
   welcome_embed_color TEXT DEFAULT '#00e85c',
   welcome_image_enabled BOOLEAN DEFAULT FALSE,
+  welcome_dm_enabled BOOLEAN DEFAULT FALSE,
+  welcome_dm_message TEXT,
   
   -- Goodbye
   goodbye_enabled BOOLEAN DEFAULT FALSE,
@@ -117,6 +119,8 @@ CREATE TABLE IF NOT EXISTS guild_configs (
 
 -- Upgrade an existing guild_configs table safely when this schema is applied
 -- after earlier dashboard versions.
+ALTER TABLE guild_configs ADD COLUMN IF NOT EXISTS welcome_dm_enabled BOOLEAN DEFAULT FALSE;
+ALTER TABLE guild_configs ADD COLUMN IF NOT EXISTS welcome_dm_message TEXT;
 ALTER TABLE guild_configs ADD COLUMN IF NOT EXISTS automod_emoji_threshold INTEGER DEFAULT 10;
 ALTER TABLE guild_configs ADD COLUMN IF NOT EXISTS automod_bad_words TEXT[] DEFAULT '{}';
 ALTER TABLE guild_configs ADD COLUMN IF NOT EXISTS xp_announce_channel_id TEXT;
