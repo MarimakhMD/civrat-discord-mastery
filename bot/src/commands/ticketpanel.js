@@ -15,6 +15,12 @@ module.exports = {
 
   async execute(interaction) {
     const config = await getGuildConfig(interaction.guild.id);
+    if (!config.tickets_enabled) {
+      return interaction.reply({ content: "❌ Le système de tickets est désactivé dans la configuration du serveur.", ephemeral: true });
+    }
+    if (!config.ticket_category_id || !config.ticket_support_role_id) {
+      return interaction.reply({ content: "❌ Configurez une catégorie et un rôle support avant d’envoyer le panel.", ephemeral: true });
+    }
 
     const embed = new EmbedBuilder()
       .setTitle(config.ticket_panel_title || "🎫 Système de Tickets")
