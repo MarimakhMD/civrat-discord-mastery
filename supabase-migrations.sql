@@ -120,8 +120,6 @@ CREATE TABLE IF NOT EXISTS guild_configs (
 
 -- Upgrade an existing guild_configs table safely when this schema is applied
 -- after earlier dashboard versions.
-ALTER TABLE suggestions ADD COLUMN IF NOT EXISTS staff_response TEXT;
-ALTER TABLE suggestions ADD COLUMN IF NOT EXISTS archived_at TIMESTAMPTZ;
 ALTER TABLE guild_configs ADD COLUMN IF NOT EXISTS welcome_dm_enabled BOOLEAN DEFAULT FALSE;
 ALTER TABLE guild_configs ADD COLUMN IF NOT EXISTS welcome_dm_message TEXT;
 ALTER TABLE guild_configs ADD COLUMN IF NOT EXISTS automod_emoji_threshold INTEGER DEFAULT 10;
@@ -177,6 +175,11 @@ CREATE TABLE IF NOT EXISTS suggestions (
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Add fields required by the persistent staff-response/archive workflow on
+-- existing installations. These run only after the suggestions table exists.
+ALTER TABLE suggestions ADD COLUMN IF NOT EXISTS staff_response TEXT;
+ALTER TABLE suggestions ADD COLUMN IF NOT EXISTS archived_at TIMESTAMPTZ;
 
 CREATE INDEX IF NOT EXISTS idx_suggestions_guild_id ON suggestions(guild_id);
 CREATE INDEX IF NOT EXISTS idx_suggestions_status ON suggestions(status);
