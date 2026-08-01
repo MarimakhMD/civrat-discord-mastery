@@ -1,25 +1,10 @@
-const { EmbedBuilder } = require("discord.js");
 const guildConfigService = require("../services/guildConfig");
-
-module.exports = {
-  name: "messageUpdate", once: false,
-  async execute(oldMessage, newMessage) {
-    if (!oldMessage.guild || oldMessage.author?.bot) return;
-    if (oldMessage.content === newMessage.content) return;
-    if (!oldMessage.content && !newMessage.content) return;
-
-    const config = await guildConfigService.getGuildConfig(oldMessage.guild.id);
-    if (!config?.logs_enabled) return;
-    const channelId = config.log_message_edit_channel_id;
-    if (!channelId) return;
-    const channel = oldMessage.client.channels.cache.get(channelId);
-    if (!channel) return;
-
-    const embed = new EmbedBuilder()
-      .setColor("#5865F2").setTitle("✏️ MESSAGE EDITED")
-      .setThumbnail(oldMessage.author.displayAvatarURL())
-      .setDescription(`👤 **Auteur** • ${oldMessage.author}\n📍 **Salon** • ${oldMessage.channel}\n🔗 [Aller au message](${newMessage.url})\n📝 **Avant**\n\`\`\`\n${(oldMessage.content || "").slice(0, 500)}\n\`\`\`\n📝 **Après**\n\`\`\`\n${(newMessage.content || "").slice(0, 500)}\n\`\`\``)
-      .setTimestamp();
-    channel.send({ embeds: [embed] });
-  },
-};
+const { sendLog } = require("../services/logService");
+module.exports = { name: "messageUpdate", once: false, async execute(oldMessage, newMessage) {
+  try {
+    if (!newMessage.guild || newMessage.author?.bot || oldMessage.content === newMessage.content) return;
+    const config = await guildConfigService.getGuildConfig(newMessage.guild.id);
+    if (!config.logs_enabled) return;
+    await sendLog(newMessage.guild, config, "log_message_edit_channel_id", { title: "✏️ Message modifié", color: "info", target: `${newMessage.author} (${newMessage.author.id})`, fields: [{ name: "Salon", value: `${newMessage.channel}`, inline: true }, { name: "Lien", value: newMessage.url ? `[Ouvrir le message](${newMessage.url})` : "Indisponible", inline: true }, { name: "Avant", value: `\`\`\`\n${(oldMessage.content || "—").slice(0, 450)}\n\`\`\`` }, { name: "Après", value: `\`\`\`\n${(newMessage.content || "—").slice(0, 450)}\n\`\`\`` }] });
+  } catch {}
+} };

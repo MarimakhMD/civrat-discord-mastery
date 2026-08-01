@@ -1,4 +1,6 @@
 const { SlashCommandBuilder, PermissionsBitField } = require("discord.js");
+const { getGuildConfig } = require("../services/guildConfig");
+const { sendLog } = require("../services/logService");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -26,6 +28,7 @@ module.exports = {
     const durationMs = Math.min(duree * 60 * 1000, 28 * 24 * 60 * 60 * 1000); // Max 28 days
 
     await member.timeout(durationMs, raison);
+    await sendLog(interaction.guild, await getGuildConfig(interaction.guild.id), "log_moderation_channel_id", { title: "⏳ Timeout", color: "warning", target: `${user} (${user.id})`, moderator: interaction.user, fields: [{ name: "Durée", value: `${duree} minute(s)`, inline: true }, { name: "Raison", value: raison, inline: true }] });
     return interaction.reply(
       `🔇 ${user.tag} a été mute pour ${duree} minute(s).\n📝 Raison : ${raison}`
     );

@@ -1,23 +1,4 @@
-const { EmbedBuilder } = require("discord.js");
 const guildConfigService = require("../services/guildConfig");
 const { fetchAuditLog } = require("../utils/auditLogCache");
-
-module.exports = {
-  name: "channelUpdate", once: false,
-  async execute(oldChannel, newChannel) {
-    if (!newChannel.guild || oldChannel.name === newChannel.name) return;
-    const config = await guildConfigService.getGuildConfig(newChannel.guild.id);
-    if (!config?.logs_enabled) return;
-    const channelId = config.log_channel_update_channel_id;
-    if (!channelId) return;
-    const logChannel = newChannel.client.channels.cache.get(channelId);
-    if (!logChannel) return;
-
-    const entry = await fetchAuditLog(newChannel.guild, 11);
-    const embed = new EmbedBuilder()
-      .setColor("#5865F2").setTitle("🔧 CHANNEL UPDATED")
-      .setDescription(`📍 **Avant** • ${oldChannel.name}\n📍 **Après** • ${newChannel.name}\n🛡 **Par** • ${entry?.executor || "Inconnu"}`)
-      .setTimestamp();
-    logChannel.send({ embeds: [embed] });
-  },
-};
+const { sendLog } = require("../services/logService");
+module.exports = { name: "channelUpdate", once: false, async execute(oldChannel, newChannel) { try { if (!newChannel.guild || oldChannel.name === newChannel.name) return; const config = await guildConfigService.getGuildConfig(newChannel.guild.id); if (!config.logs_enabled) return; const entry = await fetchAuditLog(newChannel.guild, 11); await sendLog(newChannel.guild, config, "log_channel_update_channel_id", { title: "🔧 Salon modifié", color: "info", moderator: entry?.executor, fields: [{ name: "Avant", value: oldChannel.name || "—", inline: true }, { name: "Après", value: newChannel.name || "—", inline: true }, { name: "ID", value: newChannel.id, inline: true }] }); } catch {} } };
