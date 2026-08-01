@@ -31,7 +31,7 @@ function validateConfig() {
   if (!config.token) errors.push("DISCORD_TOKEN is missing");
   if (!config.clientId) errors.push("CLIENT_ID is missing");
   if (!config.supabaseUrl) errors.push("SUPABASE_URL is missing");
-  if (!config.supabaseAnonKey) errors.push("SUPABASE_ANON_KEY is missing");
+  if (!config.supabaseServiceRoleKey) errors.push("SUPABASE_SERVICE_ROLE_KEY is missing");
 
   if (errors.length > 0) {
     console.error("❌ Configuration errors:");

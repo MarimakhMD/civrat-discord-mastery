@@ -1,19 +1,12 @@
 const DISCORD_API = "https://discord.com/api/v10";
 
-export async function exchangeCode(code: string) {
-  const res = await fetch(`${DISCORD_API}/oauth2/token`, {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      client_id: import.meta.env.VITE_DISCORD_CLIENT_ID ?? "",
-      client_secret: import.meta.env.VITE_DISCORD_CLIENT_SECRET ?? "",
-      grant_type: "authorization_code",
-      code,
-      redirect_uri: `${window.location.origin}/login`,
-    }),
-  });
-  if (!res.ok) throw new Error("Token exchange failed");
-  return res.json();
+/**
+ * OAuth code exchanges require a confidential server credential and must never
+ * run in Vite/browser code. The active dashboard uses the authorized bot API.
+ */
+export async function exchangeCode(code: string): Promise<{ access_token: string }> {
+  void code;
+  throw new Error("Discord OAuth code exchange must be handled by a server endpoint.");
 }
 
 export async function fetchDiscordUser(accessToken: string) {

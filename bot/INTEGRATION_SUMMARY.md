@@ -528,3 +528,9 @@ Les endpoints autorisés suivants sont désormais le chemin production pour `gui
 Tous vérifient token Supabase, membre Discord et `Administrator`/`ManageGuild`. Le `PUT` n’accepte que les clés canoniques de `guild_configs`; les clés inconnues sont refusées. Le client bot privilégie `SUPABASE_SERVICE_ROLE_KEY` côté serveur et conserve un fallback anon uniquement pour compatibilité contrôlée tant que RLS permissif existe. Avant le durcissement RLS, définir `VITE_BOT_API_URL` dans le dashboard et `SUPABASE_SERVICE_ROLE_KEY` uniquement sur Bot-Hosting.
 
 Le `PUT /api/guilds/:guildId/config` applique une allow-list des clés canoniques et valide types, IDs Discord, enums, bornes numériques, tailles texte et structures de récompenses avant toute écriture Supabase. Les clés inconnues ou valeurs invalides retournent 400.
+
+---
+
+## RLS strict — prérequis production
+
+La migration supprime toutes les policies existantes sur `guild_configs`, `giveaways`, `suggestions` et `tickets`, puis révoque les privilèges `anon`/`authenticated`. Aucune policy `USING (true)` ou `WITH CHECK (true)` n’est conservée. Le bot doit avoir `SUPABASE_SERVICE_ROLE_KEY` sur Bot-Hosting ; il refuse désormais de démarrer sans cette clé. Le dashboard doit avoir `VITE_BOT_API_URL` et passe exclusivement par l’API Bot autorisée pour la configuration. Tester la migration dans une instance Supabase de test avant application production est obligatoire.

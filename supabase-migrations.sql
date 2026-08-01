@@ -209,38 +209,42 @@ CREATE INDEX IF NOT EXISTS idx_tickets_status ON tickets(status);
 -- 5. ROW LEVEL SECURITY (RLS) POLICIES
 -- ═══════════════════════════════════════════════════
 
--- Enable RLS on all tables
+-- Strict production RLS: browser roles receive no direct table access.
+-- The authorized bot API uses SUPABASE_SERVICE_ROLE_KEY server-side and
+-- therefore bypasses RLS only after it validates Supabase session, Discord
+-- membership, and ManageGuild/Administrator permissions.
 ALTER TABLE guild_configs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE giveaways ENABLE ROW LEVEL SECURITY;
 ALTER TABLE suggestions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE tickets ENABLE ROW LEVEL SECURITY;
 
--- Allow all operations for now (you can restrict later based on your auth needs)
--- For production, you should add proper authentication checks
+DROP POLICY IF EXISTS "Allow all operations on guild_configs" ON guild_configs;
+DROP POLICY IF EXISTS "Allow all operations on giveaways" ON giveaways;
+DROP POLICY IF EXISTS "Allow all operations on suggestions" ON suggestions;
+DROP POLICY IF EXISTS "Allow all operations on tickets" ON tickets;
 
--- guild_configs policies
-CREATE POLICY "Allow all operations on guild_configs"
-  ON guild_configs FOR ALL
-  USING (true)
-  WITH CHECK (true);
+-- Remove any legacy policy names too. No browser-role policy is retained on
+-- sensitive tables; the server-side bot API is the sole data gateway.
+DO $$
+DECLARE policy_record record;
+BEGIN
+  FOR policy_record IN
+    SELECT tablename, policyname FROM pg_policies
+    WHERE schemaname = 'public'
+      AND tablename IN ('guild_configs', 'giveaways', 'suggestions', 'tickets')
+  LOOP
+    EXECUTE format('DROP POLICY IF EXISTS %I ON public.%I', policy_record.policyname, policy_record.tablename);
+  END LOOP;
+END $$;
 
--- giveaways policies
-CREATE POLICY "Allow all operations on giveaways"
-  ON giveaways FOR ALL
-  USING (true)
-  WITH CHECK (true);
-
--- suggestions policies
-CREATE POLICY "Allow all operations on suggestions"
-  ON suggestions FOR ALL
-  USING (true)
-  WITH CHECK (true);
-
--- tickets policies
-CREATE POLICY "Allow all operations on tickets"
-  ON tickets FOR ALL
-  USING (true)
-  WITH CHECK (true);
+REVOKE ALL ON TABLE guild_configs FROM anon, authenticated;
+REVOKE ALL ON TABLE giveaways FROM anon, authenticated;
+REVOKE ALL ON TABLE suggestions FROM anon, authenticated;
+REVOKE ALL ON TABLE tickets FROM anon, authenticated;
+REVOKE ALL ON SEQUENCE guild_configs_id_seq FROM anon, authenticated;
+REVOKE ALL ON SEQUENCE giveaways_id_seq FROM anon, authenticated;
+REVOKE ALL ON SEQUENCE suggestions_id_seq FROM anon, authenticated;
+REVOKE ALL ON SEQUENCE tickets_id_seq FROM anon, authenticated;
 
 -- ═══════════════════════════════════════════════════
 -- 6. UPDATED_AT TRIGGER FUNCTION
