@@ -279,3 +279,20 @@ node index.js     # Démarrer le bot
    - S'assurer que la table `guild_configs` existe dans Supabase
    - Les colonnes doivent correspondre au schéma dans `use-guild-config.ts`
 4. **Les IDs hardcodés restants** (MEMBER_ROLE, BOT_ROLE) sont des fallbacks qui seront remplacés par la config Supabase quand les champs correspondants seront ajoutés au schéma
+
+---
+
+## Security Center — état réel
+
+Les protections suivantes sont reliées au contrat `guild_configs` et actives côté bot lorsqu'elles sont configurées :
+
+| Protection | Champ | État |
+|---|---|---|
+| Détection raid (5 arrivées / 15 s) | `security_enabled`, `security_anti_raid` | Opérationnelle |
+| Bot non autorisé | `security_anti_bot`, `security_whitelist` | Opérationnelle |
+| Créations/suppressions massives salons | `security_anti_nuke` | Opérationnelle |
+| Créations/suppressions massives rôles | `security_anti_nuke` | Opérationnelle |
+| Réponse quarantaine | `security_quarantine_role` | Opérationnelle si le bot peut gérer le membre/rôle |
+| Log incident | `log_moderation_channel_id` | Opérationnelle |
+
+Les actions anti-webhook, mass-ban, mass-kick, seuils personnalisables, retrait de permissions et exemptions de rôles/salons ne sont pas documentées comme fonctionnelles : elles requièrent des champs canoniques supplémentaires et/ou des événements/services dédiés.

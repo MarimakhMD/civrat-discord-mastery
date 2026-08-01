@@ -8,6 +8,7 @@ const guildConfigService = require("../services/guildConfig");
 const inviteService = require("../services/inviteService");
 const welcomeService = require("../services/welcomeService");
 const logger = require("../utils/logger");
+const securityService = require("../services/securityService");
 
 // Anti-raid tracking per guild
 const joinTracker = new Map();
@@ -28,8 +29,9 @@ module.exports = {
     const inviteResult = await handleInviteTracking(member, config);
     // 4. Join Log
     await handleJoinLog(member, config, inviteResult);
-    // 5. Anti-Raid
-    await handleAntiRaid(member, config);
+    // 5. Security Center
+    await securityService.recordRaidJoin(member, config);
+    await securityService.handleBotJoin(member, config);
   },
 };
 
@@ -100,30 +102,5 @@ async function handleJoinLog(member, config, inviteResult) {
     channel.send({ embeds: [embed] });
   } catch (err) {
     logger.error(`Join log failed:`, err.message);
-  }
-}
-
-async function handleAntiRaid(member, config) {
-  if (!config.security_anti_raid) return;
-
-  if (!joinTracker.has(member.guild.id)) {
-    joinTracker.set(member.guild.id, []);
-  }
-
-  const joins = joinTracker.get(member.guild.id);
-  joins.push(Date.now());
-
-  const filtered = joins.filter((t) => Date.now() - t < 10000);
-  joinTracker.set(member.guild.id, filtered);
-
-  if (filtered.length >= 5) {
-    const alertChannelId = config.security_log_channel_id;
-    if (alertChannelId) {
-      const channel = member.client.channels.cache.get(alertChannelId);
-      if (channel) {
-        channel.send(`🚨 **RAID DÉTECTÉ** — ${filtered.length} membres ont rejoint en moins de 10s !`);
-      }
-    }
-    joinTracker.set(member.guild.id, []);
   }
 }

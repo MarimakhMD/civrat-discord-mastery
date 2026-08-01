@@ -55,3 +55,17 @@ Pour un déploiement, utilisez la configuration Vercel déjà reliée au dépôt
 2. Ajouter les chaînes de texte via le système de présentation approprié avant de les réutiliser dans des modules.
 3. Pour une donnée Discord non exposée par le backend, créer uniquement un état visuel explicite « prêt à connecter » ; ne pas simuler de persistance.
 4. Tester au minimum le build et le lint avant toute mise en production.
+
+## Security Center (bot)
+
+The bot currently enforces the canonical `guild_configs` Security fields below:
+
+- `security_enabled`
+- `security_anti_raid`
+- `security_anti_nuke`
+- `security_anti_bot`
+- `security_whitelist`
+- `security_quarantine_role`
+- `log_moderation_channel_id`
+
+When enabled, CIVRAT detects join bursts, unapproved bot joins, and repeated channel/role creation or deletion from the same audit-log actor. It writes security incidents to the configured moderation log and applies the configured quarantine role where Discord permissions allow it. Webhook, mass-ban, mass-kick, and per-action thresholds remain future work because the current canonical configuration does not contain fields for them.
