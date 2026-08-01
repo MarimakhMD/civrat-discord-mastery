@@ -456,3 +456,19 @@ Welcome, Tickets, Logs, AutoMod, Security, Invitations, XP, Giveaways, Suggestio
 ### Modules partiels ou non reliés
 
 Moderation history, Analytics, Backups, Embed Builder, metadata Discord dynamique, localisation complète et données dashboard réelles des giveaways/suggestions restent des travaux v1.1.
+
+---
+
+## QA pré-production — résultats statiques
+
+| Contrôle | Résultat |
+|---|---|
+| Commandes chargées | 23, noms uniques |
+| Événements enregistrés | 22, un listener par nom |
+| Syntaxe JavaScript bot | 70 fichiers OK |
+| Lint dashboard actif | OK |
+| Build TypeScript/Vite | OK |
+| `npm audit --omit=dev` bot | 0 vulnérabilité connue |
+| Champs canoniques hérités actifs | Aucun détecté |
+
+Les tests Discord/Supabase/MongoDB réels restent obligatoires dans une guild de test : le checkout ne contient pas de secrets de production et aucun appel vers les services réels n’a été exécuté.

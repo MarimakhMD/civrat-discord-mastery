@@ -103,3 +103,7 @@ The active React `GuildContext` now loads `guild_configs` from Supabase when a g
 The Vite dashboard passes lint and production build; dashboard routes are lazy-loaded. All JavaScript bot files pass Node syntax validation and `bot/package-lock.json` pins production dependencies (`npm audit --omit=dev`: no known vulnerabilities at audit time).
 
 Before a public production rollout, apply `supabase-migrations.sql`, replace the default `API_SECRET`, and resolve the explicit security limitations documented below: the active dashboard still discovers demo guilds rather than Discord metadata, Supabase RLS policies in the supplied migration allow all operations, and the bot cache-invalidation API endpoint is not authenticated. These are deployment/security tasks, not completed production guarantees.
+
+## Weekly Discord QA checklist
+
+Before the controlled test week, deploy slash commands with `cd bot && npm run deploy`, run one bot instance only, and apply the current Supabase migration. Static QA completed on this revision: 23 command modules load with unique command names, 22 Discord event modules register exactly once, all bot JavaScript files pass `node --check`, and the dashboard passes lint/build. Runtime QA still requires real Discord, Supabase, and MongoDB credentials; exercise each configured module in a dedicated test guild before public release.
