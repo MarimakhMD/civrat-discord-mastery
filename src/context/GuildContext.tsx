@@ -1,9 +1,9 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
 import type { GuildConfig } from '@/types';
-import { getGuildConfigFromBot, updateGuildConfigFromBot } from '@/lib/bot-sync';
+import { getGuildConfigFromBot, getGuildMetadataFromBot, updateGuildConfigFromBot, type GuildMetadata } from '@/lib/bot-sync';
 
 interface GuildState {
-  selectedGuildId: string | null; config: GuildConfig;
+  selectedGuildId: string | null; config: GuildConfig; metadata: GuildMetadata | null;
   selectGuild: (id: string) => Promise<void>; updateConfig: (data: Partial<GuildConfig>) => Promise<void>; loading: boolean;
 }
 const GuildContext = createContext<GuildState | null>(null);
@@ -28,14 +28,16 @@ const defaultConfig: GuildConfig = {
 export function GuildProvider({ children }: { children: ReactNode }) {
   const [selectedGuildId, setSelectedGuildId] = useState<string | null>(() => localStorage.getItem('selectedGuildId'));
   const [config, setConfig] = useState<GuildConfig>(defaultConfig);
+  const [metadata, setMetadata] = useState<GuildMetadata | null>(null);
   const [loading, setLoading] = useState(false);
 
   const selectGuild = useCallback(async (id: string) => {
     setLoading(true); setSelectedGuildId(id); localStorage.setItem('selectedGuildId', id);
     try {
-      const apiConfig = await getGuildConfigFromBot(id);
-      if (!apiConfig) throw new Error('Configuration sécurisée indisponible.');
+      const [apiConfig, guildMetadata] = await Promise.all([getGuildConfigFromBot(id), getGuildMetadataFromBot(id)]);
+      if (!apiConfig || !guildMetadata) throw new Error('Configuration sécurisée indisponible.');
       setConfig({ ...defaultConfig, ...apiConfig, guild_id: id });
+      setMetadata(guildMetadata);
     } finally { setLoading(false); }
   }, []);
 
@@ -49,6 +51,6 @@ export function GuildProvider({ children }: { children: ReactNode }) {
     } finally { setLoading(false); }
   }, [selectedGuildId]);
 
-  return <GuildContext.Provider value={{ selectedGuildId, config, selectGuild, updateConfig, loading }}>{children}</GuildContext.Provider>;
+  return <GuildContext.Provider value={{ selectedGuildId, config, metadata, selectGuild, updateConfig, loading }}>{children}</GuildContext.Provider>;
 }
 export function useGuild() { const ctx = useContext(GuildContext); if (!ctx) throw new Error('useGuild must be used within GuildProvider'); return ctx; }

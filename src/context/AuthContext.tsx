@@ -1,87 +1,67 @@
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
+import type { Session } from '@supabase/supabase-js';
 import type { User, Guild } from '@/types';
 import { supabase } from '@/lib/supabase';
-import { canManageGuild } from '@/lib/utils';
+import { getDiscordGuildsFromBot } from '@/lib/bot-sync';
 
 interface AuthState {
   user: User | null; guilds: Guild[]; loading: boolean; isAuthenticated: boolean;
-  login: () => void; logout: () => Promise<void>; refreshGuilds: () => Promise<void>;
+  login: () => Promise<void>; logout: () => Promise<void>; refreshGuilds: () => Promise<void>;
 }
-
 const AuthContext = createContext<AuthState | null>(null);
 
-const DISCORD_CLIENT_ID = import.meta.env.VITE_DISCORD_CLIENT_ID || '';
-const REDIRECT_URI = `${window.location.origin}/auth/callback`;
+function dashboardUser(session: Session): User {
+  const meta = session.user.user_metadata || {};
+  return {
+    id: session.user.id, discord_id: String(meta.provider_id || meta.sub || meta.id || ''),
+    username: String(meta.full_name || meta.user_name || meta.name || 'Discord user'), discriminator: String(meta.discriminator || '0000'),
+    avatar: meta.avatar_url || meta.avatar || null, email: session.user.email || null, created_at: session.user.created_at,
+    is_premium: false, premium_expires_at: null,
+  };
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [guilds, setGuilds] = useState<Guild[]>([]);
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const login = useCallback(() => {
-    const params = new URLSearchParams({
-      client_id: DISCORD_CLIENT_ID, redirect_uri: REDIRECT_URI,
-      response_type: 'code', scope: 'identify guilds email', prompt: 'consent',
-    });
-    window.location.href = `https://discord.com/api/oauth2/authorize?${params}`;
-  }, []);
-
-  const logout = useCallback(async () => {
-    try {
-      await supabase.auth.signOut();
-    } finally {
-      // Remove every client-side identity/dashboard reference even if the
-      // remote sign-out request is temporarily unavailable.
-      localStorage.removeItem('selectedGuildId');
-      setUser(null);
-      setGuilds([]);
-    }
+  const loadGuildsForToken = useCallback(async (providerToken?: string | null) => {
+    if (!providerToken) { setGuilds([]); return; }
+    setGuilds(await getDiscordGuildsFromBot(providerToken));
   }, []);
 
   const refreshGuilds = useCallback(async () => {
-    const demoGuilds: Guild[] = [
-      { id: '111111111111111111', name: 'CIVRAT Community', icon: null, owner: true, permissions: 0x8, bot_present: true, member_count: 15420 },
-      { id: '222222222222222222', name: 'Gaming Hub', icon: null, owner: false, permissions: 0x20, bot_present: true, member_count: 8340 },
-      { id: '333333333333333333', name: 'Dev Server', icon: null, owner: true, permissions: 0x8, bot_present: false, member_count: 245 },
-      { id: '444444444444444444', name: 'Music Lounge', icon: null, owner: false, permissions: 0x28, bot_present: true, member_count: 3200 },
-    ];
-    setGuilds(demoGuilds.filter(g => canManageGuild(g.permissions)));
+    await loadGuildsForToken(session?.provider_token);
+  }, [loadGuildsForToken, session]);
+
+  const login = useCallback(async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'discord',
+      options: { redirectTo: `${window.location.origin}/auth/callback`, scopes: 'identify guilds email' },
+    });
+    if (error) throw error;
+  }, []);
+
+  const logout = useCallback(async () => {
+    try { await supabase.auth.signOut(); }
+    finally { localStorage.removeItem('selectedGuildId'); setSession(null); setUser(null); setGuilds([]); }
   }, []);
 
   useEffect(() => {
-    (async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
-          const meta = session.user.user_metadata;
-          setUser({
-            id: session.user.id, discord_id: meta?.provider_id || '', username: meta?.full_name || 'User',
-            discriminator: meta?.discriminator || '0000', avatar: meta?.avatar || null,
-            email: session.user.email || null, created_at: session.user.created_at,
-            is_premium: false, premium_expires_at: null,
-          });
-          await refreshGuilds();
-        } else {
-          setUser(null);
-          setGuilds([]);
-        }
-      } catch {
-        setUser(null);
-        setGuilds([]);
-      }
-      setLoading(false);
-    })();
-  }, [refreshGuilds]);
+    let active = true;
+    supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
+      if (!active) return;
+      setSession(initialSession); setUser(initialSession ? dashboardUser(initialSession) : null); void loadGuildsForToken(initialSession?.provider_token); setLoading(false);
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      if (!active) return;
+      setSession(nextSession); setUser(nextSession ? dashboardUser(nextSession) : null);
+      void loadGuildsForToken(nextSession?.provider_token);
+    });
+    return () => { active = false; subscription.unsubscribe(); };
+  }, [loadGuildsForToken]);
 
-  return (
-    <AuthContext.Provider value={{ user, guilds, loading, isAuthenticated: !!user, login, logout, refreshGuilds }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={{ user, guilds, loading, isAuthenticated: Boolean(user), login, logout, refreshGuilds }}>{children}</AuthContext.Provider>;
 }
-
-export function useAuth() {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used within AuthProvider');
-  return ctx;
-}
+export function useAuth() { const ctx = useContext(AuthContext); if (!ctx) throw new Error('useAuth must be used within AuthProvider'); return ctx; }

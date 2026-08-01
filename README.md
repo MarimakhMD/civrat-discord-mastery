@@ -125,3 +125,7 @@ The Bot API configuration update endpoint accepts only the canonical `guild_conf
 ## Strict Supabase RLS rollout
 
 The supplied migration now removes every policy on sensitive public tables and revokes `anon`/`authenticated` table and sequence privileges. Browser clients cannot read or write `guild_configs`, `giveaways`, `suggestions`, or `tickets` after it is applied. Production requires `VITE_BOT_API_URL` in the dashboard and `SUPABASE_SERVICE_ROLE_KEY` only on Bot-Hosting; the authorized Bot API is then the exclusive gateway after it verifies the Supabase session, Discord membership and guild management permission. Apply the migration in a test project first, then verify dashboard config load/save through the Bot API before applying it to production.
+
+## Discord production metadata
+
+The dashboard authenticates through Supabase Discord OAuth and sends the short-lived Discord provider token only to the authenticated Bot API. `GET /api/discord/guilds` verifies that token matches the Supabase identity, then returns only Discord guilds where the user is owner, `Administrator`, or `ManageGuild`, marking whether CIVRAT is present. After a managed guild is selected, `GET /api/guilds/:guildId/metadata` returns authorized live channels, categories, roles, emojis, and effective member permissions. The provider token is never logged or persisted by the dashboard.

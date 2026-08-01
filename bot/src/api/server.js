@@ -82,7 +82,7 @@ function scheduleGuildReload(guildId, waitMs) {
 function createServer(discordClient) {
   const app = express();
   app.use(helmet({ contentSecurityPolicy: false }));
-  app.use(cors({ origin: [config.dashboardUrl, 'http://localhost:3000'], credentials: true }));
+  app.use(cors({ origin: [config.dashboardUrl, 'http://localhost:3000'], credentials: true, allowedHeaders: ['Authorization', 'Content-Type', 'X-Discord-Access-Token'] }));
   app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100, message: { error: 'Too many requests' } }));
   app.use(express.json({ limit: '1mb' }));
 
@@ -104,8 +104,41 @@ function createServer(discordClient) {
     const canManage = member.permissions.has(PermissionsBitField.Flags.Administrator) || member.permissions.has(PermissionsBitField.Flags.ManageGuild);
     if (!canManage) { logger.warn(`Guild API denied: insufficient permissions for user ${user.id} on ${guildId}`); res.status(403).json({ error: 'Manage Guild permission required' }); return null; }
     if (enforceSyncRate && userRateLimited(user.id)) { logger.warn(`Guild API rate limited: user ${user.id}`); res.status(429).json({ error: 'Too many requests' }); return null; }
-    return { guildId, user };
+    return { guildId, user, guild, member };
   }
+
+  app.get('/api/discord/guilds', async (req, res) => {
+    const token = req.get('authorization')?.replace(/^Bearer\s+/i, '');
+    const discordToken = req.get('x-discord-access-token');
+    if (!token || !discordToken || !supabase) return res.status(401).json({ error: 'Unauthorized' });
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+    if (error || !user) return res.status(401).json({ error: 'Unauthorized' });
+    try {
+      const meResponse = await fetch('https://discord.com/api/v10/users/@me', { headers: { Authorization: `Bearer ${discordToken}` } });
+      if (!meResponse.ok) return res.status(401).json({ error: 'Discord authorization expired' });
+      const discordUser = await meResponse.json();
+      if (discordUser.id !== discordIdFromUser(user)) return res.status(403).json({ error: 'Discord identity mismatch' });
+      const guildResponse = await fetch('https://discord.com/api/v10/users/@me/guilds', { headers: { Authorization: `Bearer ${discordToken}` } });
+      if (!guildResponse.ok) return res.status(503).json({ error: 'Discord guilds unavailable' });
+      const guilds = (await guildResponse.json()).filter((item) => {
+        const permissions = BigInt(item.permissions || '0');
+        return item.owner || (permissions & 0x8n) === 0x8n || (permissions & 0x20n) === 0x20n;
+      }).map((item) => ({ id: item.id, name: item.name, icon: item.icon, owner: item.owner, permissions: Number(item.permissions), bot_present: discordClient.guilds.cache.has(item.id), member_count: 0 }));
+      return res.json({ guilds });
+    } catch (discordError) {
+      logger.warn(`Discord guild discovery failed for user ${user.id}: ${discordError.message}`);
+      return res.status(503).json({ error: 'Discord guilds unavailable' });
+    }
+  });
+
+  app.get('/api/guilds/:guildId/metadata', async (req, res) => {
+    const access = await authorizeGuild(req, res); if (!access) return;
+    const channels = [...access.guild.channels.cache.values()].map((channel) => ({ id: channel.id, name: channel.name, type: channel.type, parent_id: channel.parentId || null }));
+    const categories = channels.filter((channel) => channel.type === 4).map((channel) => ({ id: channel.id, name: channel.name }));
+    const roles = [...access.guild.roles.cache.values()].filter((role) => role.id !== access.guild.id && !role.managed).sort((a, b) => b.position - a.position).map((role) => ({ id: role.id, name: role.name, color: role.color, position: role.position }));
+    const emojis = [...access.guild.emojis.cache.values()].map((emoji) => ({ id: emoji.id, name: emoji.name, animated: emoji.animated }));
+    return res.json({ guild: { id: access.guild.id, name: access.guild.name, icon: access.guild.icon }, channels, categories, roles, emojis, permissions: access.member.permissions.bitfield.toString() });
+  });
 
   app.get('/api/guilds/:guildId/config', async (req, res) => {
     const access = await authorizeGuild(req, res); if (!access) return;

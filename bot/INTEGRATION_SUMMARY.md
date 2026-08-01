@@ -534,3 +534,14 @@ Le `PUT /api/guilds/:guildId/config` applique une allow-list des clés canonique
 ## RLS strict — prérequis production
 
 La migration supprime toutes les policies existantes sur `guild_configs`, `giveaways`, `suggestions` et `tickets`, puis révoque les privilèges `anon`/`authenticated`. Aucune policy `USING (true)` ou `WITH CHECK (true)` n’est conservée. Le bot doit avoir `SUPABASE_SERVICE_ROLE_KEY` sur Bot-Hosting ; il refuse désormais de démarrer sans cette clé. Le dashboard doit avoir `VITE_BOT_API_URL` et passe exclusivement par l’API Bot autorisée pour la configuration. Tester la migration dans une instance Supabase de test avant application production est obligatoire.
+
+---
+
+## Métadonnées Discord production
+
+| Endpoint | Vérifications | Données |
+|---|---|---|
+| `GET /api/discord/guilds` | session Supabase + token Discord correspondant à l’identité | guilds owner/Admin/ManageGuild, présence bot |
+| `GET /api/guilds/:guildId/metadata` | session, membre Discord, Administrator/ManageGuild | salons, catégories, rôles, emojis, permissions |
+
+Le dashboard ne conserve pas le token provider Discord au-delà de la session Supabase et ne le journalise pas. Les métadonnées sont récupérées uniquement après autorisation Bot API.

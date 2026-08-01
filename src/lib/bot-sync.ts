@@ -4,15 +4,13 @@ import { supabase } from '@/lib/supabase';
 const botApiUrl = import.meta.env.VITE_BOT_API_URL?.replace(/\/$/, '');
 export const hasBotApi = Boolean(botApiUrl);
 
-async function authorizedRequest(path: string, init: RequestInit = {}) {
+async function authorizedRequest(path: string, init: RequestInit = {}, discordAccessToken?: string) {
   if (!botApiUrl) return null;
   const { data: { session } } = await supabase.auth.getSession();
   if (!session?.access_token) return null;
-  const response = await fetch(`${botApiUrl}${path}`, {
-    ...init,
-    headers: { Authorization: `Bearer ${session.access_token}`, ...(init.headers || {}) },
-  });
-  return response;
+  const headers: Record<string, string> = { Authorization: `Bearer ${session.access_token}`, ...(init.headers as Record<string, string> || {}) };
+  if (discordAccessToken) headers['X-Discord-Access-Token'] = discordAccessToken;
+  return fetch(`${botApiUrl}${path}`, { ...init, headers });
 }
 
 export async function getGuildConfigFromBot(guildId: string): Promise<GuildConfig | null> {
@@ -32,6 +30,26 @@ export async function updateGuildConfigFromBot(guildId: string, updates: Partial
     if (!response?.ok) return null;
     const payload = await response.json();
     return payload.config as GuildConfig;
+  } catch { return null; }
+}
+
+export interface DiscordGuildSummary { id: string; name: string; icon: string | null; owner: boolean; permissions: number; bot_present: boolean; member_count: number; }
+export interface GuildMetadata { guild: { id: string; name: string; icon: string | null }; channels: Array<{ id: string; name: string; type: number; parent_id: string | null }>; categories: Array<{ id: string; name: string }>; roles: Array<{ id: string; name: string; color: number; position: number }>; emojis: Array<{ id: string | null; name: string; animated: boolean }>; permissions: string; }
+
+export async function getDiscordGuildsFromBot(discordAccessToken: string): Promise<DiscordGuildSummary[]> {
+  try {
+    const response = await authorizedRequest('/api/discord/guilds', {}, discordAccessToken);
+    if (!response?.ok) return [];
+    const payload = await response.json();
+    return payload.guilds as DiscordGuildSummary[];
+  } catch { return []; }
+}
+
+export async function getGuildMetadataFromBot(guildId: string): Promise<GuildMetadata | null> {
+  try {
+    const response = await authorizedRequest(`/api/guilds/${encodeURIComponent(guildId)}/metadata`);
+    if (!response?.ok) return null;
+    return (await response.json()) as GuildMetadata;
   } catch { return null; }
 }
 
