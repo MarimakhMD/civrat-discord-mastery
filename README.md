@@ -73,3 +73,7 @@ When enabled, CIVRAT detects join bursts, unapproved bot joins, and repeated cha
 ## Invitation tracking (bot)
 
 When `invitations_enabled` is enabled, CIVRAT caches guild invites at startup and after invite lifecycle events. It identifies the incremented invite on member join, persists total/current/left counts in the existing `InviteStats` MongoDB collection, records invitation joins in `invitations_log_channel_id`, and exposes the available counters plus a leaderboard through `/invites`. Fake-invite detection is intentionally reported as unavailable because no fake-account data model exists yet.
+
+## XP & Levels (bot)
+
+When `xp_enabled` is enabled, CIVRAT stores member XP in the `UserXP` MongoDB collection. It uses `xp_per_message`, `xp_cooldown`, `xp_announce_channel_id` and `role_rewards` from `guild_configs`. The stable formula is `100 × level²` total XP. `/niveau` displays a member profile and `/classement` displays the top ten. XP level announcements and configured role rewards are sent/applied only when Discord permissions allow them.

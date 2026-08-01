@@ -313,3 +313,22 @@ Les actions anti-webhook, mass-ban, mass-kick, seuils personnalisables, retrait 
 | Vanity URLs / attribution après redémarrage avant premier cache | Discord ne fournit pas toujours l’information | Limité |
 
 Un départ issu d’un kick détecté via Audit Logs n’est pas décrémenté comme départ volontaire. Les erreurs Discord et Mongo sont absorbées et journalisées sans faire tomber le listener.
+
+---
+
+## XP & Niveaux — état réel
+
+| Fonctionnalité | Champ / source | État |
+|---|---|---|
+| Gain XP message | `xp_enabled`, `xp_per_message` | Opérationnelle |
+| Cooldown durable | `xp_cooldown`, `UserXP.lastXpAt` | Opérationnelle |
+| Niveaux | formule `100 × niveau²` | Opérationnelle |
+| Rôles récompense | `role_rewards` | Opérationnelle si le bot peut gérer le rôle/membre |
+| Annonce niveau | `xp_announce_channel_id` | Opérationnelle si le salon est accessible |
+| `/niveau` | collection `UserXP` | Opérationnelle |
+| `/classement` | index Mongo `guildId, xp` | Opérationnelle |
+| Carte XP image | aucune dépendance image/canvas | Prêt à connecter |
+| Multiplicateurs | aucun champ canonique | Prêt à connecter |
+| Analytics XP dashboard | aucun endpoint API actif | Prêt à connecter |
+
+Le modèle Mongo `UserXP` est la seule collection ajoutée pour XP : il contient guildId, userId, xp, level, lastXpAt et totalMessages, avec index unique `(guildId, userId)` et index de classement `(guildId, xp)`.

@@ -1,4 +1,5 @@
 const automodService = require("../services/automodService");
+const xpService = require("../services/xpService");
 const mongoose = require("mongoose");
 const logger = require("../utils/logger");
 const guildConfigService = require("../services/guildConfig");
@@ -13,6 +14,7 @@ module.exports = { name: "messageCreate", once: false, async execute(message) {
     const config = await guildConfigService.getGuildConfig(message.guild.id);
     if (!config) return;
     if (await automodService.handleMessage(message, config)) return;
+    await xpService.awardXp(message, config);
     await handleCounting(message);
   } catch (error) { logger.error("messageCreate failed:", error.message); }
 } };
