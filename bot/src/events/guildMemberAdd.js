@@ -9,6 +9,7 @@ const inviteService = require("../services/inviteService");
 const welcomeService = require("../services/welcomeService");
 const logger = require("../utils/logger");
 const securityService = require("../services/securityService");
+const { sendLog } = require("../services/logService");
 
 // Anti-raid tracking per guild
 const joinTracker = new Map();
@@ -27,6 +28,7 @@ module.exports = {
     await handleWelcome(member, config);
     // 3. Invite Tracking
     const inviteResult = await handleInviteTracking(member, config);
+    await handleInviteJoinLog(member, config, inviteResult);
     // 4. Join Log
     await handleJoinLog(member, config, inviteResult);
     // 5. Security Center
@@ -60,6 +62,11 @@ async function handleInviteTracking(member, config) {
   if (member.user.bot) return null;
 
   try {
+    if (!inviteService.hasCachedGuild(member.guild.id)) {
+      // First join after a restart cannot be attributed reliably; prime cache for subsequent joins.
+      await inviteService.refreshGuildInvites(member.guild);
+      return null;
+    }
     const newInvites = await member.guild.invites.fetch().catch(() => null);
     const result = inviteService.findUsedInvite(member.guild.id, newInvites);
 
@@ -73,6 +80,16 @@ async function handleInviteTracking(member, config) {
     logger.error(`Invite tracking failed for ${member.user.tag}:`, err.message);
     return null;
   }
+}
+
+
+async function handleInviteJoinLog(member, config, inviteResult) {
+  if (!config.invitations_enabled || !inviteResult?.inviter) return;
+  const stats = await inviteService.getInviteStats(inviteResult.inviter.id, member.guild.id);
+  await sendLog(member.guild, config, "invitations_log_channel_id", {
+    title: "🔗 Invitation utilisée", color: "success", target: `${member.user} (${member.id})`, moderator: inviteResult.inviter,
+    fields: [{ name: "Code", value: inviteResult.code || "Inconnu", inline: true }, { name: "Invitations nettes", value: String(stats.net), inline: true }],
+  });
 }
 
 async function handleJoinLog(member, config, inviteResult) {

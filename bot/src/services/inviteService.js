@@ -35,6 +35,8 @@ function cacheGuildInvites(guildId, invites) {
   invitesCache.set(guildId, map);
 }
 
+function hasCachedGuild(guildId) { return invitesCache.has(guildId); }
+
 function findUsedInvite(guildId, newInvites) {
   const oldInvites = invitesCache.get(guildId);
   if (!oldInvites || !newInvites) return null;
@@ -90,18 +92,41 @@ async function removeInvite(inviterId, guildId) {
 async function getInviteStats(userId, guildId) {
   try {
     const data = await InviteStats.findOne({ userId, guildId });
-    if (!data) return { total: 0, left: 0, current: 0 };
-    return { total: data.total, left: data.left, current: data.current };
+    if (!data) return { total: 0, left: 0, current: 0, fake: null, net: 0 };
+    return { total: data.total, left: data.left, current: Math.max(0, data.current), fake: null, net: Math.max(0, data.current) };
   } catch {
-    return { total: 0, left: 0, current: 0 };
+    return { total: 0, left: 0, current: 0, fake: null, net: 0 };
+  }
+}
+
+async function getLeaderboard(guildId, limit = 10) {
+  try {
+    return await InviteStats.find({ guildId }).sort({ current: -1, total: -1 }).limit(limit).lean();
+  } catch (err) {
+    logger.error(`Failed to get invite leaderboard for ${guildId}:`, err.message);
+    return [];
+  }
+}
+
+async function refreshGuildInvites(guild) {
+  try {
+    const invites = await guild.invites.fetch();
+    cacheGuildInvites(guild.id, invites);
+    return invites;
+  } catch (err) {
+    logger.warn(`Could not refresh invites for ${guild.id}: ${err.message}`);
+    return null;
   }
 }
 
 module.exports = {
   cacheGuildInvites,
+  hasCachedGuild,
   findUsedInvite,
   addInvite,
   setInvitedBy,
   removeInvite,
   getInviteStats,
+  getLeaderboard,
+  refreshGuildInvites,
 };

@@ -82,12 +82,13 @@ async function handleInviteDecrement(member, config) {
   if (member.user.bot) return;
 
   try {
+    // Discord audit entries can arrive just after guildMemberRemove. Do not count a kick as a voluntary invite departure.
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    const entry = await fetchAuditLog(member.guild, 20);
+    if (entry?.target?.id === member.id) return;
     const mongoose = require("mongoose");
     const InviteStats = mongoose.models.InviteStats || mongoose.model("InviteStats");
     const userData = await InviteStats.findOne({ userId: member.id, guildId: member.guild.id });
-
-    if (userData?.invitedBy) {
-      await inviteService.removeInvite(userData.invitedBy, member.guild.id);
-    }
+    if (userData?.invitedBy) await inviteService.removeInvite(userData.invitedBy, member.guild.id);
   } catch {}
 }

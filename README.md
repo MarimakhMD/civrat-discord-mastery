@@ -69,3 +69,7 @@ The bot currently enforces the canonical `guild_configs` Security fields below:
 - `log_moderation_channel_id`
 
 When enabled, CIVRAT detects join bursts, unapproved bot joins, and repeated channel/role creation or deletion from the same audit-log actor. It writes security incidents to the configured moderation log and applies the configured quarantine role where Discord permissions allow it. Webhook, mass-ban, mass-kick, and per-action thresholds remain future work because the current canonical configuration does not contain fields for them.
+
+## Invitation tracking (bot)
+
+When `invitations_enabled` is enabled, CIVRAT caches guild invites at startup and after invite lifecycle events. It identifies the incremented invite on member join, persists total/current/left counts in the existing `InviteStats` MongoDB collection, records invitation joins in `invitations_log_channel_id`, and exposes the available counters plus a leaderboard through `/invites`. Fake-invite detection is intentionally reported as unavailable because no fake-account data model exists yet.

@@ -296,3 +296,20 @@ Les protections suivantes sont reliées au contrat `guild_configs` et actives c�
 | Log incident | `log_moderation_channel_id` | Opérationnelle |
 
 Les actions anti-webhook, mass-ban, mass-kick, seuils personnalisables, retrait de permissions et exemptions de rôles/salons ne sont pas documentées comme fonctionnelles : elles requièrent des champs canoniques supplémentaires et/ou des événements/services dédiés.
+
+---
+
+## Invitations — état réel
+
+| Fonctionnalité | Champ / source | État |
+|---|---|---|
+| Activation tracking | `invitations_enabled` | Opérationnelle |
+| Cache au démarrage et refresh create/delete | Cache Discord + `InviteStats` | Opérationnelle |
+| Attribution de l’invitation utilisée | Comparaison cache / uses Discord | Opérationnelle après cache initial |
+| Totales, départs, actuelles/nettes | collection Mongo existante `InviteStats` | Opérationnelle |
+| Classement `/invites` | agrégation Mongo existante | Opérationnelle |
+| Log join par invitation | `invitations_log_channel_id` | Opérationnelle |
+| Fake invites | aucune donnée canonique/modèle | Prêt à connecter |
+| Vanity URLs / attribution après redémarrage avant premier cache | Discord ne fournit pas toujours l’information | Limité |
+
+Un départ issu d’un kick détecté via Audit Logs n’est pas décrémenté comme départ volontaire. Les erreurs Discord et Mongo sont absorbées et journalisées sans faire tomber le listener.
