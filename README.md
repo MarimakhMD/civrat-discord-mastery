@@ -81,3 +81,7 @@ When `xp_enabled` is enabled, CIVRAT stores member XP in the `UserXP` MongoDB co
 ## Giveaways (bot)
 
 The existing Supabase `giveaways` table is the giveaway source of truth. CIVRAT manages active rows with `giveaways_enabled`, durable giveaway entries in the minimal `GiveawayEntry` MongoDB collection, a restart-safe one-minute end scheduler, and the `/giveaway` management command. Entry buttons query the persisted giveaway row, so participation survives bot restarts. Giveaway creation, completion, rerolls, and cancellation are logged through `log_moderation_channel_id`.
+
+## Suggestions (bot)
+
+CIVRAT uses the existing Supabase `suggestions` table for suggestion state and counters, and the minimal MongoDB `SuggestionVote` collection for durable per-user vote choice. `/suggestion proposer` creates a suggestion in `suggestions_channel_id`; Discord buttons allow one active up/down vote or a vote withdrawal. Staff with `ManageGuild` can accept, reject, archive, delete, and answer suggestions. The table now stores `staff_response` and `archived_at`, required for durable staff response and archive state.

@@ -351,3 +351,21 @@ Le modèle Mongo `UserXP` est la seule collection ajoutée pour XP : il contient
 | Conditions de participation avancées | champ `requirements` texte non interprété | Prêt à connecter |
 
 La table existante ne possède pas de `message_id`; le bot envoie donc le résultat dans le salon à la fin sans modifier le message initial. Les entrées sont uniques par `(giveawayId, userId)` et persistent après redémarrage.
+
+---
+
+## Suggestions — état réel
+
+| Fonctionnalité | Source | État |
+|---|---|---|
+| Activation / salons | `suggestions_enabled`, `suggestions_channel_id`, `suggestions_approval_channel_id` | Opérationnelle |
+| État / compteurs | table Supabase existante `suggestions` | Opérationnelle |
+| Votes uniques et changement de vote | Mongo `SuggestionVote` | Opérationnelle |
+| Publication | `/suggestion proposer` | Opérationnelle |
+| Accepter / refuser / archiver / supprimer | boutons staff `ManageGuild` | Opérationnelle |
+| Réponse staff | `/suggestion repondre` + `staff_response` | Opérationnelle |
+| Logs | `log_moderation_channel_id` | Opérationnelle |
+| Mise à jour du message Discord après redémarrage | aucun `message_id` persistant | Partiellement fonctionnelle |
+| Catégories | aucun champ canonique | Prêt à connecter |
+
+Les colonnes `staff_response` et `archived_at` sont ajoutées de façon idempotente au script Supabase. Les boutons utilisent l’ID de suggestion persistant, ce qui permet aux votes de continuer après redémarrage tant que le message Discord existe.
