@@ -93,3 +93,7 @@ CIVRAT uses `captcha_enabled`, `captcha_channel_id`, `captcha_role_id`, `captcha
 ## Temporary Voice (bot)
 
 Temporary Voice uses `temp_voice_enabled`, `temp_voice_creator_channel_id`, and `temp_voice_category`. The creator channel identifier is the minimal required canonical field added by this module; without it the bot cannot know which voice channel triggers creation. CIVRAT listens to `voiceStateUpdate`, creates one private owner-managed voice channel per member, moves the member, persists the channel mapping in MongoDB, removes empty channels, and cleans orphaned records at startup.
+
+## Dashboard ↔ Bot configuration synchronization
+
+The active React `GuildContext` now loads `guild_configs` from Supabase when a guild is selected and persists every module save using an upsert on `guild_id`. The bot reads the same row through `guildConfig` with a five-minute in-memory cache. Changes are therefore visible to the bot at cache expiry; the existing `/api/guilds/:guildId/sync` cache invalidation endpoint is not called by the dashboard because it currently has no authentication middleware. The dashboard still uses local demo guild discovery, so live guild/channel/role metadata remains a separate integration task.

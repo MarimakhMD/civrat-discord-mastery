@@ -407,3 +407,20 @@ Le rôle `captcha_role_id` est actuellement le rôle attribué après vérificat
 | Permissions privées avancées | aucun champ canonique | Prêt à connecter |
 
 Le modèle Mongo `TemporaryVoice` contient guildId, channelId, ownerId et categoryId. Il évite plusieurs salons simultanés pour un même propriétaire et permet de nettoyer les salons orphelins après redémarrage.
+
+---
+
+## Audit synchronisation Dashboard ↔ Bot
+
+### Synchronisés par le contrat `guild_configs`
+
+Welcome, Tickets, Logs, AutoMod, Security, Invitations, XP, Giveaways activation, Suggestions activation, Captcha, Temporary Voice, Settings et Language utilisent les mêmes noms canoniques dans les types React, les defaults dashboard, le script Supabase et `bot/src/services/guildConfig.js`.
+
+Le `GuildContext` React actif charge/sauvegarde désormais la ligne Supabase `guild_configs` par `guild_id`. Le bot lit la même ligne avec un cache mémoire de cinq minutes.
+
+### Limites connues
+
+- La découverte des guilds, salons, rôles et présence bot dans le dashboard actif reste simulée/localisée ; il n’existe pas encore d’endpoint dashboard authentifié pour ces métadonnées Discord.
+- L’endpoint bot `POST /api/guilds/:guildId/sync` invalide le cache mais n’a pas encore d’authentification ; le dashboard ne l’appelle pas.
+- Giveaways et Suggestions conservent leurs données dans leurs tables Supabase, mais le dashboard actif affiche encore des données de démonstration faute d’un endpoint sécurisé de lecture.
+- Moderation, Analytics, Backup et Embed Builder ne possèdent pas encore de contrat de données bot complet.
