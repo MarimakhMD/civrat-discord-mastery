@@ -424,3 +424,35 @@ Le `GuildContext` React actif charge/sauvegarde désormais la ligne Supabase `gu
 - L’endpoint bot `POST /api/guilds/:guildId/sync` invalide le cache mais n’a pas encore d’authentification ; le dashboard ne l’appelle pas.
 - Giveaways et Suggestions conservent leurs données dans leurs tables Supabase, mais le dashboard actif affiche encore des données de démonstration faute d’un endpoint sécurisé de lecture.
 - Moderation, Analytics, Backup et Embed Builder ne possèdent pas encore de contrat de données bot complet.
+
+---
+
+## Audit v1.0 — état de production
+
+### Vérifications passées
+
+- `npm run lint` dashboard actif : OK
+- `npm run build` TypeScript/Vite : OK
+- `node --check` sur les 70 fichiers JavaScript bot : OK
+- `npm audit --omit=dev` bot avec lockfile : 0 vulnérabilité connue au moment de l’audit
+- Contrat canonique : aucun ancien nom actif détecté dans les modules React ou services bot.
+
+### Risques à traiter avant exposition publique
+
+| Risque | État |
+|---|---|
+| RLS Supabase `Allow all operations` dans la migration | Critique : à restreindre selon l’identité/guild avant production publique |
+| `POST /api/guilds/:guildId/sync` non authentifié | Élevé : ne pas exposer publiquement avant middleware API_SECRET/JWT |
+| `API_SECRET` par défaut autorisé par config | Élevé : définir une valeur forte et faire échouer le boot en production si absente |
+| Découverte dashboard de guilds/salons/rôles simulée | Élevé fonctionnel : intégrer une API authentifiée Discord/bot |
+| Ancienne structure TanStack/React Start conservée | Moyen : non active Vite, à migrer/supprimer dans une tâche dédiée |
+| Counting channel hardcodé et intervalles non stoppés explicitement | Moyen : isoler avant scale horizontal |
+| Cache config bot TTL 5 min | Moyen : synchronisation non instantanée sans endpoint sécurisé |
+
+### Modules synchronisés
+
+Welcome, Tickets, Logs, AutoMod, Security, Invitations, XP, Giveaways, Suggestions, Captcha et Temporary Voice lisent le contrat canonique `guild_configs` côté bot. Le dashboard actif persiste désormais ses sauvegardes dans la même table.
+
+### Modules partiels ou non reliés
+
+Moderation history, Analytics, Backups, Embed Builder, metadata Discord dynamique, localisation complète et données dashboard réelles des giveaways/suggestions restent des travaux v1.1.

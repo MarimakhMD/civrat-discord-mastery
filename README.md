@@ -97,3 +97,9 @@ Temporary Voice uses `temp_voice_enabled`, `temp_voice_creator_channel_id`, and 
 ## Dashboard ↔ Bot configuration synchronization
 
 The active React `GuildContext` now loads `guild_configs` from Supabase when a guild is selected and persists every module save using an upsert on `guild_id`. The bot reads the same row through `guildConfig` with a five-minute in-memory cache. Changes are therefore visible to the bot at cache expiry; the existing `/api/guilds/:guildId/sync` cache invalidation endpoint is not called by the dashboard because it currently has no authentication middleware. The dashboard still uses local demo guild discovery, so live guild/channel/role metadata remains a separate integration task.
+
+## v1.0 production-readiness audit
+
+The Vite dashboard passes lint and production build; dashboard routes are lazy-loaded. All JavaScript bot files pass Node syntax validation and `bot/package-lock.json` pins production dependencies (`npm audit --omit=dev`: no known vulnerabilities at audit time).
+
+Before a public production rollout, apply `supabase-migrations.sql`, replace the default `API_SECRET`, and resolve the explicit security limitations documented below: the active dashboard still discovers demo guilds rather than Discord metadata, Supabase RLS policies in the supplied migration allow all operations, and the bot cache-invalidation API endpoint is not authenticated. These are deployment/security tasks, not completed production guarantees.
