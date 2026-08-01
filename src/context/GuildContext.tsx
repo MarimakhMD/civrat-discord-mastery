@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
 import type { GuildConfig } from '@/types';
 import { supabase } from '@/lib/supabase';
+import { invalidateBotGuildConfig } from '@/lib/bot-sync';
 
 interface GuildState {
   selectedGuildId: string | null; config: GuildConfig;
@@ -47,6 +48,7 @@ export function GuildProvider({ children }: { children: ReactNode }) {
       const { data: saved, error } = await supabase.from('guild_configs').upsert(payload, { onConflict: 'guild_id' }).select().single();
       if (error) throw error;
       setConfig({ ...defaultConfig, ...saved, guild_id: selectedGuildId });
+      await invalidateBotGuildConfig(selectedGuildId);
     } finally { setLoading(false); }
   }, [selectedGuildId]);
 

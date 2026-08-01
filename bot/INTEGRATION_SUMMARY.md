@@ -480,3 +480,19 @@ Les tests Discord/Supabase/MongoDB réels restent obligatoires dans une guild de
 Le commit Arena `799b5b4` contient 23 fichiers dans `bot/src/commands` et le loader charge 23 commandes lorsqu’il exécute ce dossier. Si un hébergement affiche 17, il exécute un dossier bot ancien ou une branche/archive différente ; le loader générique ne filtre aucun des six nouveaux fichiers.
 
 `deploy.js` utilise `Routes.applicationCommands`, dont le PUT remplace toute la liste globale. Les doublons Discord ne peuvent donc pas venir de deux listes globales de ce même script ; ils correspondent à des commandes guild-scoped historiques ou à une autre application. Pour une guild de test, définir temporairement `LEGACY_GUILD_ID`, exécuter `npm run deploy` pour vider les commandes guild héritées, puis retirer la variable. Le loader logue désormais le chemin scanné et le nombre de fichiers trouvés afin de diagnostiquer le répertoire réellement lancé.
+
+---
+
+## Synchronisation immédiate cache configuration
+
+Après chaque `upsert` dashboard réussi, le `GuildContext` appelle facultativement `POST /api/guilds/:guildId/sync` si `VITE_BOT_API_URL` est défini. Le dashboard transmet uniquement le bearer token de la session Supabase active ; aucun secret bot/API n’est exposé au navigateur. L’API bot valide le token avec Supabase, invalide seulement la clé cache de cette guild puis recharge immédiatement sa configuration.
+
+| Élément | État |
+|---|---|
+| Sauvegarde Supabase | Opérationnelle |
+| Invalidation ciblée `guildId` | Opérationnelle |
+| Rechargement cache immédiat | Opérationnelle |
+| Auth bearer Supabase sur endpoint | Opérationnelle |
+| Fallback TTL 5 min sans `VITE_BOT_API_URL` | Opérationnel |
+
+Configuration dashboard nécessaire pour l’instantané : `VITE_BOT_API_URL=https://api-bot.example.com` (URL publique non secrète du bot). L’endpoint ne modifie aucune donnée ; il ne fait que recharger le cache ciblé.
