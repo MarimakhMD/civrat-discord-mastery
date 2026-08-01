@@ -107,3 +107,7 @@ Before a public production rollout, apply `supabase-migrations.sql`, replace the
 ## Weekly Discord QA checklist
 
 Before the controlled test week, deploy slash commands with `cd bot && npm run deploy`, run one bot instance only, and apply the current Supabase migration. Static QA completed on this revision: 23 command modules load with unique command names, 22 Discord event modules register exactly once, all bot JavaScript files pass `node --check`, and the dashboard passes lint/build. Runtime QA still requires real Discord, Supabase, and MongoDB credentials; exercise each configured module in a dedicated test guild before public release.
+
+## Hosting source verification and slash-command cleanup
+
+The Arena branch at commit `799b5b4` contains 23 command files and 22 event files. The command loader scans the absolute `bot/src/commands` directory and now logs both its path and discovered file count; a hosting log of 17 loaded commands proves that the process is executing an older/different bot directory, not this branch revision. `deploy.js` already replaces the complete global command collection. To remove historical guild-scoped duplicates once, set `LEGACY_GUILD_ID` to the test-server ID, run `npm run deploy`, then remove that variable. Do not set it to a production guild unless intentionally clearing its old guild-scoped commands.

@@ -472,3 +472,11 @@ Moderation history, Analytics, Backups, Embed Builder, metadata Discord dynamiqu
 | Champs canoniques hérités actifs | Aucun détecté |
 
 Les tests Discord/Supabase/MongoDB réels restent obligatoires dans une guild de test : le checkout ne contient pas de secrets de production et aucun appel vers les services réels n’a été exécuté.
+
+---
+
+## Diagnostic commandes 17/23 et doublons
+
+Le commit Arena `799b5b4` contient 23 fichiers dans `bot/src/commands` et le loader charge 23 commandes lorsqu’il exécute ce dossier. Si un hébergement affiche 17, il exécute un dossier bot ancien ou une branche/archive différente ; le loader générique ne filtre aucun des six nouveaux fichiers.
+
+`deploy.js` utilise `Routes.applicationCommands`, dont le PUT remplace toute la liste globale. Les doublons Discord ne peuvent donc pas venir de deux listes globales de ce même script ; ils correspondent à des commandes guild-scoped historiques ou à une autre application. Pour une guild de test, définir temporairement `LEGACY_GUILD_ID`, exécuter `npm run deploy` pour vider les commandes guild héritées, puis retirer la variable. Le loader logue désormais le chemin scanné et le nombre de fichiers trouvés afin de diagnostiquer le répertoire réellement lancé.

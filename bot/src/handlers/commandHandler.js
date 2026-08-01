@@ -14,7 +14,13 @@ function loadCommands() {
   const commandsPath = path.join(__dirname, "..", "commands");
   const commandFiles = fs
     .readdirSync(commandsPath)
-    .filter((file) => file.endsWith(".js"));
+    .filter((file) => file.endsWith(".js"))
+    .sort();
+
+  // Makes a repeated in-process load deterministic and exposes the exact
+  // directory/count being executed in hosting logs.
+  commands.clear();
+  logger.info(`Scanning ${commandFiles.length} command files in ${commandsPath}`);
 
   for (const file of commandFiles) {
     try {
@@ -30,7 +36,7 @@ function loadCommands() {
     }
   }
 
-  logger.success(`${commands.size} commands loaded`);
+  logger.success(`${commands.size} commands loaded (${commandFiles.length} files found)`);
   return commands;
 }
 
