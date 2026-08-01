@@ -526,3 +526,5 @@ Les endpoints autorisés suivants sont désormais le chemin production pour `gui
 | `POST /api/guilds/:guildId/sync` | invalidation/rechargement ciblé |
 
 Tous vérifient token Supabase, membre Discord et `Administrator`/`ManageGuild`. Le `PUT` n’accepte que les clés canoniques de `guild_configs`; les clés inconnues sont refusées. Le client bot privilégie `SUPABASE_SERVICE_ROLE_KEY` côté serveur et conserve un fallback anon uniquement pour compatibilité contrôlée tant que RLS permissif existe. Avant le durcissement RLS, définir `VITE_BOT_API_URL` dans le dashboard et `SUPABASE_SERVICE_ROLE_KEY` uniquement sur Bot-Hosting.
+
+Le `PUT /api/guilds/:guildId/config` applique une allow-list des clés canoniques et valide types, IDs Discord, enums, bornes numériques, tailles texte et structures de récompenses avant toute écriture Supabase. Les clés inconnues ou valeurs invalides retournent 400.

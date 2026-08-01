@@ -38,10 +38,29 @@ function userRateLimited(userId) {
   if (recent.length >= USER_SYNC_MAX) { userSyncRequests.set(userId, recent); return true; }
   recent.push(now); userSyncRequests.set(userId, recent); return false;
 }
+const BOOLEAN_KEYS = new Set([...CONFIG_KEYS].filter((key) => key.endsWith('_enabled') || key.startsWith('automod_anti_') || key.startsWith('security_anti_') || key.startsWith('notify_')));
+const NUMBER_LIMITS = { xp_per_message: [1, 10000], xp_cooldown: [0, 86400], automod_mention_threshold: [1, 100], automod_caps_threshold: [1, 100], automod_emoji_threshold: [1, 100] };
+const ID_KEYS = new Set([...CONFIG_KEYS].filter((key) => key.endsWith('_id') || key.endsWith('_channel_id') || key.endsWith('_role_id') || key.endsWith('_category')));
+const NULLABLE_TEXT_KEYS = new Set(['welcome_message', 'goodbye_message', 'welcome_dm_message']);
+
+function isDiscordId(value) { return typeof value === 'string' && /^\d{15,22}$/.test(value); }
+function validConfigValue(key, value) {
+  if (BOOLEAN_KEYS.has(key)) return typeof value === 'boolean';
+  if (key in NUMBER_LIMITS) return Number.isInteger(value) && value >= NUMBER_LIMITS[key][0] && value <= NUMBER_LIMITS[key][1];
+  if (ID_KEYS.has(key)) return value === null || isDiscordId(value);
+  if (key === 'language') return value === 'fr' || value === 'en';
+  if (key === 'automod_punishment') return ['ignore', 'delete', 'warn', 'timeout', 'kick', 'ban'].includes(value);
+  if (key === 'captcha_type') return ['button', 'image'].includes(value);
+  if (key === 'automod_bad_words' || key === 'security_whitelist') return Array.isArray(value) && value.length <= 100 && value.every((item) => typeof item === 'string' && item.length <= 200);
+  if (key === 'role_rewards') return Array.isArray(value) && value.length <= 100 && value.every((item) => Number.isInteger(item?.level) && item.level > 0 && isDiscordId(item?.role_id));
+  if (key === 'level_rewards') return Array.isArray(value) && value.length <= 100 && value.every((item) => Number.isInteger(item?.level) && item.level > 0 && Number.isInteger(item?.xp_required) && item.xp_required >= 0);
+  if (NULLABLE_TEXT_KEYS.has(key) && value === null) return true;
+  return typeof value === 'string' && value.length <= 4000;
+}
 function sanitizeUpdates(value) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
   const entries = Object.entries(value);
-  if (!entries.length || entries.some(([key]) => !CONFIG_KEYS.has(key))) return null;
+  if (!entries.length || entries.some(([key, item]) => !CONFIG_KEYS.has(key) || !validConfigValue(key, item))) return null;
   return Object.fromEntries(entries);
 }
 

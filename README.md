@@ -119,3 +119,5 @@ The bot cache sync endpoint validates the Supabase bearer session, resolves the 
 ## Backend configuration path (RLS preparation)
 
 When `VITE_BOT_API_URL` is configured, the active dashboard reads and writes `guild_configs` through authenticated Bot API endpoints (`GET`/`PUT /api/guilds/:guildId/config`) rather than direct browser table access. The API validates the Supabase session, Discord guild membership and `Administrator`/`ManageGuild`, then writes through the server-side Supabase client. Configure `SUPABASE_SERVICE_ROLE_KEY` only on Bot-Hosting before strict RLS is enabled. Until then, omitting `VITE_BOT_API_URL` preserves the existing direct-Supabase controlled-test fallback; production must configure the API URL and remove that fallback only after RLS rollout validation.
+
+The Bot API configuration update endpoint accepts only the canonical `guild_configs` allow-list. It rejects unknown keys, malformed Discord IDs, invalid booleans/enums, unsafe numeric ranges, oversized text, and invalid reward/array payloads before any server-side Supabase write.
