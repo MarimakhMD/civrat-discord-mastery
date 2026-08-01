@@ -11,7 +11,7 @@
 const { Client, GatewayIntentBits, Partials } = require("discord.js");
 const { config, validateConfig } = require("./src/config");
 const { connectMongo } = require("./src/config/database");
-const { loadCommands, registerCommands } = require("./src/handlers/commandHandler");
+const { loadCommands } = require("./src/handlers/commandHandler");
 const { loadEvents } = require("./src/handlers/eventHandler");
 const guildConfigService = require("./src/services/guildConfig");
 const logger = require("./src/utils/logger");
@@ -49,8 +49,8 @@ async function start() {
   loadCommands();
   loadEvents(client);
 
-  // 3. Register slash commands with Discord
-  await registerCommands();
+  // 3. Start API server (Express). Slash commands are deployed explicitly
+  // with `node deploy.js` / `npm run deploy`, never on normal bot startup.
 
   // 4. Start API server (Express)
   try {
