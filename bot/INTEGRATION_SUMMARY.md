@@ -496,3 +496,19 @@ Après chaque `upsert` dashboard réussi, le `GuildContext` appelle facultativem
 | Fallback TTL 5 min sans `VITE_BOT_API_URL` | Opérationnel |
 
 Configuration dashboard nécessaire pour l’instantané : `VITE_BOT_API_URL=https://api-bot.example.com` (URL publique non secrète du bot). L’endpoint ne modifie aucune donnée ; il ne fait que recharger le cache ciblé.
+
+---
+
+## Synchronisation cache — contrôles d’accès
+
+`POST /api/guilds/:guildId/sync` applique désormais les contrôles suivants avant toute invalidation :
+
+| Contrôle | Réponse en échec |
+|---|---|
+| Bearer Supabase valide | 401 |
+| Guild Discord connue du bot | 404 |
+| Utilisateur membre de la guild | 403 |
+| `Administrator` ou `ManageGuild` | 403 |
+| Maximum 20 sync / utilisateur / 15 min | 429 |
+
+Un cooldown par guild de 8 secondes coalesce les sauvegardes rapprochées. La première recharge immédiatement. Les suivantes retournent 202 et planifient un unique rechargement ciblé qui relit la dernière ligne Supabase. Aucun token, secret ou configuration complète n’est écrit dans les logs.

@@ -111,3 +111,7 @@ Before the controlled test week, deploy slash commands with `cd bot && npm run d
 ## Hosting source verification and slash-command cleanup
 
 The Arena branch at commit `799b5b4` contains 23 command files and 22 event files. The command loader scans the absolute `bot/src/commands` directory and now logs both its path and discovered file count; a hosting log of 17 loaded commands proves that the process is executing an older/different bot directory, not this branch revision. `deploy.js` already replaces the complete global command collection. To remove historical guild-scoped duplicates once, set `LEGACY_GUILD_ID` to the test-server ID, run `npm run deploy`, then remove that variable. Do not set it to a production guild unless intentionally clearing its old guild-scoped commands.
+
+## Immediate sync authorization
+
+The bot cache sync endpoint validates the Supabase bearer session, resolves the caller’s Discord member record in the requested guild, and requires Discord `Administrator` or `ManageGuild`. It also limits each authenticated user to 20 requests per 15 minutes and coalesces repeated syncs for a guild into at most one reload every 8 seconds. A coalesced save returns HTTP 202; the delayed reload reads the latest Supabase row, so the final saved configuration wins without repeated database calls.
