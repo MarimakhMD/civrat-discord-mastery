@@ -10,6 +10,7 @@ const welcomeService = require("../services/welcomeService");
 const logger = require("../utils/logger");
 const securityService = require("../services/securityService");
 const { sendLog } = require("../services/logService");
+const captchaService = require("../services/captchaService");
 
 // Anti-raid tracking per guild
 const joinTracker = new Map();
@@ -26,7 +27,9 @@ module.exports = {
     await handleAutoRole(member, config);
     // 2. Welcome Message
     await handleWelcome(member, config);
-    // 3. Invite Tracking
+    // 3. Captcha reminder (best effort; DMs can be closed)
+    await captchaService.sendReminder(member, config);
+    // 4. Invite Tracking
     const inviteResult = await handleInviteTracking(member, config);
     await handleInviteJoinLog(member, config, inviteResult);
     // 4. Join Log

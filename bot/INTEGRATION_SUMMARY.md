@@ -369,3 +369,22 @@ La table existante ne possède pas de `message_id`; le bot envoie donc le résul
 | Catégories | aucun champ canonique | Prêt à connecter |
 
 Les colonnes `staff_response` et `archived_at` sont ajoutées de façon idempotente au script Supabase. Les boutons utilisent l’ID de suggestion persistant, ce qui permet aux votes de continuer après redémarrage tant que le message Discord existe.
+
+---
+
+## Captcha — état réel
+
+| Fonctionnalité | Champ / source | État |
+|---|---|---|
+| Activation | `captcha_enabled` | Opérationnelle |
+| Panneau staff | `/captcha panel` | Opérationnelle |
+| Vérification bouton | `captcha_verify` | Opérationnelle |
+| Attribution rôle | `captcha_role_id` | Opérationnelle si le bot peut gérer le rôle/membre |
+| Double vérification | cache rôles Discord | Opérationnelle |
+| Rappel nouveau membre | DM vers `captcha_channel_id` | Opérationnelle, best effort |
+| Logs succès / échec | `log_moderation_channel_id` | Opérationnelle |
+| Expiration / sanction non vérifié | aucun champ canonique | Prêt à connecter |
+| Retrait rôle non vérifié | aucun champ canonique | Prêt à connecter |
+| Image/texte captcha | `captcha_type` non implémenté côté bot | Prêt à connecter |
+
+Le rôle `captcha_role_id` est actuellement le rôle attribué après vérification. Aucun rôle de pré-vérification n’est supprimé car le contrat n’en définit pas.

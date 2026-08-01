@@ -85,3 +85,7 @@ The existing Supabase `giveaways` table is the giveaway source of truth. CIVRAT 
 ## Suggestions (bot)
 
 CIVRAT uses the existing Supabase `suggestions` table for suggestion state and counters, and the minimal MongoDB `SuggestionVote` collection for durable per-user vote choice. `/suggestion proposer` creates a suggestion in `suggestions_channel_id`; Discord buttons allow one active up/down vote or a vote withdrawal. Staff with `ManageGuild` can accept, reject, archive, delete, and answer suggestions. The table now stores `staff_response` and `archived_at`, required for durable staff response and archive state.
+
+## Captcha / verification (bot)
+
+CIVRAT uses `captcha_enabled`, `captcha_channel_id`, `captcha_role_id`, `captcha_success_message`, and `captcha_failure_message`. Staff publish the persistent Discord panel with `/captcha panel`; members click its button to receive the configured role exactly once. New members receive a best-effort DM reminder linking to the configured verification channel. Expiration, removal of a separate unverified role, and image captchas are not implemented because no canonical configuration fields currently exist for them.
