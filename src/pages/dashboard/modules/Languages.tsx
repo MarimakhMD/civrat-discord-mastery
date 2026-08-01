@@ -6,14 +6,18 @@ import { SaveBar } from '@/components/ui/SaveBar';
 import { Select } from '@/components/ui/Select';
 import { useGuild } from '@/context/GuildContext';
 
+// Keep the full catalogue for future translations. Only fully translated
+// languages are exposed in the dashboard selector for now.
 const languages = [
-  { value: 'en', label: 'English' },
+  { value: 'en', label: '🇬🇧 English' },
   { value: 'es', label: 'Español' },
-  { value: 'fr', label: 'Français' },
+  { value: 'fr', label: '🇫🇷 Français' },
   { value: 'de', label: 'Deutsch' },
   { value: 'pt', label: 'Português' },
   { value: 'tr', label: 'Türkçe' },
 ];
+
+const visibleLanguages = languages.filter(({ value }) => value === 'fr' || value === 'en');
 
 const messagePreviewMap: Record<string, string> = {
   en: 'Welcome to the server! Please read the rules.',
@@ -67,7 +71,7 @@ export default function Languages() {
         <h3 className="mb-4 text-lg font-semibold">Select Language</h3>
         <FormField label="Bot Language">
           <Select
-            options={languages}
+            options={visibleLanguages}
             value={selectedLanguage}
             onChange={handleLanguageChange}
           />
@@ -76,7 +80,7 @@ export default function Languages() {
 
       <div className="module-card !cursor-default p-6">
         <h3 className="mb-4 text-lg font-semibold">Message Preview</h3>
-        <div className="rounded bg-slate-50 p-4">
+        <div className="rounded-xl border border-white/10 bg-dark-700/60 p-4">
           <p className="text-sm text-dark-300">Example welcome message:</p>
           <p className="mt-2 text-sm font-medium">
             {messagePreviewMap[selectedLanguage] || messagePreviewMap['en']}

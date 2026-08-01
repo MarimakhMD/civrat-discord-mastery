@@ -17,17 +17,23 @@ export function Select({ value, onChange, options, placeholder = 'Select an opti
   }, []);
 
   return (
-    <div ref={ref} className={cn('relative w-full', className)}>
-      <button type="button" onClick={() => !disabled && setIsOpen(!isOpen)} disabled={disabled}
+    <div ref={ref} className={cn('relative isolate w-full', className)}>
+      <button
+        type="button"
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+        onClick={() => !disabled && setIsOpen((open) => !open)}
+        onKeyDown={(event) => { if (event.key === 'Escape') setIsOpen(false); }}
+        disabled={disabled}
         className={cn('input-field flex items-center justify-between', disabled && 'opacity-50 cursor-not-allowed')}>
         <span className={cn(selectedOption ? 'text-white' : 'text-dark-300')}>{selectedOption?.label || placeholder}</span>
         <ChevronDown className={cn('w-4 h-4 transition-transform', isOpen && 'rotate-180')} />
       </button>
       {isOpen && !disabled && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-dark-700 rounded-lg border border-white/10 shadow-xl z-50 overflow-hidden">
-          <div className="max-h-64 overflow-y-auto">
+        <div className="absolute top-full left-0 right-0 z-[60] mt-2 overflow-hidden rounded-lg border border-white/10 bg-dark-800 shadow-2xl shadow-black/40">
+          <div role="listbox" className="max-h-64 overflow-y-auto">
             {options.map(option => (
-              <button key={option.value} type="button" onClick={() => { onChange(option.value); setIsOpen(false); }}
+              <button key={option.value} type="button" role="option" aria-selected={value === option.value} onClick={() => { onChange(option.value); setIsOpen(false); }}
                 className={cn('w-full text-left px-4 py-3 text-sm transition-colors', value === option.value ? 'bg-neon-green/20 text-neon-green font-medium' : 'text-white hover:bg-white/5')}>
                 {option.label}
               </button>
