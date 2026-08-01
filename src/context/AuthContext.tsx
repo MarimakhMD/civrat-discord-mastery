@@ -27,8 +27,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const logout = useCallback(async () => {
-    await supabase.auth.signOut();
-    setUser(null); setGuilds([]);
+    try {
+      await supabase.auth.signOut();
+    } finally {
+      // Remove every client-side identity/dashboard reference even if the
+      // remote sign-out request is temporarily unavailable.
+      localStorage.removeItem('selectedGuildId');
+      setUser(null);
+      setGuilds([]);
+    }
   }, []);
 
   const refreshGuilds = useCallback(async () => {
@@ -53,13 +60,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             email: session.user.email || null, created_at: session.user.created_at,
             is_premium: false, premium_expires_at: null,
           });
+          await refreshGuilds();
         } else {
-          setUser({ id: 'demo', discord_id: '123456789', username: 'CIVRAT_Demo', discriminator: '0001', avatar: null, email: 'demo@civrat.dev', created_at: new Date().toISOString(), is_premium: false, premium_expires_at: null });
+          setUser(null);
+          setGuilds([]);
         }
       } catch {
-        setUser({ id: 'demo', discord_id: '123456789', username: 'CIVRAT_Demo', discriminator: '0001', avatar: null, email: 'demo@civrat.dev', created_at: new Date().toISOString(), is_premium: false, premium_expires_at: null });
+        setUser(null);
+        setGuilds([]);
       }
-      await refreshGuilds();
       setLoading(false);
     })();
   }, [refreshGuilds]);

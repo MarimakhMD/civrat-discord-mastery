@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Home, MessageSquare, ScrollText, Ticket, Shield, Lock, Award, Gift, Globe2, Lightbulb, ShieldAlert, UserPlus, Settings, BarChart3, Crown, Menu, X, LogOut, Mic, Database, FileCode, Bot } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/utils';
@@ -31,7 +31,13 @@ export function Sidebar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const handleLogout = async () => {
+    await logout();
+    setIsOpen(false);
+    navigate('/', { replace: true });
+  };
   const isActive = (module: string) => location.pathname.includes(`/dashboard/${module}`);
 
   const content = (
@@ -64,7 +70,7 @@ export function Sidebar() {
             <div className="w-9 h-9 rounded-full bg-dark-500 flex items-center justify-center text-neon-green font-bold text-sm border border-neon-green/30">{user.username.charAt(0)}</div>
             {(isExpanded || isOpen) && <div className="flex-1 min-w-0"><p className="text-sm font-semibold text-white truncate">{user.username}</p><p className="text-xs text-dark-300">#{user.discriminator}</p></div>}
           </div>
-          <button onClick={() => { logout(); setIsOpen(false); }} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-dark-300 hover:text-error hover:bg-error/10 transition-colors">
+          <button onClick={() => void handleLogout()} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-dark-300 hover:text-error hover:bg-error/10 transition-colors">
             <LogOut className="w-4 h-4" />{(isExpanded || isOpen) && "Logout"}
           </button>
         </div>
