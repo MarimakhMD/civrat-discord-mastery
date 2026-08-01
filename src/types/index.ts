@@ -22,7 +22,7 @@ export interface GuildConfig {
   giveaways_enabled: boolean; suggestions_enabled: boolean; suggestions_channel_id: string | null; suggestions_approval_channel_id: string | null;
   invitations_enabled: boolean; invitations_log_channel_id: string | null;
   security_enabled: boolean; security_anti_nuke: boolean; security_anti_bot: boolean; security_anti_raid: boolean; security_whitelist: string[]; security_log_channel_id: string | null; security_quarantine_role: string | null;
-  temp_voice_enabled: boolean; temp_voice_category: string | null;
+  temp_voice_enabled: boolean; temp_voice_category: string | null; temp_voice_creator_channel_id: string | null;
   notify_security_alert: boolean; notify_weekly_summary: boolean; notify_product_updates: boolean;
   updated_at: string;
 }

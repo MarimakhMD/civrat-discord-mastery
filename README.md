@@ -89,3 +89,7 @@ CIVRAT uses the existing Supabase `suggestions` table for suggestion state and c
 ## Captcha / verification (bot)
 
 CIVRAT uses `captcha_enabled`, `captcha_channel_id`, `captcha_role_id`, `captcha_success_message`, and `captcha_failure_message`. Staff publish the persistent Discord panel with `/captcha panel`; members click its button to receive the configured role exactly once. New members receive a best-effort DM reminder linking to the configured verification channel. Expiration, removal of a separate unverified role, and image captchas are not implemented because no canonical configuration fields currently exist for them.
+
+## Temporary Voice (bot)
+
+Temporary Voice uses `temp_voice_enabled`, `temp_voice_creator_channel_id`, and `temp_voice_category`. The creator channel identifier is the minimal required canonical field added by this module; without it the bot cannot know which voice channel triggers creation. CIVRAT listens to `voiceStateUpdate`, creates one private owner-managed voice channel per member, moves the member, persists the channel mapping in MongoDB, removes empty channels, and cleans orphaned records at startup.

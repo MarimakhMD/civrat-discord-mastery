@@ -388,3 +388,22 @@ Les colonnes `staff_response` et `archived_at` sont ajoutées de façon idempote
 | Image/texte captcha | `captcha_type` non implémenté côté bot | Prêt à connecter |
 
 Le rôle `captcha_role_id` est actuellement le rôle attribué après vérification. Aucun rôle de pré-vérification n’est supprimé car le contrat n’en définit pas.
+
+---
+
+## Temporary Voice — état réel
+
+| Fonctionnalité | Source | État |
+|---|---|---|
+| Activation / catégorie | `temp_voice_enabled`, `temp_voice_category` | Opérationnelle |
+| Salon générateur | `temp_voice_creator_channel_id` | Opérationnelle |
+| Création et déplacement | `voiceStateUpdate` | Opérationnelle |
+| Un salon par propriétaire | Mongo `TemporaryVoice` | Opérationnelle |
+| Suppression salon vide | `voiceStateUpdate` | Opérationnelle |
+| Nettoyage après redémarrage | `ready` + Mongo | Opérationnelle |
+| Logs création/suppression | `log_moderation_channel_id` | Opérationnelle |
+| Nom configurable | aucun champ canonique | Prêt à connecter |
+| Limite utilisateur | aucun champ canonique | Prêt à connecter |
+| Permissions privées avancées | aucun champ canonique | Prêt à connecter |
+
+Le modèle Mongo `TemporaryVoice` contient guildId, channelId, ownerId et categoryId. Il évite plusieurs salons simultanés pour un même propriétaire et permet de nettoyer les salons orphelins après redémarrage.

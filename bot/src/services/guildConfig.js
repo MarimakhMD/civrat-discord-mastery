@@ -88,6 +88,7 @@ const defaultConfig = {
   security_quarantine_role: null,
   temp_voice_enabled: false,
   temp_voice_category: null,
+  temp_voice_creator_channel_id: null,
 };
 
 /**

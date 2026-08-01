@@ -106,6 +106,7 @@ CREATE TABLE IF NOT EXISTS guild_configs (
   -- Temporary voice
   temp_voice_enabled BOOLEAN DEFAULT FALSE,
   temp_voice_category TEXT,
+  temp_voice_creator_channel_id TEXT,
   
   -- Notifications
   notify_security_alert BOOLEAN DEFAULT TRUE,
@@ -129,6 +130,7 @@ ALTER TABLE guild_configs ADD COLUMN IF NOT EXISTS xp_announce_channel_id TEXT;
 ALTER TABLE guild_configs ADD COLUMN IF NOT EXISTS security_quarantine_role TEXT;
 ALTER TABLE guild_configs ADD COLUMN IF NOT EXISTS temp_voice_enabled BOOLEAN DEFAULT FALSE;
 ALTER TABLE guild_configs ADD COLUMN IF NOT EXISTS temp_voice_category TEXT;
+ALTER TABLE guild_configs ADD COLUMN IF NOT EXISTS temp_voice_creator_channel_id TEXT;
 
 -- Index for fast lookups
 CREATE INDEX IF NOT EXISTS idx_guild_configs_guild_id ON guild_configs(guild_id);

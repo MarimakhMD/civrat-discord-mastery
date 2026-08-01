@@ -21,6 +21,7 @@ export default function TempVoice() {
 
   const [enabled, setEnabled] = useState(config.temp_voice_enabled);
   const [category, setCategory] = useState(config.temp_voice_category ?? '');
+  const [creatorChannel, setCreatorChannel] = useState(config.temp_voice_creator_channel_id ?? '');
   const [nameTemplate, setNameTemplate] = useState('{user}\'s Voice');
   const [maxChannels, setMaxChannels] = useState(10);
   const [autoDelete, setAutoDelete] = useState(true);
@@ -32,6 +33,7 @@ export default function TempVoice() {
       await updateConfig({
         temp_voice_enabled: enabled,
         temp_voice_category: category || null,
+        temp_voice_creator_channel_id: creatorChannel || null,
       });
       setIsDirty(false);
     } catch {
@@ -44,6 +46,7 @@ export default function TempVoice() {
   const handleReset = () => {
     setEnabled(config.temp_voice_enabled);
     setCategory(config.temp_voice_category ?? '');
+    setCreatorChannel(config.temp_voice_creator_channel_id ?? '');
     setNameTemplate('{user}\'s Voice');
     setMaxChannels(10);
     setAutoDelete(true);
@@ -82,6 +85,10 @@ export default function TempVoice() {
                   }}
                   placeholder="Select category"
                 />
+              </FormField>
+
+              <FormField label="Salon générateur">
+                <Select options={[{ value: 'voice-1', label: '➕ Créer un vocal' }, { value: 'voice-2', label: '🔊 Rejoindre pour créer' }]} value={creatorChannel} onChange={(value) => { setCreatorChannel(value); setIsDirty(true); }} placeholder="Choisir le salon générateur" />
               </FormField>
 
               <FormField label="Channel Name Template">

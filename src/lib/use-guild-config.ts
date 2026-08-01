@@ -72,6 +72,9 @@ export interface GuildConfig {
   security_anti_raid: boolean;
   security_whitelist: string[];
   security_log_channel_id: string | null;
+  temp_voice_enabled: boolean;
+  temp_voice_category: string | null;
+  temp_voice_creator_channel_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -145,6 +148,9 @@ const defaultConfig: GuildConfig = {
   security_anti_raid: false,
   security_whitelist: [],
   security_log_channel_id: null,
+  temp_voice_enabled: false,
+  temp_voice_category: null,
+  temp_voice_creator_channel_id: null,
   created_at: "",
   updated_at: "",
 };

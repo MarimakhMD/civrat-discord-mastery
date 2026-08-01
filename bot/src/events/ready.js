@@ -7,6 +7,7 @@
 const inviteService = require("../services/inviteService");
 const guildConfig = require("../services/guildConfig");
 const logger = require("../utils/logger");
+const tempVoiceService = require("../services/tempVoiceService");
 
 module.exports = {
   name: "ready",
@@ -25,6 +26,9 @@ module.exports = {
 
     // Preload guild configs from Supabase
     await guildConfig.preloadConfigs(client);
+
+    // Remove persisted temporary voice records whose channels are now empty.
+    await tempVoiceService.cleanupGuild(client);
 
     // Cache invites for all guilds
     for (const guild of client.guilds.cache.values()) {
