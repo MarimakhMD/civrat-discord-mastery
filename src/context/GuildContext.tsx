@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
 import type { GuildConfig } from '@/types';
 import { supabase } from '@/lib/supabase';
-import { invalidateBotGuildConfig } from '@/lib/bot-sync';
+import { getGuildConfigFromBot, hasBotApi, updateGuildConfigFromBot } from '@/lib/bot-sync';
 
 interface GuildState {
   selectedGuildId: string | null; config: GuildConfig;
@@ -34,9 +34,18 @@ export function GuildProvider({ children }: { children: ReactNode }) {
   const selectGuild = useCallback(async (id: string) => {
     setLoading(true); setSelectedGuildId(id); localStorage.setItem('selectedGuildId', id);
     try {
-      const { data, error } = await supabase.from('guild_configs').select('*').eq('guild_id', id).maybeSingle();
-      if (error) throw error;
-      setConfig({ ...defaultConfig, ...(data ?? {}), guild_id: id });
+      // Production path: authorized bot API. The direct Supabase read remains a
+      // controlled-test fallback until strict RLS and bot API hosting are live.
+      const apiConfig = await getGuildConfigFromBot(id);
+      if (apiConfig) {
+        setConfig({ ...defaultConfig, ...apiConfig, guild_id: id });
+      } else if (!hasBotApi) {
+        const { data, error } = await supabase.from('guild_configs').select('*').eq('guild_id', id).maybeSingle();
+        if (error) throw error;
+        setConfig({ ...defaultConfig, ...(data ?? {}), guild_id: id });
+      } else {
+        throw new Error('Configuration sécurisée indisponible.');
+      }
     } finally { setLoading(false); }
   }, []);
 
@@ -44,11 +53,18 @@ export function GuildProvider({ children }: { children: ReactNode }) {
     if (!selectedGuildId) throw new Error('Sélectionnez un serveur avant d’enregistrer.');
     setLoading(true);
     try {
-      const payload = { ...data, guild_id: selectedGuildId, updated_at: new Date().toISOString() };
-      const { data: saved, error } = await supabase.from('guild_configs').upsert(payload, { onConflict: 'guild_id' }).select().single();
-      if (error) throw error;
-      setConfig({ ...defaultConfig, ...saved, guild_id: selectedGuildId });
-      await invalidateBotGuildConfig(selectedGuildId);
+      const apiConfig = await updateGuildConfigFromBot(selectedGuildId, data);
+      if (apiConfig) {
+        setConfig({ ...defaultConfig, ...apiConfig, guild_id: selectedGuildId });
+      } else if (!hasBotApi) {
+        // Temporary compatibility path for existing controlled deployments.
+        const payload = { ...data, guild_id: selectedGuildId, updated_at: new Date().toISOString() };
+        const { data: saved, error } = await supabase.from('guild_configs').upsert(payload, { onConflict: 'guild_id' }).select().single();
+        if (error) throw error;
+        setConfig({ ...defaultConfig, ...saved, guild_id: selectedGuildId });
+      } else {
+        throw new Error('Sauvegarde sécurisée indisponible.');
+      }
     } finally { setLoading(false); }
   }, [selectedGuildId]);
 

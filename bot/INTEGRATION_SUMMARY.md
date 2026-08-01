@@ -512,3 +512,17 @@ Configuration dashboard nécessaire pour l’instantané : `VITE_BOT_API_URL=htt
 | Maximum 20 sync / utilisateur / 15 min | 429 |
 
 Un cooldown par guild de 8 secondes coalesce les sauvegardes rapprochées. La première recharge immédiatement. Les suivantes retournent 202 et planifient un unique rechargement ciblé qui relit la dernière ligne Supabase. Aucun token, secret ou configuration complète n’est écrit dans les logs.
+
+---
+
+## Migration Dashboard → Bot API (pré-RLS)
+
+Les endpoints autorisés suivants sont désormais le chemin production pour `guild_configs` :
+
+| Endpoint | Action |
+|---|---|
+| `GET /api/guilds/:guildId/config` | lecture autorisée de la configuration |
+| `PUT /api/guilds/:guildId/config` | écriture whitelistée et rechargement cache |
+| `POST /api/guilds/:guildId/sync` | invalidation/rechargement ciblé |
+
+Tous vérifient token Supabase, membre Discord et `Administrator`/`ManageGuild`. Le `PUT` n’accepte que les clés canoniques de `guild_configs`; les clés inconnues sont refusées. Le client bot privilégie `SUPABASE_SERVICE_ROLE_KEY` côté serveur et conserve un fallback anon uniquement pour compatibilité contrôlée tant que RLS permissif existe. Avant le durcissement RLS, définir `VITE_BOT_API_URL` dans le dashboard et `SUPABASE_SERVICE_ROLE_KEY` uniquement sur Bot-Hosting.

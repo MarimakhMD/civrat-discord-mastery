@@ -115,3 +115,7 @@ The Arena branch at commit `799b5b4` contains 23 command files and 22 event file
 ## Immediate sync authorization
 
 The bot cache sync endpoint validates the Supabase bearer session, resolves the caller’s Discord member record in the requested guild, and requires Discord `Administrator` or `ManageGuild`. It also limits each authenticated user to 20 requests per 15 minutes and coalesces repeated syncs for a guild into at most one reload every 8 seconds. A coalesced save returns HTTP 202; the delayed reload reads the latest Supabase row, so the final saved configuration wins without repeated database calls.
+
+## Backend configuration path (RLS preparation)
+
+When `VITE_BOT_API_URL` is configured, the active dashboard reads and writes `guild_configs` through authenticated Bot API endpoints (`GET`/`PUT /api/guilds/:guildId/config`) rather than direct browser table access. The API validates the Supabase session, Discord guild membership and `Administrator`/`ManageGuild`, then writes through the server-side Supabase client. Configure `SUPABASE_SERVICE_ROLE_KEY` only on Bot-Hosting before strict RLS is enabled. Until then, omitting `VITE_BOT_API_URL` preserves the existing direct-Supabase controlled-test fallback; production must configure the API URL and remove that fallback only after RLS rollout validation.
