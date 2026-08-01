@@ -124,7 +124,7 @@ const defaultConfig: GuildConfig = {
   level_rewards: [],
   role_rewards: [],
   giveaways_enabled: false,
-  language: "en",
+  language: "fr",
   suggestions_enabled: false,
   suggestions_channel_id: null,
   suggestions_approval_channel_id: null,
