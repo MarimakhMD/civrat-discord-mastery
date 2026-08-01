@@ -34,7 +34,7 @@ export default function Languages() {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [selectedLanguage, setSelectedLanguage] = useState(config.language);
+  const [selectedLanguage, setSelectedLanguage] = useState(() => config.language === 'fr' || config.language === 'en' ? config.language : 'en');
 
   const handleSave = async () => {
     try {
@@ -50,7 +50,7 @@ export default function Languages() {
   };
 
   const handleReset = () => {
-    setSelectedLanguage(config.language);
+    setSelectedLanguage(config.language === 'fr' || config.language === 'en' ? config.language : 'en');
     setIsDirty(false);
   };
 
