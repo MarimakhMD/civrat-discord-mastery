@@ -51,6 +51,8 @@ const defaultConfig = {
   automod_punishment: "warn",
   automod_mention_threshold: 5,
   automod_caps_threshold: 70,
+  automod_emoji_threshold: 10,
+  automod_bad_words: [],
   captcha_enabled: false,
   captcha_channel_id: null,
   captcha_role_id: null,
@@ -60,6 +62,7 @@ const defaultConfig = {
   xp_enabled: false,
   xp_per_message: 15,
   xp_cooldown: 60,
+  xp_announce_channel_id: null,
   level_rewards: [],
   role_rewards: [],
   giveaways_enabled: false,
@@ -80,6 +83,9 @@ const defaultConfig = {
   security_anti_raid: false,
   security_whitelist: [],
   security_log_channel_id: null,
+  security_quarantine_role: null,
+  temp_voice_enabled: false,
+  temp_voice_category: null,
 };
 
 /**

@@ -20,7 +20,7 @@ export default function Settings() {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [prefix, setPrefix] = useState(config.prefix);
+  const [prefix, setPrefix] = useState(config.bot_prefix);
   const [language, setLanguage] = useState(config.language);
   const [embedColor, setEmbedColor] = useState('#3b82f6');
   const [dmOnJoin, setDmOnJoin] = useState(false);
@@ -31,7 +31,7 @@ export default function Settings() {
       setIsSaving(true);
       setError(null);
       await updateConfig({
-        prefix,
+        bot_prefix: prefix,
         language,
       });
       setIsDirty(false);
@@ -43,7 +43,7 @@ export default function Settings() {
   };
 
   const handleReset = () => {
-    setPrefix(config.prefix);
+    setPrefix(config.bot_prefix);
     setLanguage(config.language);
     setEmbedColor('#3b82f6');
     setDmOnJoin(false);

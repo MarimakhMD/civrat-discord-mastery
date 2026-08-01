@@ -34,16 +34,16 @@ export default function Invites() {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [enabled, setEnabled] = useState(config.invtrack_enabled);
-  const [logChannel, setLogChannel] = useState(config.invtrack_channel ?? '');
+  const [enabled, setEnabled] = useState(config.invitations_enabled);
+  const [logChannel, setLogChannel] = useState(config.invitations_log_channel_id ?? '');
 
   const handleSave = async () => {
     try {
       setIsSaving(true);
       setError(null);
       await updateConfig({
-        invtrack_enabled: enabled,
-        invtrack_channel: logChannel || null,
+        invitations_enabled: enabled,
+        invitations_log_channel_id: logChannel || null,
       });
       setIsDirty(false);
     } catch {
@@ -54,8 +54,8 @@ export default function Invites() {
   };
 
   const handleReset = () => {
-    setEnabled(config.invtrack_enabled);
-    setLogChannel(config.invtrack_channel ?? '');
+    setEnabled(config.invitations_enabled);
+    setLogChannel(config.invitations_log_channel_id ?? '');
     setIsDirty(false);
   };
 
