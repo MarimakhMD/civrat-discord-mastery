@@ -3,7 +3,7 @@ import { useLocation, Link } from 'react-router-dom';
 import { Bell, ChevronDown, ChevronRight } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useGuild } from '@/context/GuildContext';
-import { cn, getGuildIconUrl } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 
 export function TopBar() {
   const [guildMenuOpen, setGuildMenuOpen] = useState(false);

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { AlertTriangle, ArrowRight, BarChart3, Bot, Check, Gift, Globe2, Lock, MessageCircle, Shield, Ticket, Users, Zap } from 'lucide-react';
+import { AlertTriangle, ArrowRight, BarChart3, Bot, Gift, Globe2, Lock, MessageCircle, Shield, Ticket, Users, Zap } from 'lucide-react';
 
 const BOT_INVITE = 'https://discord.com/oauth2/authorize?client_id=1478877109538652371&permissions=8&integration_type=0&scope=bot';
 type Locale = 'fr' | 'en';

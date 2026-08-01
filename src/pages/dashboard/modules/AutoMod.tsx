@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BadgeAlert, Ban, Link2Off, ShieldAlert, Timer, Trash2 } from 'lucide-react';
+import { BadgeAlert, Link2Off, ShieldAlert, Trash2 } from 'lucide-react';
 import { ModuleHeader } from '@/components/ui/ModuleHeader';
 import { Toggle } from '@/components/ui/Toggle';
 import { FormField } from '@/components/ui/FormField';
