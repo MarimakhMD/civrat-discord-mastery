@@ -1,179 +1,19 @@
 import { useState } from 'react';
-import { Shield } from 'lucide-react';
+import { AlertTriangle, LockKeyhole, Shield, ShieldCheck } from 'lucide-react';
 import { ModuleHeader } from '@/components/ui/ModuleHeader';
 import { Toggle } from '@/components/ui/Toggle';
 import { FormField } from '@/components/ui/FormField';
 import { SaveBar } from '@/components/ui/SaveBar';
 import { Select } from '@/components/ui/Select';
 import { useGuild } from '@/context/GuildContext';
-
-const roles = [
-  { value: 'r-1', label: '@Admin' },
-  { value: 'r-2', label: '@Moderator' },
-  { value: 'r-3', label: '@Member' },
-  { value: 'r-4', label: '@Muted' },
-];
-
-const mockSecurityEvents = [
-  { id: 1, type: 'Raid Detected', user: 'Unknown', time: '2 minutes ago', severity: 'high' },
-  { id: 2, type: 'Mass Ban Attempt', user: 'Hacker#0001', time: '1 hour ago', severity: 'critical' },
-  { id: 3, type: 'Token Leak', time: '3 hours ago', severity: 'high' },
-];
-
+const roles = [{ value: 'r-1', label: '@Administrateur' }, { value: 'r-2', label: '@Modérateur' }, { value: 'r-3', label: '@Quarantaine' }];
+const protections = [{ id: 'raid', name: 'Anti Raid', text: 'Détecte les arrivées et comportements massifs.' }, { id: 'nuke', name: 'Anti Nuker', text: 'Surveille les actions destructrices sur le serveur.' }, { id: 'webhook', name: 'Anti Webhook', text: 'Prêt à surveiller les webhooks suspects.' }, { id: 'bot', name: 'Anti Bot', text: 'Prêt à contrôler les ajouts de bots.' }, { id: 'roles', name: 'Anti Role Delete', text: 'Prêt à détecter les suppressions de rôles.' }, { id: 'channels', name: 'Anti Channel Delete', text: 'Prêt à détecter les suppressions de salons.' }, { id: 'ban', name: 'Anti Mass Ban', text: 'Prêt à prévenir les bannissements massifs.' }, { id: 'kick', name: 'Anti Mass Kick', text: 'Prêt à prévenir les expulsions massives.' }];
 export default function Security() {
-  const { config, updateConfig } = useGuild();
-  const [isDirty, setIsDirty] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const [enabled, setEnabled] = useState(config.security_enabled);
-  const [antiRaid, setAntiRaid] = useState(config.security_anti_raid);
-  const [antiNuke, setAntiNuke] = useState(config.security_anti_nuke);
-  const [quarantineRole, setQuarantineRole] = useState(config.security_quarantine_role ?? '');
-  const [whitelistRoles, setWhitelistRoles] = useState<string[]>([]);
-
-  const handleSave = async () => {
-    try {
-      setIsSaving(true);
-      setError(null);
-      await updateConfig({
-        security_enabled: enabled,
-        security_anti_raid: antiRaid,
-        security_anti_nuke: antiNuke,
-        security_quarantine_role: quarantineRole || null,
-      });
-      setIsDirty(false);
-    } catch (err) {
-      setError('Failed to save security settings');
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const handleReset = () => {
-    setEnabled(config.security_enabled);
-    setAntiRaid(config.security_anti_raid);
-    setAntiNuke(config.security_anti_nuke);
-    setQuarantineRole(config.security_quarantine_role ?? '');
-    setWhitelistRoles([]);
-    setIsDirty(false);
-  };
-
-  return (
-    <div className="space-y-6">
-      <ModuleHeader
-        icon={Shield}
-        title="Security Settings"
-        description="Configure server security and threat protection"
-        toggleEnabled={enabled}
-        onToggle={(checked) => {
-          setEnabled(checked);
-          setIsDirty(true);
-        }}
-      />
-
-      {enabled && (
-        <div className="space-y-6">
-          <div className="module-card !cursor-default p-6">
-            <h3 className="mb-4 text-lg font-semibold">Threat Protection</h3>
-            <div className="space-y-3">
-              <label className="flex items-center gap-3">
-                <Toggle
-                  checked={antiRaid}
-                  onChange={(checked) => {
-                    setAntiRaid(checked);
-                    setIsDirty(true);
-                  }}
-                />
-                <span className="text-sm">Anti-Raid</span>
-              </label>
-              <label className="flex items-center gap-3">
-                <Toggle
-                  checked={antiNuke}
-                  onChange={(checked) => {
-                    setAntiNuke(checked);
-                    setIsDirty(true);
-                  }}
-                />
-                <span className="text-sm">Anti-Nuke</span>
-              </label>
-            </div>
-          </div>
-
-          <div className="module-card !cursor-default p-6">
-            <h3 className="mb-4 text-lg font-semibold">Quarantine</h3>
-            <FormField label="Quarantine Role">
-              <Select
-                options={roles}
-                value={quarantineRole}
-                onChange={(val) => {
-                  setQuarantineRole(val);
-                  setIsDirty(true);
-                }}
-                placeholder="Select role"
-              />
-            </FormField>
-          </div>
-
-          <div className="module-card !cursor-default p-6">
-            <h3 className="mb-4 text-lg font-semibold">Whitelist Roles</h3>
-            <div className="space-y-2">
-              {roles.map((role) => (
-                <label key={role.value} className="flex items-center gap-3">
-                  <input
-                    type="checkbox"
-                    checked={whitelistRoles.includes(role.value)}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setWhitelistRoles([...whitelistRoles, role.value]);
-                      } else {
-                        setWhitelistRoles(whitelistRoles.filter((r) => r !== role.value));
-                      }
-                      setIsDirty(true);
-                    }}
-                    className="h-4 w-4 rounded border-slate-300"
-                  />
-                  <span className="text-sm">{role.label}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          <div className="module-card !cursor-default p-6">
-            <h3 className="mb-4 text-lg font-semibold">Recent Security Events</h3>
-            <div className="space-y-2">
-              {mockSecurityEvents.map((event) => (
-                <div
-                  key={event.id}
-                  className="flex items-center justify-between rounded border-l-4 border-red-600 bg-red-50 px-4 py-3"
-                >
-                  <div>
-                    <p className="font-medium text-slate-900">{event.type}</p>
-                    <p className="text-sm text-dark-300">{event.time}</p>
-                  </div>
-                  <span
-                    className={`rounded px-2 py-1 text-xs font-medium ${
-                      event.severity === 'critical'
-                        ? 'bg-red-200 text-red-800'
-                        : 'bg-orange-200 text-orange-800'
-                    }`}
-                  >
-                    {event.severity}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      <SaveBar
-        isDirty={isDirty}
-        isSaving={isSaving}
-        onSave={handleSave}
-        onReset={handleReset}
-        error={error}
-      />
-    </div>
-  );
+  const { config, updateConfig } = useGuild(); const [dirty, setDirty] = useState(false); const [saving, setSaving] = useState(false); const [error, setError] = useState<string | null>(null); const [enabled, setEnabled] = useState(config.security_enabled); const [raid, setRaid] = useState(config.security_anti_raid); const [nuke, setNuke] = useState(config.security_anti_nuke); const [role, setRole] = useState(config.security_quarantine_role ?? '');
+  const active = [raid, nuke].filter(Boolean).length; const score = enabled ? 40 + active * 30 : 0; const change = (fn: () => void) => { fn(); setDirty(true); }; const save = async () => { try { setSaving(true); setError(null); await updateConfig({ security_enabled: enabled, security_anti_raid: raid, security_anti_nuke: nuke, security_quarantine_role: role || null }); setDirty(false); } catch { setError('Impossible d’enregistrer le centre de sécurité.'); } finally { setSaving(false); } }; const reset = () => { setEnabled(config.security_enabled); setRaid(config.security_anti_raid); setNuke(config.security_anti_nuke); setRole(config.security_quarantine_role ?? ''); setDirty(false); };
+  const state = (id: string) => id === 'raid' ? raid : id === 'nuke' ? nuke : false;
+  return <div className="space-y-6"><ModuleHeader icon={Shield} title="Security Center" description="Visualisez vos défenses et préparez les protections du serveur." toggleEnabled={enabled} onToggle={(value) => change(() => setEnabled(value))} />
+    <div className="grid gap-4 md:grid-cols-3"><div className="module-card !cursor-default"><div className="flex items-center gap-4"><div className="grid h-16 w-16 place-items-center rounded-full border-4 border-neon-green/30 text-xl font-black text-neon-green">{score}</div><div><p className="font-bold">Score de sécurité</p><p className="text-sm text-dark-300">{score >= 80 ? 'Protection élevée' : score ? 'Protection à renforcer' : 'Protection désactivée'}</p></div></div></div><Stat label="Protections actives" value={`${active}/8`} /><Stat label="Dernières alertes" value="—" /></div>
+    <div className="grid gap-6 xl:grid-cols-5"><section className="space-y-6 xl:col-span-3"><div className="module-card !cursor-default"><p className="text-xs font-bold uppercase tracking-widest text-neon-green">Bouclier du serveur</p><h2 className="mt-1 text-xl font-bold">Protections</h2><div className="mt-5 grid gap-2 sm:grid-cols-2">{protections.map((item) => <div key={item.id} className="flex gap-3 rounded-xl border border-white/8 bg-dark-700/45 p-4"><Toggle checked={state(item.id)} onChange={(value) => { if (item.id === 'raid') change(() => setRaid(value)); if (item.id === 'nuke') change(() => setNuke(value)); }} /><div className="min-w-0 flex-1"><div className="flex items-center justify-between gap-2"><b className="text-sm">{item.name}</b><span className={state(item.id) ? 'text-xs font-bold text-neon-green' : 'text-xs text-dark-300'}>{state(item.id) ? 'Actif' : 'Prêt à connecter'}</span></div><p className="mt-1 text-xs leading-5 text-dark-300">{item.text}</p></div></div>)}</div></div><div className="module-card !cursor-default"><h2 className="font-bold">Réponse aux incidents</h2><div className="mt-4"><FormField label="Rôle de quarantaine"><Select options={roles} value={role} onChange={(value) => change(() => setRole(value))} placeholder="Choisir un rôle" /></FormField></div><p className="mt-4 text-xs leading-5 text-dark-300">Les actions de quarantaine et les alertes en temps réel seront exécutées par le bot dès que ces données seront connectées.</p></div></section><aside className="xl:col-span-2"><div className="sticky top-24 module-card !cursor-default"><div className="flex items-center gap-2"><AlertTriangle className="h-4 w-4 text-neon-yellow" /><h2 className="font-bold">Alertes & recommandations</h2></div><div className="mt-5 space-y-3"><Notice icon={ShieldCheck} title="Centre de sécurité prêt" text="Activez Anti Raid et Anti Nuker pour améliorer le score." /><Notice icon={LockKeyhole} title="Quarantaine" text={role ? 'Rôle de quarantaine sélectionné.' : 'Sélectionnez un rôle de quarantaine.'} /></div><div className="mt-5 rounded-xl bg-[#313338] p-4"><p className="text-xs text-[#b5bac1]"># security-alerts</p><div className="mt-3 rounded border-l-4 border-neon-yellow bg-[#2b2d31] p-3 text-xs text-[#dbdee1]">Les alertes de sécurité apparaîtront ici, avec leur niveau, l’auteur et l’action appliquée.</div></div></div></aside></div><SaveBar isDirty={dirty} isSaving={saving} onSave={save} onReset={reset} error={error} /></div>;
 }
+function Stat({ label, value }: { label: string; value: string }) { return <div className="module-card !cursor-default"><strong className="text-2xl text-neon-green">{value}</strong><p className="mt-1 text-sm text-dark-300">{label}</p></div>; } function Notice({ icon: Icon, title, text }: { icon: typeof ShieldCheck; title: string; text: string }) { return <div className="flex gap-3 rounded-xl border border-white/8 bg-dark-700/45 p-3"><Icon className="mt-0.5 h-4 w-4 shrink-0 text-neon-green" /><div><p className="text-sm font-semibold">{title}</p><p className="mt-1 text-xs leading-5 text-dark-300">{text}</p></div></div>; }

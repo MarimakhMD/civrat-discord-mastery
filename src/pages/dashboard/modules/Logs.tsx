@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { FileText } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { FileText, Filter, Search, Send, ShieldCheck } from 'lucide-react';
 import { ModuleHeader } from '@/components/ui/ModuleHeader';
 import { Toggle } from '@/components/ui/Toggle';
 import { FormField } from '@/components/ui/FormField';
@@ -7,124 +7,17 @@ import { SaveBar } from '@/components/ui/SaveBar';
 import { Select } from '@/components/ui/Select';
 import { useGuild } from '@/context/GuildContext';
 
-const channels = [
-  { value: 'ch-1', label: '#general' },
-  { value: 'ch-2', label: '#welcome' },
-  { value: 'ch-3', label: '#logs' },
-  { value: 'ch-4', label: '#moderation' },
-];
-
-const logEvents = [
-  { id: 'member_join', label: 'Member Join' },
-  { id: 'member_leave', label: 'Member Leave' },
-  { id: 'message_delete', label: 'Message Delete' },
-  { id: 'message_edit', label: 'Message Edit' },
-  { id: 'role_add', label: 'Role Added' },
-  { id: 'role_remove', label: 'Role Removed' },
-  { id: 'channel_create', label: 'Channel Create' },
-  { id: 'channel_delete', label: 'Channel Delete' },
-  { id: 'ban_add', label: 'Ban Added' },
-  { id: 'ban_remove', label: 'Ban Removed' },
-];
-
+const channels = [{ value: 'ch-1', label: '#général' }, { value: 'ch-2', label: '#bienvenue' }, { value: 'ch-3', label: '#logs' }, { value: 'ch-4', label: '#modération' }];
+const categories = [{ id: 'message_delete', name: 'Messages', text: 'Suppressions, modifications et actions sur les messages.' }, { id: 'member_join', name: 'Membres', text: 'Arrivées, départs et changements de membres.' }, { id: 'ban_add', name: 'Modération', text: 'Bannissements, expulsions et sanctions.' }, { id: 'tickets', name: 'Tickets', text: 'Créations, fermetures et transcripts.' }, { id: 'invites', name: 'Invitations', text: 'Utilisation et création d’invitations.' }, { id: 'channel_create', name: 'Salons', text: 'Créations, modifications et suppressions.' }, { id: 'role_add', name: 'Rôles', text: 'Mises à jour des rôles et permissions.' }, { id: 'voice', name: 'Vocal', text: 'Connexions, déplacements et sorties.' }, { id: 'emoji', name: 'Emojis', text: 'Création et suppression d’emojis.' }, { id: 'server', name: 'Serveur', text: 'Paramètres généraux de la communauté.' }];
 export default function Logs() {
-  const { config, updateConfig } = useGuild();
-  const [isDirty, setIsDirty] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const [enabled, setEnabled] = useState(config.logs_enabled);
-  const [logChannel, setLogChannel] = useState(config.logs_channel_id ?? '');
-  const [enabledEvents, setEnabledEvents] = useState<string[]>(config.log_events);
-
-  const handleSave = async () => {
-    try {
-      setIsSaving(true);
-      setError(null);
-      await updateConfig({
-        logs_enabled: enabled,
-        logs_channel_id: logChannel || null,
-        log_events: enabledEvents,
-      });
-      setIsDirty(false);
-    } catch (err) {
-      setError('Failed to save logging settings');
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const handleReset = () => {
-    setEnabled(config.logs_enabled);
-    setLogChannel(config.logs_channel_id ?? '');
-    setEnabledEvents(config.log_events);
-    setIsDirty(false);
-  };
-
-  const handleToggleEvent = (eventId: string) => {
-    const updated = enabledEvents.includes(eventId)
-      ? enabledEvents.filter((id) => id !== eventId)
-      : [...enabledEvents, eventId];
-    setEnabledEvents(updated);
-    setIsDirty(true);
-  };
-
-  return (
-    <div className="space-y-6">
-      <ModuleHeader
-        icon={FileText}
-        title="Logging System"
-        description="Configure event logging and auditing"
-        toggleEnabled={enabled}
-        onToggle={(checked) => {
-          setEnabled(checked);
-          setIsDirty(true);
-        }}
-      />
-
-      {enabled && (
-        <div className="space-y-6">
-          <div className="module-card !cursor-default p-6">
-            <h3 className="mb-4 text-lg font-semibold">Log Channel</h3>
-            <FormField label="Channel">
-              <Select
-                options={channels}
-                value={logChannel}
-                onChange={(val) => {
-                  setLogChannel(val);
-                  setIsDirty(true);
-                }}
-                placeholder="Select log channel"
-              />
-            </FormField>
-          </div>
-
-          <div className="module-card !cursor-default p-6">
-            <h3 className="mb-4 text-lg font-semibold">Log Events</h3>
-            <div className="grid gap-4 md:grid-cols-2">
-              {logEvents.map((event) => (
-                <label key={event.id} className="flex items-center gap-3">
-                  <input
-                    type="checkbox"
-                    checked={enabledEvents.includes(event.id)}
-                    onChange={() => handleToggleEvent(event.id)}
-                    className="h-4 w-4 rounded border-slate-300"
-                  />
-                  <span className="text-sm">{event.label}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      <SaveBar
-        isDirty={isDirty}
-        isSaving={isSaving}
-        onSave={handleSave}
-        onReset={handleReset}
-        error={error}
-      />
-    </div>
-  );
+  const { config, updateConfig } = useGuild(); const [isDirty, setIsDirty] = useState(false); const [isSaving, setIsSaving] = useState(false); const [error, setError] = useState<string | null>(null); const [enabled, setEnabled] = useState(config.logs_enabled); const [channel, setChannel] = useState(config.logs_channel_id ?? ''); const [events, setEvents] = useState<string[]>(config.log_events); const [search, setSearch] = useState(''); const [activePreview, setActivePreview] = useState('Messages');
+  const listed = useMemo(() => categories.filter((item) => item.name.toLowerCase().includes(search.toLowerCase())), [search]); const change = (fn: () => void) => { fn(); setIsDirty(true); }; const toggle = (id: string) => change(() => setEvents(events.includes(id) ? events.filter((item) => item !== id) : [...events, id]));
+  const save = async () => { try { setIsSaving(true); setError(null); await updateConfig({ logs_enabled: enabled, logs_channel_id: channel || null, log_events: events }); setIsDirty(false); } catch { setError('Impossible d’enregistrer la configuration des logs.'); } finally { setIsSaving(false); } }; const reset = () => { setEnabled(config.logs_enabled); setChannel(config.logs_channel_id ?? ''); setEvents(config.log_events); setIsDirty(false); };
+  return <div className="space-y-6"><ModuleHeader icon={FileText} title="Centre de journalisation" description="Choisissez les événements à tracer et centralisez l’audit de votre serveur." toggleEnabled={enabled} onToggle={(value) => change(() => setEnabled(value))} />
+    <div className="grid gap-4 sm:grid-cols-3"><Stat value="—" label="Événements aujourd’hui" /><Stat value={channel ? '# logs' : 'Non défini'} label="Salon de journalisation" /><Stat value={`${events.length}/10`} label="Catégories activées" /></div>
+    <div className="grid gap-6 xl:grid-cols-5"><section className="space-y-6 xl:col-span-3"><div className="module-card !cursor-default"><div className="grid gap-4 sm:grid-cols-[1fr_220px]"><div className="relative"><Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neon-green" /><input value={search} onChange={(event) => setSearch(event.target.value)} className="input-field pl-10" placeholder="Rechercher une catégorie…" /></div><FormField label="Salon principal"><Select options={channels} value={channel} onChange={(value) => change(() => setChannel(value))} placeholder="Choisir un salon" /></FormField></div><div className="mt-5 grid gap-2 sm:grid-cols-2">{listed.map((item) => <button type="button" key={item.id} onClick={() => setActivePreview(item.name)} className="flex items-center gap-3 rounded-xl border border-white/8 bg-dark-700/45 p-4 text-left transition hover:border-neon-green/25"><Toggle checked={events.includes(item.id)} onChange={() => toggle(item.id)} /><span className="min-w-0 flex-1"><span className="flex items-center justify-between gap-2"><b className="text-sm">{item.name}</b><em className={events.includes(item.id) ? 'not-italic text-xs font-bold text-neon-green' : 'not-italic text-xs text-dark-300'}>{events.includes(item.id) ? 'Actif' : 'Inactif'}</em></span><small className="mt-1 block text-xs leading-5 text-dark-300">{item.text}</small></span></button>)}</div>{!listed.length && <div className="py-10 text-center text-sm text-dark-300">Aucune catégorie ne correspond à cette recherche.</div>}</div>
+      <div className="module-card !cursor-default"><div className="flex items-center gap-2"><Filter className="h-4 w-4 text-neon-yellow" /><h2 className="font-bold">État de la synchronisation</h2></div><p className="mt-2 text-sm text-dark-300">Les événements réels apparaîtront ici dès que le bot Discord transmettra les logs. Aucun historique fictif n’est affiché.</p><div className="mt-4 rounded-xl border border-dashed border-white/15 bg-dark-700/30 p-5 text-sm text-dark-300"><ShieldCheck className="mb-2 h-5 w-5 text-neon-green" />Configuration prête : sélectionnez un salon, activez les catégories, puis sauvegardez.</div></div></section>
+      <aside className="xl:col-span-2"><div className="sticky top-24 module-card !cursor-default"><div className="flex items-center gap-2"><Send className="h-4 w-4 text-neon-yellow" /><h2 className="font-bold">Aperçu Discord</h2></div><p className="mt-1 text-xs text-dark-300">Catégorie sélectionnée : {activePreview}</p><div className="mt-5 rounded-xl bg-[#313338] p-4"><p className="text-xs text-[#b5bac1]"># {channel ? 'logs' : 'choisir-un-salon'}</p><div className="mt-3 rounded-md border-l-4 border-neon-green bg-[#2b2d31] p-3"><p className="text-sm font-bold text-white">{activePreview} · CIVRAT Logs</p><p className="mt-2 text-xs leading-5 text-[#dbdee1]">Un événement sera affiché ici avec son auteur, sa date, son contexte et les détails utiles à la modération.</p></div></div><p className="mt-4 rounded-lg bg-neon-yellow/8 p-3 text-xs leading-5 text-dark-300">L’aperçu est visuel. L’envoi réel dépend du bot Discord existant.</p></div></aside></div>
+    <SaveBar isDirty={isDirty} isSaving={isSaving} onSave={save} onReset={reset} error={error} /></div>;
 }
+function Stat({ value, label }: { value: string; label: string }) { return <div className="module-card !cursor-default"><strong className="text-2xl text-neon-green">{value}</strong><p className="mt-1 text-sm text-dark-300">{label}</p></div>; }
