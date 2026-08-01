@@ -24,7 +24,6 @@ const NAV_ITEMS = [
   { icon: Bot, label: 'Moderation', module: 'moderation' },
   { icon: Database, label: 'Backup', module: 'backup' },
   { icon: FileCode, label: 'Embeds', module: 'embedbuilder' },
-  { icon: Crown, label: 'Premium', module: 'premium' },
 ];
 
 export function Sidebar() {
@@ -58,12 +57,6 @@ export function Sidebar() {
           </Link>
         ))}
       </nav>
-      {(isExpanded || isOpen) && <div className="px-3 py-3 border-t border-white/10">
-        <div className="glass rounded-lg p-3 mb-3">
-          <div className="flex items-center gap-2 mb-1"><Crown className="w-4 h-4 text-neon-yellow" /><span className="text-xs font-semibold text-neon-yellow">Premium</span></div>
-          <p className="text-[11px] text-dark-300">Unlock all features</p>
-        </div>
-      </div>}
       {user && (
         <div className="px-3 py-3 border-t border-white/10">
           <div className="flex items-center gap-3 mb-2">
