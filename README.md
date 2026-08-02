@@ -137,3 +137,7 @@ The Bot API logs only safe counters for Discord guild discovery: whether a provi
 ## Discord OAuth provider-token diagnostics
 
 Supabase provider tokens are captured during the explicit `/auth/callback` PKCE `exchangeCodeForSession` step and kept only in AuthContext memory. They may be absent from a restored `getSession()` result by design, so a browser refresh can require a fresh Discord OAuth authorization before guild discovery. Set `VITE_AUTH_DEBUG=true` only while diagnosing OAuth; it logs token presence and length, identity providers, and metadata keys, never raw access/provider/refresh token values. In Supabase Auth, allow the dashboard `/auth/callback` URL; in Discord Developer Portal, configure the Supabase project callback URL shown by the Discord provider configuration, not a browser secret exchange URL.
+
+## OAuth callback compatibility
+
+CIVRAT supports both Supabase Discord callback formats during the provider migration: PKCE `?code=...` is exchanged explicitly with `exchangeCodeForSession`, while historical implicit `#access_token=...&refresh_token=...` callbacks are accepted with `setSession`. A Discord provider token found in either result is retained only in transient session memory long enough to load the user guilds, then removed. Configure Supabase Auth redirect URLs for `/auth/callback`; configure the Discord Developer Portal redirect URL to the Supabase provider callback URL. Never enable raw token logging; `VITE_AUTH_DEBUG=true` logs only token presence and length.

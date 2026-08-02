@@ -10,6 +10,7 @@ interface AuthState {
 }
 const AuthContext = createContext<AuthState | null>(null);
 const authDebug = import.meta.env.VITE_AUTH_DEBUG === 'true';
+const TRANSIENT_PROVIDER_TOKEN = 'civrat_discord_provider_token';
 
 function logSession(source: string, session: Session | null) {
   if (!authDebug) return;
@@ -51,8 +52,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!nextSession) { setDiscordProviderToken(null); setGuilds([]); return; }
     // Provider tokens are intentionally memory-only; Supabase may omit them on
     // restored/refresh sessions, but they are available after the code exchange.
-    const providerToken = nextSession.provider_token;
-    if (providerToken) { setDiscordProviderToken(providerToken); void loadGuildsForToken(providerToken); }
+    const providerToken = nextSession.provider_token || sessionStorage.getItem(TRANSIENT_PROVIDER_TOKEN);
+    if (providerToken) {
+      setDiscordProviderToken(providerToken);
+      void loadGuildsForToken(providerToken).finally(() => sessionStorage.removeItem(TRANSIENT_PROVIDER_TOKEN));
+    }
   }, [loadGuildsForToken]);
 
   const refreshGuilds = useCallback(async () => {
@@ -65,7 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
   const logout = useCallback(async () => {
     try { await supabase.auth.signOut(); }
-    finally { localStorage.removeItem('selectedGuildId'); setSession(null); setUser(null); setGuilds([]); setGuildsError(null); setDiscordProviderToken(null); }
+    finally { localStorage.removeItem('selectedGuildId'); sessionStorage.removeItem(TRANSIENT_PROVIDER_TOKEN); setSession(null); setUser(null); setGuilds([]); setGuildsError(null); setDiscordProviderToken(null); }
   }, []);
 
   useEffect(() => {

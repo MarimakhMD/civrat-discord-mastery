@@ -557,3 +557,9 @@ Le dashboard ne conserve pas le token provider Discord au-delà de la session Su
 ## OAuth Discord — token provider
 
 Le callback dashboard échange explicitement le code PKCE avec `exchangeCodeForSession` et capture `provider_token` uniquement en mémoire. `getSession()` ou un refresh token peut ne pas restituer ce token provider : c’est attendu et la découverte guilds demande alors une nouvelle autorisation Discord. `VITE_AUTH_DEBUG=true` active des logs sûrs (présence/longueur uniquement, jamais valeur token). L’API `/api/discord/guilds` journalise aussi les compteurs de filtre sans token.
+
+---
+
+## Callback OAuth PKCE et implicite
+
+Le callback accepte `?code=` (PKCE) et `#access_token=...&refresh_token=...` (implicite historique). Le token provider Discord est capturé avant suppression du fragment URL, utilisé uniquement pour la découverte guilds, puis retiré du stockage transitoire. Les logs debug ne contiennent jamais les valeurs des tokens.
