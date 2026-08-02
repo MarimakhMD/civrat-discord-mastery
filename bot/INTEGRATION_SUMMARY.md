@@ -551,3 +551,9 @@ Le dashboard ne conserve pas le token provider Discord au-delà de la session Su
 ## Diagnostic guilds Discord
 
 `GET /api/discord/guilds` journalise sans secret : token provider présent (booléen), nombre brut Discord, nombre après filtre owner/Admin/ManageGuild, nombre après présence bot et nombre final. La réponse finale ne contient que les guilds administrables où CIVRAT est dans le cache du bot. Le dashboard affiche une erreur avec retry si l’API, la session ou le token provider échoue au lieu de masquer l’échec comme `0 serveur`.
+
+---
+
+## OAuth Discord — token provider
+
+Le callback dashboard échange explicitement le code PKCE avec `exchangeCodeForSession` et capture `provider_token` uniquement en mémoire. `getSession()` ou un refresh token peut ne pas restituer ce token provider : c’est attendu et la découverte guilds demande alors une nouvelle autorisation Discord. `VITE_AUTH_DEBUG=true` active des logs sûrs (présence/longueur uniquement, jamais valeur token). L’API `/api/discord/guilds` journalise aussi les compteurs de filtre sans token.

@@ -133,3 +133,7 @@ The dashboard authenticates through Supabase Discord OAuth and sends the short-l
 ## Guild discovery diagnostics
 
 The Bot API logs only safe counters for Discord guild discovery: whether a provider token header was received, Discord guild count, count after the owner/Admin/ManageGuild filter, count after the CIVRAT-presence filter, and final response count. It never logs provider tokens. A dashboard error now exposes Bot API failures instead of silently displaying an indistinguishable empty guild list.
+
+## Discord OAuth provider-token diagnostics
+
+Supabase provider tokens are captured during the explicit `/auth/callback` PKCE `exchangeCodeForSession` step and kept only in AuthContext memory. They may be absent from a restored `getSession()` result by design, so a browser refresh can require a fresh Discord OAuth authorization before guild discovery. Set `VITE_AUTH_DEBUG=true` only while diagnosing OAuth; it logs token presence and length, identity providers, and metadata keys, never raw access/provider/refresh token values. In Supabase Auth, allow the dashboard `/auth/callback` URL; in Discord Developer Portal, configure the Supabase project callback URL shown by the Discord provider configuration, not a browser secret exchange URL.
