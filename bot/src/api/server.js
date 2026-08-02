@@ -30,7 +30,8 @@ const CONFIG_KEYS = new Set([
 
 function discordIdFromUser(user) {
   const meta = user.user_metadata || {};
-  return String(meta.provider_id || meta.sub || meta.id || '');
+  const discordIdentity = user.identities?.find((identity) => identity.provider === 'discord')?.identity_data || {};
+  return String(meta.provider_id || meta.sub || meta.id || discordIdentity.provider_id || discordIdentity.sub || discordIdentity.id || '');
 }
 function userRateLimited(userId) {
   const now = Date.now();
@@ -110,20 +111,30 @@ function createServer(discordClient) {
   app.get('/api/discord/guilds', async (req, res) => {
     const token = req.get('authorization')?.replace(/^Bearer\s+/i, '');
     const discordToken = req.get('x-discord-access-token');
-    if (!token || !discordToken || !supabase) return res.status(401).json({ error: 'Unauthorized' });
+    logger.info(`Discord guild discovery request: provider token received=${Boolean(discordToken)}`);
+    if (!token || !discordToken || !supabase) { logger.warn('Discord guild discovery denied: missing authentication'); return res.status(401).json({ error: 'Unauthorized' }); }
     const { data: { user }, error } = await supabase.auth.getUser(token);
-    if (error || !user) return res.status(401).json({ error: 'Unauthorized' });
+    if (error || !user) { logger.warn('Discord guild discovery denied: invalid Supabase session'); return res.status(401).json({ error: 'Unauthorized' }); }
     try {
       const meResponse = await fetch('https://discord.com/api/v10/users/@me', { headers: { Authorization: `Bearer ${discordToken}` } });
-      if (!meResponse.ok) return res.status(401).json({ error: 'Discord authorization expired' });
+      if (!meResponse.ok) { logger.warn(`Discord guild discovery denied: provider token rejected (${meResponse.status})`); return res.status(401).json({ error: 'Discord authorization expired' }); }
       const discordUser = await meResponse.json();
-      if (discordUser.id !== discordIdFromUser(user)) return res.status(403).json({ error: 'Discord identity mismatch' });
+      if (discordUser.id !== discordIdFromUser(user)) { logger.warn(`Discord guild discovery denied: identity mismatch for user ${user.id}`); return res.status(403).json({ error: 'Discord identity mismatch' }); }
       const guildResponse = await fetch('https://discord.com/api/v10/users/@me/guilds', { headers: { Authorization: `Bearer ${discordToken}` } });
-      if (!guildResponse.ok) return res.status(503).json({ error: 'Discord guilds unavailable' });
-      const guilds = (await guildResponse.json()).filter((item) => {
+      if (!guildResponse.ok) { logger.warn(`Discord guild discovery failed: guild API status ${guildResponse.status}`); return res.status(503).json({ error: 'Discord guilds unavailable' }); }
+      const discordGuilds = await guildResponse.json();
+      logger.info(`Discord guild discovery: guilds received=${discordGuilds.length}`);
+      const manageableGuilds = discordGuilds.filter((item) => {
         const permissions = BigInt(item.permissions || '0');
         return item.owner || (permissions & 0x8n) === 0x8n || (permissions & 0x20n) === 0x20n;
-      }).map((item) => ({ id: item.id, name: item.name, icon: item.icon, owner: item.owner, permissions: Number(item.permissions), bot_present: discordClient.guilds.cache.has(item.id), member_count: 0 }));
+      });
+      logger.info(`Discord guild discovery: after admin filter=${manageableGuilds.length}`);
+      const guilds = manageableGuilds.filter((item) => discordClient.guilds.cache.has(item.id)).map((item) => {
+        const permissions = BigInt(item.permissions || '0');
+        return { id: item.id, name: item.name, icon: item.icon, owner: item.owner, permissions: Number(permissions & 0xffffffffn), bot_present: true, member_count: 0 };
+      });
+      logger.info(`Discord guild discovery: after bot filter=${guilds.length}`);
+      logger.info(`Discord guild discovery: final response guilds=${guilds.length}`);
       return res.json({ guilds });
     } catch (discordError) {
       logger.warn(`Discord guild discovery failed for user ${user.id}: ${discordError.message}`);

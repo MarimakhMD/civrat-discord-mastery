@@ -545,3 +545,9 @@ La migration supprime toutes les policies existantes sur `guild_configs`, `givea
 | `GET /api/guilds/:guildId/metadata` | session, membre Discord, Administrator/ManageGuild | salons, catégories, rôles, emojis, permissions |
 
 Le dashboard ne conserve pas le token provider Discord au-delà de la session Supabase et ne le journalise pas. Les métadonnées sont récupérées uniquement après autorisation Bot API.
+
+---
+
+## Diagnostic guilds Discord
+
+`GET /api/discord/guilds` journalise sans secret : token provider présent (booléen), nombre brut Discord, nombre après filtre owner/Admin/ManageGuild, nombre après présence bot et nombre final. La réponse finale ne contient que les guilds administrables où CIVRAT est dans le cache du bot. Le dashboard affiche une erreur avec retry si l’API, la session ou le token provider échoue au lieu de masquer l’échec comme `0 serveur`.

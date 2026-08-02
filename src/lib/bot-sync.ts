@@ -37,12 +37,14 @@ export interface DiscordGuildSummary { id: string; name: string; icon: string | 
 export interface GuildMetadata { guild: { id: string; name: string; icon: string | null }; channels: Array<{ id: string; name: string; type: number; parent_id: string | null }>; categories: Array<{ id: string; name: string }>; roles: Array<{ id: string; name: string; color: number; position: number }>; emojis: Array<{ id: string | null; name: string; animated: boolean }>; permissions: string; }
 
 export async function getDiscordGuildsFromBot(discordAccessToken: string): Promise<DiscordGuildSummary[]> {
-  try {
-    const response = await authorizedRequest('/api/discord/guilds', {}, discordAccessToken);
-    if (!response?.ok) return [];
-    const payload = await response.json();
-    return payload.guilds as DiscordGuildSummary[];
-  } catch { return []; }
+  const response = await authorizedRequest('/api/discord/guilds', {}, discordAccessToken);
+  if (!response) throw new Error('Bot API unavailable');
+  if (!response.ok) {
+    const payload = await response.json().catch(() => ({}));
+    throw new Error(payload.error || `Bot API request failed (${response.status})`);
+  }
+  const payload = await response.json();
+  return payload.guilds as DiscordGuildSummary[];
 }
 
 export async function getGuildMetadataFromBot(guildId: string): Promise<GuildMetadata | null> {

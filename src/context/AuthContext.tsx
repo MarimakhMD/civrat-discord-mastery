@@ -5,15 +5,16 @@ import { supabase } from '@/lib/supabase';
 import { getDiscordGuildsFromBot } from '@/lib/bot-sync';
 
 interface AuthState {
-  user: User | null; guilds: Guild[]; loading: boolean; isAuthenticated: boolean;
+  user: User | null; guilds: Guild[]; guildsError: string | null; loading: boolean; isAuthenticated: boolean;
   login: () => Promise<void>; logout: () => Promise<void>; refreshGuilds: () => Promise<void>;
 }
 const AuthContext = createContext<AuthState | null>(null);
 
 function dashboardUser(session: Session): User {
   const meta = session.user.user_metadata || {};
+  const discordIdentity = session.user.identities?.find((identity) => identity.provider === 'discord')?.identity_data || {};
   return {
-    id: session.user.id, discord_id: String(meta.provider_id || meta.sub || meta.id || ''),
+    id: session.user.id, discord_id: String(meta.provider_id || meta.sub || meta.id || discordIdentity.provider_id || discordIdentity.sub || discordIdentity.id || ''),
     username: String(meta.full_name || meta.user_name || meta.name || 'Discord user'), discriminator: String(meta.discriminator || '0000'),
     avatar: meta.avatar_url || meta.avatar || null, email: session.user.email || null, created_at: session.user.created_at,
     is_premium: false, premium_expires_at: null,
@@ -23,12 +24,19 @@ function dashboardUser(session: Session): User {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [guilds, setGuilds] = useState<Guild[]>([]);
+  const [guildsError, setGuildsError] = useState<string | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
   const loadGuildsForToken = useCallback(async (providerToken?: string | null) => {
-    if (!providerToken) { setGuilds([]); return; }
-    setGuilds(await getDiscordGuildsFromBot(providerToken));
+    if (!providerToken) { setGuilds([]); setGuildsError('Discord authorization is missing or expired. Please sign in again.'); return; }
+    try {
+      setGuilds(await getDiscordGuildsFromBot(providerToken));
+      setGuildsError(null);
+    } catch (error) {
+      setGuilds([]);
+      setGuildsError(error instanceof Error ? error.message : 'Unable to load Discord servers.');
+    }
   }, []);
 
   const refreshGuilds = useCallback(async () => {
@@ -45,7 +53,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = useCallback(async () => {
     try { await supabase.auth.signOut(); }
-    finally { localStorage.removeItem('selectedGuildId'); setSession(null); setUser(null); setGuilds([]); }
+    finally { localStorage.removeItem('selectedGuildId'); setSession(null); setUser(null); setGuilds([]); setGuildsError(null); }
   }, []);
 
   useEffect(() => {
@@ -62,6 +70,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => { active = false; subscription.unsubscribe(); };
   }, [loadGuildsForToken]);
 
-  return <AuthContext.Provider value={{ user, guilds, loading, isAuthenticated: Boolean(user), login, logout, refreshGuilds }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ user, guilds, guildsError, loading, isAuthenticated: Boolean(user), login, logout, refreshGuilds }}>{children}</AuthContext.Provider>;
 }
 export function useAuth() { const ctx = useContext(AuthContext); if (!ctx) throw new Error('useAuth must be used within AuthProvider'); return ctx; }

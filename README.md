@@ -129,3 +129,7 @@ The supplied migration now removes every policy on sensitive public tables and r
 ## Discord production metadata
 
 The dashboard authenticates through Supabase Discord OAuth and sends the short-lived Discord provider token only to the authenticated Bot API. `GET /api/discord/guilds` verifies that token matches the Supabase identity, then returns only Discord guilds where the user is owner, `Administrator`, or `ManageGuild`, marking whether CIVRAT is present. After a managed guild is selected, `GET /api/guilds/:guildId/metadata` returns authorized live channels, categories, roles, emojis, and effective member permissions. The provider token is never logged or persisted by the dashboard.
+
+## Guild discovery diagnostics
+
+The Bot API logs only safe counters for Discord guild discovery: whether a provider token header was received, Discord guild count, count after the owner/Admin/ManageGuild filter, count after the CIVRAT-presence filter, and final response count. It never logs provider tokens. A dashboard error now exposes Bot API failures instead of silently displaying an indistinguishable empty guild list.
