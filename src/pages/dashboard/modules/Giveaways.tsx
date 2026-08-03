@@ -5,13 +5,7 @@ import { FormField } from '@/components/ui/FormField';
 import { SaveBar } from '@/components/ui/SaveBar';
 import { Select } from '@/components/ui/Select';
 import { useGuild } from '@/context/GuildContext';
-
-const channels = [
-  { value: 'ch-1', label: '#general' },
-  { value: 'ch-2', label: '#welcome' },
-  { value: 'ch-3', label: '#logs' },
-  { value: 'ch-4', label: '#moderation' },
-];
+import { useDiscordOptions } from '@/hooks/use-discord-options';
 
 const mockGiveaways = [
   { id: 1, prize: 'Nitro Classic', winners: 3, participants: 145, endsIn: '2 hours' },
@@ -27,6 +21,7 @@ const mockHistory = [
 
 export default function Giveaways() {
   const { updateConfig } = useGuild();
+  const { textChannels: channels } = useDiscordOptions();
   const [isDirty, setIsDirty] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);

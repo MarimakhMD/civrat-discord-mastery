@@ -1,10 +1,10 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import type { GuildConfig } from '@/types';
 import { getGuildConfigFromBot, getGuildMetadataFromBot, updateGuildConfigFromBot, type GuildMetadata } from '@/lib/bot-sync';
 
 interface GuildState {
   selectedGuildId: string | null; config: GuildConfig; metadata: GuildMetadata | null;
-  selectGuild: (id: string) => Promise<void>; updateConfig: (data: Partial<GuildConfig>) => Promise<void>; loading: boolean;
+  selectGuild: (id: string) => Promise<void>; refreshMetadata: () => Promise<void>; updateConfig: (data: Partial<GuildConfig>) => Promise<void>; loading: boolean;
 }
 const GuildContext = createContext<GuildState | null>(null);
 
@@ -41,6 +41,21 @@ export function GuildProvider({ children }: { children: ReactNode }) {
     } finally { setLoading(false); }
   }, []);
 
+  const refreshMetadata = useCallback(async () => {
+    if (!selectedGuildId) return;
+    const guildMetadata = await getGuildMetadataFromBot(selectedGuildId);
+    if (guildMetadata) setMetadata(guildMetadata);
+  }, [selectedGuildId]);
+
+  // Discord gateway events update the bot cache immediately. Polling this
+  // lightweight metadata endpoint keeps the dashboard current without polling
+  // every module or hitting Discord directly from the browser.
+  useEffect(() => {
+    if (!selectedGuildId) return;
+    const timer = window.setInterval(() => { void refreshMetadata(); }, 30_000);
+    return () => window.clearInterval(timer);
+  }, [selectedGuildId, refreshMetadata]);
+
   const updateConfig = useCallback(async (data: Partial<GuildConfig>) => {
     if (!selectedGuildId) throw new Error('Sélectionnez un serveur avant d’enregistrer.');
     setLoading(true);
@@ -51,6 +66,6 @@ export function GuildProvider({ children }: { children: ReactNode }) {
     } finally { setLoading(false); }
   }, [selectedGuildId]);
 
-  return <GuildContext.Provider value={{ selectedGuildId, config, metadata, selectGuild, updateConfig, loading }}>{children}</GuildContext.Provider>;
+  return <GuildContext.Provider value={{ selectedGuildId, config, metadata, selectGuild, refreshMetadata, updateConfig, loading }}>{children}</GuildContext.Provider>;
 }
 export function useGuild() { const ctx = useContext(GuildContext); if (!ctx) throw new Error('useGuild must be used within GuildProvider'); return ctx; }

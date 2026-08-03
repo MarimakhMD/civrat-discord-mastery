@@ -6,11 +6,12 @@ import { FormField } from '@/components/ui/FormField';
 import { SaveBar } from '@/components/ui/SaveBar';
 import { Select } from '@/components/ui/Select';
 import { useGuild } from '@/context/GuildContext';
+import { useDiscordOptions } from '@/hooks/use-discord-options';
 
-const channels = [{ value: 'ch-1', label: '#général' }, { value: 'ch-2', label: '#bienvenue' }, { value: 'ch-3', label: '#logs' }, { value: 'ch-4', label: '#modération' }];
 const categories = [{ id: 'message_delete', name: 'Messages', text: 'Suppressions, modifications et actions sur les messages.' }, { id: 'member_join', name: 'Membres', text: 'Arrivées, départs et changements de membres.' }, { id: 'ban_add', name: 'Modération', text: 'Bannissements, expulsions et sanctions.' }, { id: 'tickets', name: 'Tickets', text: 'Créations, fermetures et transcripts.' }, { id: 'invites', name: 'Invitations', text: 'Utilisation et création d’invitations.' }, { id: 'channel_create', name: 'Salons', text: 'Créations, modifications et suppressions.' }, { id: 'role_add', name: 'Rôles', text: 'Mises à jour des rôles et permissions.' }, { id: 'voice', name: 'Vocal', text: 'Connexions, déplacements et sorties.' }, { id: 'emoji', name: 'Emojis', text: 'Création et suppression d’emojis.' }, { id: 'server', name: 'Serveur', text: 'Paramètres généraux de la communauté.' }];
 export default function Logs() {
   const { config, updateConfig } = useGuild();
+  const { textChannels: channels } = useDiscordOptions();
   const logFields = ['log_message_delete_channel_id', 'log_message_edit_channel_id', 'log_member_join_channel_id', 'log_member_leave_channel_id', 'log_role_update_channel_id', 'log_channel_update_channel_id', 'log_moderation_channel_id'] as const;
   const mappedEvents = ['message_delete', 'message_edit', 'member_join', 'member_leave', 'role_add', 'channel_create', 'ban_add'];
   const configuredEvents = mappedEvents.filter((_, index) => Boolean(config[logFields[index]]));

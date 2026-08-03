@@ -6,6 +6,7 @@ import { FormField } from '@/components/ui/FormField';
 import { SaveBar } from '@/components/ui/SaveBar';
 import { Select } from '@/components/ui/Select';
 import { useGuild } from '@/context/GuildContext';
+import { useDiscordOptions } from '@/hooks/use-discord-options';
 
 const mockChannels = [
   { id: 1, name: 'Temp Voice #1', users: 3, createdBy: 'Alex#1234' },
@@ -15,6 +16,7 @@ const mockChannels = [
 
 export default function TempVoice() {
   const { config, updateConfig } = useGuild();
+  const { categories, voiceChannels } = useDiscordOptions();
   const [isDirty, setIsDirty] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -73,11 +75,7 @@ export default function TempVoice() {
             <div className="space-y-4">
               <FormField label="Voice Category">
                 <Select
-                  options={[
-                    { value: 'cat-1', label: 'Voice Channels' },
-                    { value: 'cat-2', label: 'Temporary' },
-                    { value: 'cat-3', label: 'General' },
-                  ]}
+                  options={categories}
                   value={category}
                   onChange={(val) => {
                     setCategory(val);
@@ -88,7 +86,7 @@ export default function TempVoice() {
               </FormField>
 
               <FormField label="Salon générateur">
-                <Select options={[{ value: 'voice-1', label: '➕ Créer un vocal' }, { value: 'voice-2', label: '🔊 Rejoindre pour créer' }]} value={creatorChannel} onChange={(value) => { setCreatorChannel(value); setIsDirty(true); }} placeholder="Choisir le salon générateur" />
+                <Select options={voiceChannels} value={creatorChannel} onChange={(value) => { setCreatorChannel(value); setIsDirty(true); }} placeholder="Choisir le salon générateur" />
               </FormField>
 
               <FormField label="Channel Name Template">

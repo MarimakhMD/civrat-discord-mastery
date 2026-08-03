@@ -141,3 +141,7 @@ Supabase provider tokens are captured during the explicit `/auth/callback` PKCE 
 ## OAuth callback compatibility
 
 CIVRAT supports both Supabase Discord callback formats during the provider migration: PKCE `?code=...` is exchanged explicitly with `exchangeCodeForSession`, while historical implicit `#access_token=...&refresh_token=...` callbacks are accepted with `setSession`. A Discord provider token found in either result is retained only in transient session memory long enough to load the user guilds, then removed. Configure Supabase Auth redirect URLs for `/auth/callback`; configure the Discord Developer Portal redirect URL to the Supabase provider callback URL. Never enable raw token logging; `VITE_AUTH_DEBUG=true` logs only token presence and length.
+
+## Live Discord metadata and dashboard selects
+
+The Bot API now exposes authorized overview, stats, channels, categories, roles, emojis, members, settings and logs routes under `/api/guilds/:guildId/*`. `GuildContext` refreshes guild metadata every 30 seconds while a guild is selected; Discord gateway events update the bot cache between polls. Core configuration selects now derive channel/category/role choices from this metadata rather than hard-coded option IDs. The logs endpoint intentionally returns 501 until persistent event-log storage is introduced; Discord log channels are not a queryable event history.

@@ -563,3 +563,21 @@ Le callback dashboard échange explicitement le code PKCE avec `exchangeCodeForS
 ## Callback OAuth PKCE et implicite
 
 Le callback accepte `?code=` (PKCE) et `#access_token=...&refresh_token=...` (implicite historique). Le token provider Discord est capturé avant suppression du fragment URL, utilisé uniquement pour la découverte guilds, puis retiré du stockage transitoire. Les logs debug ne contiennent jamais les valeurs des tokens.
+
+---
+
+## Endpoints métadonnées Discord
+
+| Endpoint | État | Données |
+|---|---|---|
+| `/api/guilds/:guildId/overview` | Opérationnel | serveur, bot, uptime, ping, boosts, compteurs cache |
+| `/api/guilds/:guildId/stats` | Opérationnel | membres, humains, bots, salons, rôles, emojis, boosts, tickets, giveaways |
+| `/api/guilds/:guildId/channels` | Opérationnel | salons texte/vocal/forums/threads |
+| `/api/guilds/:guildId/categories` | Opérationnel | catégories Discord |
+| `/api/guilds/:guildId/roles` | Opérationnel | rôles non gérés |
+| `/api/guilds/:guildId/emojis` | Opérationnel | emojis guild |
+| `/api/guilds/:guildId/members` | Opérationnel | pagination membres réels |
+| `/api/guilds/:guildId/settings` | Opérationnel | config canonique autorisée |
+| `/api/guilds/:guildId/logs` | 501 volontaire | historique persistant non encore stocké |
+
+Les selects de configuration migrés utilisent le metadata context dynamique. Les statistiques dashboard métier restantes doivent consommer les endpoints dédiés plutôt que les données mock dans une phase UI dédiée.

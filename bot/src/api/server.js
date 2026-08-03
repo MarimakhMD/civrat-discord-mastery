@@ -142,13 +142,84 @@ function createServer(discordClient) {
     }
   });
 
-  app.get('/api/guilds/:guildId/metadata', async (req, res) => {
-    const access = await authorizeGuild(req, res); if (!access) return;
-    const channels = [...access.guild.channels.cache.values()].map((channel) => ({ id: channel.id, name: channel.name, type: channel.type, parent_id: channel.parentId || null }));
+  function guildMetadata(access) {
+    const channels = [...access.guild.channels.cache.values()].map((channel) => ({ id: channel.id, name: channel.name, type: channel.type, parent_id: channel.parentId || null, position: channel.position ?? 0 }));
     const categories = channels.filter((channel) => channel.type === 4).map((channel) => ({ id: channel.id, name: channel.name }));
     const roles = [...access.guild.roles.cache.values()].filter((role) => role.id !== access.guild.id && !role.managed).sort((a, b) => b.position - a.position).map((role) => ({ id: role.id, name: role.name, color: role.color, position: role.position }));
-    const emojis = [...access.guild.emojis.cache.values()].map((emoji) => ({ id: emoji.id, name: emoji.name, animated: emoji.animated }));
-    return res.json({ guild: { id: access.guild.id, name: access.guild.name, icon: access.guild.icon }, channels, categories, roles, emojis, permissions: access.member.permissions.bitfield.toString() });
+    const emojis = [...access.guild.emojis.cache.values()].map((emoji) => ({ id: emoji.id, name: emoji.name || '', animated: Boolean(emoji.animated) }));
+    return { guild: { id: access.guild.id, name: access.guild.name, icon: access.guild.icon, owner_id: access.guild.ownerId, boost_count: access.guild.premiumSubscriptionCount || 0, boost_level: access.guild.premiumTier }, channels, categories, roles, emojis, permissions: access.member.permissions.bitfield.toString() };
+  }
+
+  app.get('/api/guilds/:guildId/metadata', async (req, res) => {
+    const access = await authorizeGuild(req, res); if (!access) return;
+    return res.json(guildMetadata(access));
+  });
+
+  app.get('/api/guilds/:guildId/overview', async (req, res) => {
+    const access = await authorizeGuild(req, res); if (!access) return;
+    const data = guildMetadata(access);
+    return res.json({ ...data.guild, bot_present: true, bot_ping: discordClient.ws.ping, bot_uptime: process.uptime(), channel_count: data.channels.length, role_count: data.roles.length, emoji_count: data.emojis.length });
+  });
+
+  app.get('/api/guilds/:guildId/channels', async (req, res) => {
+    const access = await authorizeGuild(req, res); if (!access) return;
+    return res.json({ channels: guildMetadata(access).channels });
+  });
+  app.get('/api/guilds/:guildId/categories', async (req, res) => {
+    const access = await authorizeGuild(req, res); if (!access) return;
+    return res.json({ categories: guildMetadata(access).categories });
+  });
+  app.get('/api/guilds/:guildId/roles', async (req, res) => {
+    const access = await authorizeGuild(req, res); if (!access) return;
+    return res.json({ roles: guildMetadata(access).roles });
+  });
+  app.get('/api/guilds/:guildId/emojis', async (req, res) => {
+    const access = await authorizeGuild(req, res); if (!access) return;
+    return res.json({ emojis: guildMetadata(access).emojis });
+  });
+
+  app.get('/api/guilds/:guildId/stats', async (req, res) => {
+    const access = await authorizeGuild(req, res); if (!access) return;
+    try {
+      await access.guild.members.fetch();
+      const members = [...access.guild.members.cache.values()];
+      const metadata = guildMetadata(access);
+      const [tickets, giveaways] = await Promise.all([
+        supabase.from('tickets').select('*', { count: 'exact', head: true }).eq('guild_id', access.guildId).eq('closed', false),
+        supabase.from('giveaways').select('*', { count: 'exact', head: true }).eq('guild_id', access.guildId).eq('active', true),
+      ]);
+      return res.json({ members: access.guild.memberCount, humans: members.filter((member) => !member.user.bot).length, bots: members.filter((member) => member.user.bot).length, channels: metadata.channels.length, text_channels: metadata.channels.filter((channel) => channel.type === 0).length, voice_channels: metadata.channels.filter((channel) => channel.type === 2).length, forum_channels: metadata.channels.filter((channel) => channel.type === 15).length, threads: metadata.channels.filter((channel) => [10, 11, 12].includes(channel.type)).length, roles: metadata.roles.length, emojis: metadata.emojis.length, boosts: access.guild.premiumSubscriptionCount || 0, boost_level: access.guild.premiumTier, bot_ping: discordClient.ws.ping, bot_uptime: process.uptime(), open_tickets: tickets.count || 0, active_giveaways: giveaways.count || 0 });
+    } catch (statsError) {
+      logger.warn(`Guild stats failed for ${access.guildId}: ${statsError.message}`);
+      return res.status(503).json({ error: 'Guild stats unavailable' });
+    }
+  });
+
+  app.get('/api/guilds/:guildId/members', async (req, res) => {
+    const access = await authorizeGuild(req, res); if (!access) return;
+    const limit = Math.min(Math.max(Number.parseInt(req.query.limit, 10) || 50, 1), 100);
+    const offset = Math.max(Number.parseInt(req.query.offset, 10) || 0, 0);
+    try {
+      await access.guild.members.fetch();
+      const all = [...access.guild.members.cache.values()].sort((a, b) => a.displayName.localeCompare(b.displayName));
+      const members = all.slice(offset, offset + limit).map((member) => ({ id: member.id, username: member.user.username, display_name: member.displayName, bot: member.user.bot, avatar: member.user.displayAvatarURL(), roles: [...member.roles.cache.values()].filter((role) => role.id !== access.guild.id).map((role) => role.id) }));
+      return res.json({ total: all.length, offset, limit, members });
+    } catch (membersError) {
+      logger.warn(`Guild members failed for ${access.guildId}: ${membersError.message}`);
+      return res.status(503).json({ error: 'Guild members unavailable' });
+    }
+  });
+
+  app.get('/api/guilds/:guildId/settings', async (req, res) => {
+    const access = await authorizeGuild(req, res); if (!access) return;
+    try { return res.json({ config: await reloadGuildConfig(access.guildId, 'authorized settings read') }); }
+    catch (error) { return res.status(503).json({ error: 'Configuration unavailable' }); }
+  });
+
+  app.get('/api/guilds/:guildId/logs', async (req, res) => {
+    const access = await authorizeGuild(req, res); if (!access) return;
+    // Discord logs are delivered to configured channels; no persistent log table exists yet.
+    return res.status(501).json({ error: 'Persistent dashboard logs are not configured', logs: [] });
   });
 
   app.get('/api/guilds/:guildId/config', async (req, res) => {

@@ -6,11 +6,12 @@ import { FormField } from '@/components/ui/FormField';
 import { SaveBar } from '@/components/ui/SaveBar';
 import { Select } from '@/components/ui/Select';
 import { useGuild } from '@/context/GuildContext';
+import { useDiscordOptions } from '@/hooks/use-discord-options';
 
-const channels = [{ value: 'ch-1', label: '#général' }, { value: 'ch-2', label: '#bienvenue' }, { value: 'ch-3', label: '#logs' }, { value: 'ch-4', label: '#départs' }];
 const variables = ['{user}', '{username}', '{server}', '{memberCount}'];
 export default function Welcome() {
-  const { config, updateConfig } = useGuild(); const [isDirty, setIsDirty] = useState(false); const [isSaving, setIsSaving] = useState(false); const [error, setError] = useState<string | null>(null);
+  const { config, updateConfig } = useGuild();
+  const { textChannels: channels } = useDiscordOptions(); const [isDirty, setIsDirty] = useState(false); const [isSaving, setIsSaving] = useState(false); const [error, setError] = useState<string | null>(null);
   const [welcomeEnabled, setWelcomeEnabled] = useState(config.welcome_enabled); const [goodbyeEnabled, setGoodbyeEnabled] = useState(config.goodbye_enabled); const [welcomeChannel, setWelcomeChannel] = useState(config.welcome_channel_id ?? ''); const [goodbyeChannel, setGoodbyeChannel] = useState(config.goodbye_channel_id ?? ''); const [welcomeMessage, setWelcomeMessage] = useState(config.welcome_message ?? ''); const [goodbyeMessage, setGoodbyeMessage] = useState(config.goodbye_message ?? ''); const [embed, setEmbed] = useState(config.welcome_embed_enabled); const [color, setColor] = useState(config.welcome_embed_color); const [dm, setDm] = useState(config.welcome_dm_enabled); const [dmMessage, setDmMessage] = useState(config.welcome_dm_message ?? '');
   const change = (fn: () => void) => { fn(); setIsDirty(true); }; const save = async () => { try { setIsSaving(true); setError(null); await updateConfig({ welcome_enabled: welcomeEnabled, welcome_channel_id: welcomeChannel || null, welcome_message: welcomeMessage || null, welcome_embed_enabled: embed, welcome_embed_color: color, welcome_dm_enabled: dm, welcome_dm_message: dmMessage || null, goodbye_enabled: goodbyeEnabled, goodbye_channel_id: goodbyeChannel || null, goodbye_message: goodbyeMessage || null }); setIsDirty(false); } catch { setError('Impossible d’enregistrer les messages.'); } finally { setIsSaving(false); } };
   const reset = () => { setWelcomeEnabled(config.welcome_enabled); setGoodbyeEnabled(config.goodbye_enabled); setWelcomeChannel(config.welcome_channel_id ?? ''); setGoodbyeChannel(config.goodbye_channel_id ?? ''); setWelcomeMessage(config.welcome_message ?? ''); setGoodbyeMessage(config.goodbye_message ?? ''); setEmbed(config.welcome_embed_enabled); setColor(config.welcome_embed_color); setDm(config.welcome_dm_enabled); setDmMessage(config.welcome_dm_message ?? ''); setIsDirty(false); };

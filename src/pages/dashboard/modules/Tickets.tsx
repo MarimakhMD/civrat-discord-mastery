@@ -6,13 +6,13 @@ import { SaveBar } from '@/components/ui/SaveBar';
 import { Select } from '@/components/ui/Select';
 import { Toggle } from '@/components/ui/Toggle';
 import { useGuild } from '@/context/GuildContext';
+import { useDiscordOptions } from '@/hooks/use-discord-options';
 
-const channels = [{ value: 'ch-1', label: '#general' }, { value: 'ch-2', label: '#bienvenue' }, { value: 'ch-3', label: '#logs' }, { value: 'ch-4', label: '#support' }];
-const roles = [{ value: 'r-1', label: '@Administrateur' }, { value: 'r-2', label: '@Modérateur' }, { value: 'r-3', label: '@Support' }, { value: 'r-4', label: '@Membre' }];
 const tickets = [{ user: 'Alex', subject: 'Problème de vérification', status: 'Ouvert', date: 'Il y a 2 h' }, { user: 'Jordan', subject: 'Demande de rôle', status: 'En attente', date: 'Hier' }, { user: 'Sam', subject: 'Appel de sanction', status: 'Résolu', date: 'Il y a 3 j' }];
 
 export default function Tickets() {
-  const { config, updateConfig } = useGuild(); const [isDirty, setIsDirty] = useState(false); const [isSaving, setIsSaving] = useState(false); const [error, setError] = useState<string | null>(null);
+  const { config, updateConfig } = useGuild();
+  const { textChannels: channels, roles } = useDiscordOptions(); const [isDirty, setIsDirty] = useState(false); const [isSaving, setIsSaving] = useState(false); const [error, setError] = useState<string | null>(null);
   const [enabled, setEnabled] = useState(config.tickets_enabled); const [category, setCategory] = useState(config.ticket_category_id ?? ''); const [supportRole, setSupportRole] = useState(config.ticket_support_role_id ?? ''); const [transcriptChannel, setTranscriptChannel] = useState(config.ticket_log_channel_id ?? '');
   const [panelTitle, setPanelTitle] = useState('Centre d’assistance'); const [autoClose, setAutoClose] = useState(true); const [transcripts, setTranscripts] = useState(true);
   const change = (fn: () => void) => { fn(); setIsDirty(true); };

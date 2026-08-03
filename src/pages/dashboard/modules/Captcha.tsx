@@ -5,23 +5,12 @@ import { FormField } from '@/components/ui/FormField';
 import { SaveBar } from '@/components/ui/SaveBar';
 import { Select } from '@/components/ui/Select';
 import { useGuild } from '@/context/GuildContext';
+import { useDiscordOptions } from '@/hooks/use-discord-options';
 
-const channels = [
-  { value: 'ch-1', label: '#general' },
-  { value: 'ch-2', label: '#welcome' },
-  { value: 'ch-3', label: '#logs' },
-  { value: 'ch-4', label: '#moderation' },
-];
-
-const roles = [
-  { value: 'r-1', label: '@Admin' },
-  { value: 'r-2', label: '@Moderator' },
-  { value: 'r-3', label: '@Member' },
-  { value: 'r-4', label: '@Muted' },
-];
 
 export default function Captcha() {
   const { config, updateConfig } = useGuild();
+  const { textChannels: channels, roles } = useDiscordOptions();
   const [isDirty, setIsDirty] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);

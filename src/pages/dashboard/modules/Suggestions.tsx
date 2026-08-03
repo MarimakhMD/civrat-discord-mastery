@@ -5,13 +5,7 @@ import { FormField } from '@/components/ui/FormField';
 import { SaveBar } from '@/components/ui/SaveBar';
 import { Select } from '@/components/ui/Select';
 import { useGuild } from '@/context/GuildContext';
-
-const channels = [
-  { value: 'ch-1', label: '#general' },
-  { value: 'ch-2', label: '#welcome' },
-  { value: 'ch-3', label: '#logs' },
-  { value: 'ch-4', label: '#moderation' },
-];
+import { useDiscordOptions } from '@/hooks/use-discord-options';
 
 const mockSuggestions = [
   { id: 1, user: 'Alex#1234', text: 'Add a music bot', status: 'pending', votes: 24 },
@@ -22,6 +16,7 @@ const mockSuggestions = [
 
 export default function Suggestions() {
   const { config, updateConfig } = useGuild();
+  const { textChannels: channels } = useDiscordOptions();
   const [isDirty, setIsDirty] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
