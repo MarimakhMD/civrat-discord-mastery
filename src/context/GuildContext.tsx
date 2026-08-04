@@ -3,7 +3,7 @@ import type { GuildConfig } from '@/types';
 import { getGuildConfigFromBot, getGuildMetadataFromBot, updateGuildConfigFromBot, type GuildMetadata } from '@/lib/bot-sync';
 
 interface GuildState {
-  selectedGuildId: string | null; config: GuildConfig; metadata: GuildMetadata | null;
+  selectedGuildId: string | null; config: GuildConfig; metadata: GuildMetadata | null; error: string | null;
   selectGuild: (id: string) => Promise<void>; refreshMetadata: () => Promise<void>; updateConfig: (data: Partial<GuildConfig>) => Promise<void>; loading: boolean;
 }
 const GuildContext = createContext<GuildState | null>(null);
@@ -29,17 +29,30 @@ export function GuildProvider({ children }: { children: ReactNode }) {
   const [selectedGuildId, setSelectedGuildId] = useState<string | null>(() => localStorage.getItem('selectedGuildId'));
   const [config, setConfig] = useState<GuildConfig>(defaultConfig);
   const [metadata, setMetadata] = useState<GuildMetadata | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const selectGuild = useCallback(async (id: string) => {
     setLoading(true); setSelectedGuildId(id); localStorage.setItem('selectedGuildId', id);
     try {
+      setError(null);
       const [apiConfig, guildMetadata] = await Promise.all([getGuildConfigFromBot(id), getGuildMetadataFromBot(id)]);
       if (!apiConfig || !guildMetadata) throw new Error('Configuration sécurisée indisponible.');
       setConfig({ ...defaultConfig, ...apiConfig, guild_id: id });
       setMetadata(guildMetadata);
+    } catch (loadError) {
+      const message = loadError instanceof Error ? loadError.message : 'Impossible de charger la configuration du serveur.';
+      setError(message);
+      throw loadError;
     } finally { setLoading(false); }
   }, []);
+
+  // Restore the persisted guild configuration on a page refresh before any module renders its form state.
+  useEffect(() => {
+    if (!selectedGuildId) return;
+    const timer = window.setTimeout(() => { void selectGuild(selectedGuildId).catch(() => {}); }, 0);
+    return () => window.clearTimeout(timer);
+  }, [selectedGuildId, selectGuild]);
 
   const refreshMetadata = useCallback(async () => {
     if (!selectedGuildId) return;
@@ -60,12 +73,17 @@ export function GuildProvider({ children }: { children: ReactNode }) {
     if (!selectedGuildId) throw new Error('Sélectionnez un serveur avant d’enregistrer.');
     setLoading(true);
     try {
+      setError(null);
       const apiConfig = await updateGuildConfigFromBot(selectedGuildId, data);
       if (!apiConfig) throw new Error('Sauvegarde sécurisée indisponible.');
       setConfig({ ...defaultConfig, ...apiConfig, guild_id: selectedGuildId });
+    } catch (saveError) {
+      const message = saveError instanceof Error ? saveError.message : 'Sauvegarde sécurisée indisponible.';
+      setError(message);
+      throw saveError;
     } finally { setLoading(false); }
   }, [selectedGuildId]);
 
-  return <GuildContext.Provider value={{ selectedGuildId, config, metadata, selectGuild, refreshMetadata, updateConfig, loading }}>{children}</GuildContext.Provider>;
+  return <GuildContext.Provider value={{ selectedGuildId, config, metadata, error, selectGuild, refreshMetadata, updateConfig, loading }}>{children}</GuildContext.Provider>;
 }
 export function useGuild() { const ctx = useContext(GuildContext); if (!ctx) throw new Error('useGuild must be used within GuildProvider'); return ctx; }

@@ -145,3 +145,7 @@ CIVRAT supports both Supabase Discord callback formats during the provider migra
 ## Live Discord metadata and dashboard selects
 
 The Bot API now exposes authorized overview, stats, channels, categories, roles, emojis, members, settings and logs routes under `/api/guilds/:guildId/*`. `GuildContext` refreshes guild metadata every 30 seconds while a guild is selected; Discord gateway events update the bot cache between polls. Core configuration selects now derive channel/category/role choices from this metadata rather than hard-coded option IDs. The logs endpoint intentionally returns 501 until persistent event-log storage is introduced; Discord log channels are not a queryable event history.
+
+## Configuration save reliability
+
+Guild configuration is restored automatically when the selected guild is restored from browser state. The dashboard waits for both authorized Bot API config and live metadata before rendering a selected guild. Every shared `SaveBar` now provides mobile-safe loading, error, reset, and transient success feedback after the Bot API confirms the Supabase write. This does not claim a live deployment test; production validation still requires Bot API HTTPS, Supabase service role, CORS, Discord permissions, and a real save/reload cycle.

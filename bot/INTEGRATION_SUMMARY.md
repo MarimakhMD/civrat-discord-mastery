@@ -581,3 +581,9 @@ Le callback accepte `?code=` (PKCE) et `#access_token=...&refresh_token=...` (im
 | `/api/guilds/:guildId/logs` | 501 volontaire | historique persistant non encore stocké |
 
 Les selects de configuration migrés utilisent le metadata context dynamique. Les statistiques dashboard métier restantes doivent consommer les endpoints dédiés plutôt que les données mock dans une phase UI dédiée.
+
+---
+
+## Fiabilité sauvegarde dashboard
+
+Le `GuildContext` recharge automatiquement la configuration Supabase via Bot API à partir de la guild persistée après refresh. Les modules conservent le même `updateConfig`; après réponse Bot API, le contexte remplace sa configuration par la ligne serveur retournée. Le SaveBar partagé affiche loading, erreur et succès après confirmation API. Les tests réels doivent valider HTTPS/CORS/service role/permissions Discord avant validation production.
