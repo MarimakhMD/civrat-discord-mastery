@@ -74,6 +74,7 @@ const defaultConfig = {
   suggestions_approval_channel_id: null,
   invitations_enabled: false,
   invitations_log_channel_id: null,
+  bot_log_channel_id: null,
   bot_prefix: "!",
   bot_name: "CIVRAT",
   notify_security_alert: true,

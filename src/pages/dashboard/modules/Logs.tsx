@@ -1,29 +1,86 @@
 import { useMemo, useState } from 'react';
-import { FileText, Filter, Search, Send, ShieldCheck } from 'lucide-react';
+import { FileText, ShieldCheck } from 'lucide-react';
 import { ModuleHeader } from '@/components/ui/ModuleHeader';
-import { Toggle } from '@/components/ui/Toggle';
 import { FormField } from '@/components/ui/FormField';
 import { SaveBar } from '@/components/ui/SaveBar';
 import { Select } from '@/components/ui/Select';
 import { useGuild } from '@/context/GuildContext';
 import { useDiscordOptions } from '@/hooks/use-discord-options';
 
-const categories = [{ id: 'message_delete', name: 'Messages', text: 'Suppressions, modifications et actions sur les messages.' }, { id: 'member_join', name: 'Membres', text: 'Arrivées, départs et changements de membres.' }, { id: 'ban_add', name: 'Modération', text: 'Bannissements, expulsions et sanctions.' }, { id: 'tickets', name: 'Tickets', text: 'Créations, fermetures et transcripts.' }, { id: 'invites', name: 'Invitations', text: 'Utilisation et création d’invitations.' }, { id: 'channel_create', name: 'Salons', text: 'Créations, modifications et suppressions.' }, { id: 'role_add', name: 'Rôles', text: 'Mises à jour des rôles et permissions.' }, { id: 'voice', name: 'Vocal', text: 'Connexions, déplacements et sorties.' }, { id: 'emoji', name: 'Emojis', text: 'Création et suppression d’emojis.' }, { id: 'server', name: 'Serveur', text: 'Paramètres généraux de la communauté.' }];
+const logCategories = [
+  { key: 'log_moderation_channel_id', title: 'Modération', description: 'Bannissements, sanctions, AutoMod et vérifications.', requires: 'logs' },
+  { key: 'log_message_delete_channel_id', title: 'Messages supprimés', description: 'Suppressions simples et groupées.', requires: 'logs' },
+  { key: 'log_message_edit_channel_id', title: 'Messages modifiés', description: 'Modifications de messages.', requires: 'logs' },
+  { key: 'log_member_join_channel_id', title: 'Arrivées', description: 'Nouveaux membres.', requires: 'logs' },
+  { key: 'log_member_leave_channel_id', title: 'Départs', description: 'Membres quittant le serveur.', requires: 'logs' },
+  { key: 'invitations_log_channel_id', title: 'Invitations', description: 'Créations, suppressions et utilisations d’invitations.', requires: 'invitations' },
+  { key: 'ticket_log_channel_id', title: 'Tickets', description: 'Créations, fermetures et transcripts.', requires: 'tickets' },
+  { key: 'bot_log_channel_id', title: 'Bot', description: 'Actions appliquées par CIVRAT.', requires: 'bot' },
+  { key: 'log_role_update_channel_id', title: 'Rôles', description: 'Créations, suppressions et modifications de rôles.', requires: 'logs' },
+  { key: 'log_channel_update_channel_id', title: 'Salons', description: 'Créations, suppressions et modifications de salons.', requires: 'logs' },
+] as const;
+type LogKey = typeof logCategories[number]['key'];
+type LogSelections = Record<LogKey, string>;
+
+function selectionsFromConfig(config: Record<LogKey, string | null>): LogSelections {
+  return Object.fromEntries(logCategories.map(({ key }) => [key, config[key] ?? ''])) as LogSelections;
+}
+
 export default function Logs() {
   const { config, updateConfig } = useGuild();
   const { textChannels: channels } = useDiscordOptions();
-  const logFields = ['log_message_delete_channel_id', 'log_message_edit_channel_id', 'log_member_join_channel_id', 'log_member_leave_channel_id', 'log_role_update_channel_id', 'log_channel_update_channel_id', 'log_moderation_channel_id'] as const;
-  const mappedEvents = ['message_delete', 'message_edit', 'member_join', 'member_leave', 'role_add', 'channel_create', 'ban_add'];
-  const configuredEvents = mappedEvents.filter((_, index) => Boolean(config[logFields[index]]));
-  const configuredChannel = logFields.map((field) => config[field]).find(Boolean) ?? '';
-  const [isDirty, setIsDirty] = useState(false); const [isSaving, setIsSaving] = useState(false); const [error, setError] = useState<string | null>(null); const [enabled, setEnabled] = useState(config.logs_enabled); const [channel, setChannel] = useState(configuredChannel); const [events, setEvents] = useState<string[]>(configuredEvents); const [search, setSearch] = useState(''); const [activePreview, setActivePreview] = useState('Messages');
-  const listed = useMemo(() => categories.filter((item) => item.name.toLowerCase().includes(search.toLowerCase())), [search]); const change = (fn: () => void) => { fn(); setIsDirty(true); }; const toggle = (id: string) => change(() => setEvents(events.includes(id) ? events.filter((item) => item !== id) : [...events, id]));
-  const save = async () => { try { setIsSaving(true); setError(null); const selected = channel || null; await updateConfig({ logs_enabled: enabled, log_message_delete_channel_id: events.includes('message_delete') ? selected : null, log_message_edit_channel_id: events.includes('message_edit') ? selected : null, log_member_join_channel_id: events.includes('member_join') ? selected : null, log_member_leave_channel_id: events.includes('member_leave') ? selected : null, log_role_update_channel_id: events.includes('role_add') ? selected : null, log_channel_update_channel_id: events.includes('channel_create') ? selected : null, log_moderation_channel_id: events.includes('ban_add') ? selected : null }); setIsDirty(false); } catch (saveError) { setError(saveError instanceof Error ? saveError.message : 'Impossible d’enregistrer la configuration des logs.'); } finally { setIsSaving(false); } }; const reset = () => { setEnabled(config.logs_enabled); setChannel(configuredChannel); setEvents(configuredEvents); setIsDirty(false); };
-  return <div className="space-y-6"><ModuleHeader icon={FileText} title="Centre de journalisation" description="Choisissez les événements à tracer et centralisez l’audit de votre serveur." toggleEnabled={enabled} onToggle={(value) => change(() => setEnabled(value))} />
-    <div className="grid gap-4 sm:grid-cols-3"><Stat value="—" label="Événements aujourd’hui" /><Stat value={channel ? '# logs' : 'Non défini'} label="Salon de journalisation" /><Stat value={`${events.length}/10`} label="Catégories activées" /></div>
-    <div className="grid gap-6 xl:grid-cols-5"><section className="space-y-6 xl:col-span-3"><div className="module-card !cursor-default"><div className="grid gap-4 sm:grid-cols-[1fr_220px]"><div className="relative"><Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neon-green" /><input value={search} onChange={(event) => setSearch(event.target.value)} className="input-field pl-10" placeholder="Rechercher une catégorie…" /></div><FormField label="Salon principal"><Select options={channels} value={channel} onChange={(value) => change(() => setChannel(value))} placeholder="Choisir un salon" /></FormField></div><div className="mt-5 grid gap-2 sm:grid-cols-2">{listed.map((item) => <button type="button" key={item.id} onClick={() => setActivePreview(item.name)} className="flex items-center gap-3 rounded-xl border border-white/8 bg-dark-700/45 p-4 text-left transition hover:border-neon-green/25"><Toggle checked={events.includes(item.id)} onChange={() => toggle(item.id)} /><span className="min-w-0 flex-1"><span className="flex items-center justify-between gap-2"><b className="text-sm">{item.name}</b><em className={events.includes(item.id) ? 'not-italic text-xs font-bold text-neon-green' : 'not-italic text-xs text-dark-300'}>{events.includes(item.id) ? 'Actif' : 'Inactif'}</em></span><small className="mt-1 block text-xs leading-5 text-dark-300">{item.text}</small></span></button>)}</div>{!listed.length && <div className="py-10 text-center text-sm text-dark-300">Aucune catégorie ne correspond à cette recherche.</div>}</div>
-      <div className="module-card !cursor-default"><div className="flex items-center gap-2"><Filter className="h-4 w-4 text-neon-yellow" /><h2 className="font-bold">État de la synchronisation</h2></div><p className="mt-2 text-sm text-dark-300">Les événements réels apparaîtront ici dès que le bot Discord transmettra les logs. Aucun historique fictif n’est affiché.</p><div className="mt-4 rounded-xl border border-dashed border-white/15 bg-dark-700/30 p-5 text-sm text-dark-300"><ShieldCheck className="mb-2 h-5 w-5 text-neon-green" />Configuration prête : sélectionnez un salon, activez les catégories, puis sauvegardez.</div></div></section>
-      <aside className="xl:col-span-2"><div className="sticky top-24 module-card !cursor-default"><div className="flex items-center gap-2"><Send className="h-4 w-4 text-neon-yellow" /><h2 className="font-bold">Aperçu Discord</h2></div><p className="mt-1 text-xs text-dark-300">Catégorie sélectionnée : {activePreview}</p><div className="mt-5 rounded-xl bg-[#313338] p-4"><p className="text-xs text-[#b5bac1]"># {channel ? 'logs' : 'choisir-un-salon'}</p><div className="mt-3 rounded-md border-l-4 border-neon-green bg-[#2b2d31] p-3"><p className="text-sm font-bold text-white">{activePreview} · CIVRAT Logs</p><p className="mt-2 text-xs leading-5 text-[#dbdee1]">Un événement sera affiché ici avec son auteur, sa date, son contexte et les détails utiles à la modération.</p></div></div><p className="mt-4 rounded-lg bg-neon-yellow/8 p-3 text-xs leading-5 text-dark-300">L’aperçu est visuel. L’envoi réel dépend du bot Discord existant.</p></div></aside></div>
-    <SaveBar isDirty={isDirty} isSaving={isSaving} onSave={save} onReset={reset} error={error} /></div>;
+  const [isDirty, setIsDirty] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [enabled, setEnabled] = useState(config.logs_enabled);
+  const [selections, setSelections] = useState<LogSelections>(() => selectionsFromConfig(config));
+
+  const configuredCount = useMemo(() => Object.values(selections).filter(Boolean).length, [selections]);
+  const valid = !enabled || configuredCount > 0;
+  const changeChannel = (key: LogKey, value: string) => {
+    setSelections((current) => ({ ...current, [key]: value }));
+    setIsDirty(true);
+  };
+  const reset = () => {
+    setEnabled(config.logs_enabled);
+    setSelections(selectionsFromConfig(config));
+    setError(null);
+    setIsDirty(false);
+  };
+  const save = async () => {
+    if (!valid || isSaving) return;
+    try {
+      setIsSaving(true);
+      setError(null);
+      await updateConfig({ logs_enabled: enabled, ...Object.fromEntries(logCategories.map(({ key }) => [key, selections[key] || null])) });
+      setIsDirty(false);
+    } catch (saveError) {
+      setError(saveError instanceof Error ? saveError.message : 'Impossible d’enregistrer la configuration des logs.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return <div className="space-y-6">
+    <ModuleHeader icon={FileText} title="Centre de journalisation" description="Configurez un salon texte indépendant pour chaque catégorie d’événement." toggleEnabled={enabled} onToggle={(value) => { setEnabled(value); setIsDirty(true); }} />
+    <div className="grid gap-4 sm:grid-cols-3">
+      <Stat value={`${configuredCount}/10`} label="Catégories configurées" />
+      <Stat value={enabled ? 'Actif' : 'Désactivé'} label="Journalisation" />
+      <Stat value={valid ? 'Prêt' : 'À compléter'} label="État de la configuration" />
+    </div>
+    <div className="module-card !cursor-default">
+      <div className="flex items-start gap-3"><ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-neon-green" /><div><h2 className="font-bold">Salons de journalisation</h2><p className="mt-1 text-sm text-dark-300">Les salons sont enregistrés séparément. Seuls les salons texte accessibles au bot sont proposés.</p></div></div>
+      <div className="mt-6 grid gap-4 lg:grid-cols-2">
+        {logCategories.map(({ key, title, description, requires }) => <div key={key} className="rounded-xl border border-white/8 bg-dark-700/45 p-4">
+          <FormField label={title}><Select options={channels} value={selections[key]} onChange={(value) => changeChannel(key, value)} placeholder="Choisir un salon texte" /></FormField>
+          <p className="mt-2 text-xs leading-5 text-dark-300">{description}</p>
+          {requires === 'invitations' && !config.invitations_enabled && <p className="mt-2 text-xs text-neon-yellow">Activez aussi les Invitations pour recevoir ces logs.</p>}
+          {requires === 'tickets' && !config.tickets_enabled && <p className="mt-2 text-xs text-neon-yellow">Activez aussi les Tickets pour recevoir ces logs.</p>}
+        </div>)}
+      </div>
+      {enabled && !valid && <p className="mt-5 rounded-lg border border-error/30 bg-error/10 p-3 text-sm text-error">Configurez au moins un salon de journalisation avant d’activer les logs.</p>}
+    </div>
+    <SaveBar isDirty={isDirty} isSaving={isSaving} saveDisabled={!valid} onSave={save} onReset={reset} error={error} />
+  </div>;
 }
 function Stat({ value, label }: { value: string; label: string }) { return <div className="module-card !cursor-default"><strong className="text-2xl text-neon-green">{value}</strong><p className="mt-1 text-sm text-dark-300">{label}</p></div>; }

@@ -19,7 +19,7 @@ const defaultConfig: GuildConfig = {
   captcha_enabled: false, captcha_channel_id: null, captcha_role_id: null, captcha_type: 'button', captcha_success_message: 'You have been verified!', captcha_failure_message: 'Verification failed. Please try again.',
   xp_enabled: false, xp_per_message: 15, xp_cooldown: 60, xp_announce_channel_id: null, level_rewards: [], role_rewards: [],
   giveaways_enabled: false, suggestions_enabled: false, suggestions_channel_id: null, suggestions_approval_channel_id: null,
-  invitations_enabled: false, invitations_log_channel_id: null,
+  invitations_enabled: false, invitations_log_channel_id: null, bot_log_channel_id: null,
   security_enabled: false, security_anti_nuke: false, security_anti_bot: false, security_anti_raid: false, security_whitelist: [], security_log_channel_id: null, security_quarantine_role: null,
   temp_voice_enabled: false, temp_voice_category: null, temp_voice_creator_channel_id: null,
   notify_security_alert: true, notify_weekly_summary: true, notify_product_updates: false, updated_at: null,

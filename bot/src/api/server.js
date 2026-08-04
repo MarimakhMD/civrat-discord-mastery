@@ -22,7 +22,7 @@ const CONFIG_KEYS = new Set([
   'automod_enabled', 'automod_anti_spam', 'automod_anti_links', 'automod_anti_invites', 'automod_anti_ghost_ping', 'automod_anti_mention_spam', 'automod_anti_caps', 'automod_punishment', 'automod_mention_threshold', 'automod_caps_threshold', 'automod_emoji_threshold', 'automod_bad_words',
   'captcha_enabled', 'captcha_channel_id', 'captcha_role_id', 'captcha_type', 'captcha_success_message', 'captcha_failure_message',
   'xp_enabled', 'xp_per_message', 'xp_cooldown', 'xp_announce_channel_id', 'level_rewards', 'role_rewards',
-  'giveaways_enabled', 'suggestions_enabled', 'suggestions_channel_id', 'suggestions_approval_channel_id', 'invitations_enabled', 'invitations_log_channel_id',
+  'giveaways_enabled', 'suggestions_enabled', 'suggestions_channel_id', 'suggestions_approval_channel_id', 'invitations_enabled', 'invitations_log_channel_id', 'bot_log_channel_id',
   'security_enabled', 'security_anti_nuke', 'security_anti_bot', 'security_anti_raid', 'security_whitelist', 'security_log_channel_id', 'security_quarantine_role',
   'temp_voice_enabled', 'temp_voice_category', 'temp_voice_creator_channel_id',
   'notify_security_alert', 'notify_weekly_summary', 'notify_product_updates',
@@ -251,6 +251,13 @@ function createServer(discordClient) {
       const elapsed = Date.now() - state.lastSyncAt;
       if (elapsed < SYNC_COOLDOWN_MS) scheduleGuildReload(access.guildId, SYNC_COOLDOWN_MS - elapsed);
       else await reloadGuildConfig(access.guildId, 'authorized update');
+      try {
+        const { sendLog } = require('../services/logService');
+        await sendLog(access.guild, saved, 'bot_log_channel_id', {
+          title: '⚙️ Configuration appliquée', color: 'success', moderator: access.member.user,
+          fields: [{ name: 'Champs modifiés', value: Object.keys(updates).slice(0, 25).join(', ').slice(0, 1024) || 'Configuration' }],
+        });
+      } catch (logError) { logger.warn(`Bot activity log failed for ${access.guildId}: ${logError.message}`); }
       return res.json({ config: saved });
     } catch (error) { logger.error(`Guild config update failed for ${access.guildId}:`, error.message); return res.status(503).json({ error: 'Configuration save unavailable' }); }
   });

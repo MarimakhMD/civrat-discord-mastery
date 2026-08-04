@@ -93,6 +93,7 @@ CREATE TABLE IF NOT EXISTS guild_configs (
   -- Invitations
   invitations_enabled BOOLEAN DEFAULT FALSE,
   invitations_log_channel_id TEXT,
+  bot_log_channel_id TEXT,
   
   -- Security
   security_enabled BOOLEAN DEFAULT FALSE,
@@ -125,6 +126,7 @@ ALTER TABLE guild_configs ADD COLUMN IF NOT EXISTS welcome_dm_message TEXT;
 ALTER TABLE guild_configs ADD COLUMN IF NOT EXISTS automod_emoji_threshold INTEGER DEFAULT 10;
 ALTER TABLE guild_configs ADD COLUMN IF NOT EXISTS automod_bad_words TEXT[] DEFAULT '{}';
 ALTER TABLE guild_configs ADD COLUMN IF NOT EXISTS xp_announce_channel_id TEXT;
+ALTER TABLE guild_configs ADD COLUMN IF NOT EXISTS bot_log_channel_id TEXT;
 ALTER TABLE guild_configs ADD COLUMN IF NOT EXISTS security_quarantine_role TEXT;
 ALTER TABLE guild_configs ADD COLUMN IF NOT EXISTS temp_voice_enabled BOOLEAN DEFAULT FALSE;
 ALTER TABLE guild_configs ADD COLUMN IF NOT EXISTS temp_voice_category TEXT;
