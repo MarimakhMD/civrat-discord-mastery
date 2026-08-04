@@ -58,6 +58,7 @@ function validConfigValue(key, value) {
   if (NULLABLE_TEXT_KEYS.has(key) && value === null) return true;
   return typeof value === 'string' && value.length <= 4000;
 }
+function validExpectedUpdatedAt(value) { return value === null || (typeof value === 'string' && !Number.isNaN(Date.parse(value))); }
 function sanitizeUpdates(value) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
   const entries = Object.entries(value);
@@ -231,10 +232,13 @@ function createServer(discordClient) {
   app.put('/api/guilds/:guildId/config', async (req, res) => {
     const access = await authorizeGuild(req, res, true); if (!access) return;
     const updates = sanitizeUpdates(req.body?.updates);
-    if (!updates) return res.status(400).json({ error: 'Invalid configuration payload' });
+    const expectedUpdatedAt = req.body?.expectedUpdatedAt;
+    if (!updates || !validExpectedUpdatedAt(expectedUpdatedAt)) return res.status(400).json({ error: 'Invalid configuration payload' });
     try {
       const guildConfigService = require('../services/guildConfig');
-      const saved = await guildConfigService.updateGuildConfig(access.guildId, updates);
+      const result = await guildConfigService.updateGuildConfig(access.guildId, updates, expectedUpdatedAt);
+      if (result.conflict) return res.status(409).json({ error: 'Configuration modified in another session. Refresh before saving again.' });
+      const saved = result.config;
       if (!saved) return res.status(503).json({ error: 'Configuration save unavailable' });
       const state = guildSyncState.get(access.guildId) || { lastSyncAt: 0, timer: null };
       const elapsed = Date.now() - state.lastSyncAt;

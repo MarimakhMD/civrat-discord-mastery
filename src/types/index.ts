@@ -24,7 +24,7 @@ export interface GuildConfig {
   security_enabled: boolean; security_anti_nuke: boolean; security_anti_bot: boolean; security_anti_raid: boolean; security_whitelist: string[]; security_log_channel_id: string | null; security_quarantine_role: string | null;
   temp_voice_enabled: boolean; temp_voice_category: string | null; temp_voice_creator_channel_id: string | null;
   notify_security_alert: boolean; notify_weekly_summary: boolean; notify_product_updates: boolean;
-  updated_at: string;
+  updated_at: string | null;
 }
 export interface LevelRole { level: number; role_id: string; }
 export interface LevelReward { level: number; xp_required: number; }

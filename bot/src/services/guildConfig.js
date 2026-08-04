@@ -124,7 +124,7 @@ async function getGuildConfig(guildId) {
     }
 
     // Merge with defaults (Supabase values override defaults)
-    const config = { ...defaultConfig, ...data, guild_id: guildId };
+    const config = { ...defaultConfig, ...data, guild_id: guildId, updated_at: data?.updated_at || null };
 
     // Cache the result
     configCache.set(guildId, {
@@ -145,42 +145,47 @@ async function getGuildConfig(guildId) {
  * @param {Object} updates - Partial configuration updates
  * @returns {Promise<Object|null>} Updated configuration
  */
-async function updateGuildConfig(guildId, updates) {
+async function updateGuildConfig(guildId, updates, expectedUpdatedAt) {
   try {
     if (!supabase) {
       logger.error("Supabase not available for update");
-      return null;
+      return { config: null, conflict: false };
     }
 
-    const { data, error } = await supabase
-      .from("guild_configs")
-      .upsert(
-        {
-          ...updates,
-          guild_id: guildId,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: "guild_id" }
-      )
-      .select()
-      .single();
+    const updateData = { ...updates, updated_at: new Date().toISOString() };
+    let data;
+    let error;
+
+    if (expectedUpdatedAt === null) {
+      ({ data, error } = await supabase
+        .from("guild_configs")
+        .insert({ ...updateData, guild_id: guildId })
+        .select()
+        .single());
+      if (error?.code === '23505') return { config: null, conflict: true };
+    } else {
+      ({ data, error } = await supabase
+        .from("guild_configs")
+        .update(updateData)
+        .eq("guild_id", guildId)
+        .eq("updated_at", expectedUpdatedAt)
+        .select()
+        .maybeSingle());
+      if (!error && !data) return { config: null, conflict: true };
+    }
 
     if (error) {
       logger.error(`Supabase update failed for guild ${guildId}:`, error.message);
-      return null;
+      return { config: null, conflict: false };
     }
 
-    // Invalidate cache
     configCache.delete(guildId);
-
-    // Return merged config
-    return { ...defaultConfig, ...data, guild_id: guildId };
+    return { config: { ...defaultConfig, ...data, guild_id: guildId }, conflict: false };
   } catch (err) {
     logger.error(`Failed to update guild config for ${guildId}:`, err.message);
-    return null;
+    return { config: null, conflict: false };
   }
 }
-
 /**
  * Invalidate cache for a specific guild
  */

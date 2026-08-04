@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useRef, type ReactNode } from 'react';
 import type { GuildConfig } from '@/types';
 import { getGuildConfigFromBot, getGuildMetadataFromBot, updateGuildConfigFromBot, type GuildMetadata } from '@/lib/bot-sync';
 
@@ -22,7 +22,7 @@ const defaultConfig: GuildConfig = {
   invitations_enabled: false, invitations_log_channel_id: null,
   security_enabled: false, security_anti_nuke: false, security_anti_bot: false, security_anti_raid: false, security_whitelist: [], security_log_channel_id: null, security_quarantine_role: null,
   temp_voice_enabled: false, temp_voice_category: null, temp_voice_creator_channel_id: null,
-  notify_security_alert: true, notify_weekly_summary: true, notify_product_updates: false, updated_at: new Date().toISOString(),
+  notify_security_alert: true, notify_weekly_summary: true, notify_product_updates: false, updated_at: null,
 };
 
 export function GuildProvider({ children }: { children: ReactNode }) {
@@ -31,6 +31,7 @@ export function GuildProvider({ children }: { children: ReactNode }) {
   const [metadata, setMetadata] = useState<GuildMetadata | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const saveInFlight = useRef(false);
 
   const selectGuild = useCallback(async (id: string) => {
     setLoading(true); setSelectedGuildId(id); localStorage.setItem('selectedGuildId', id);
@@ -71,18 +72,20 @@ export function GuildProvider({ children }: { children: ReactNode }) {
 
   const updateConfig = useCallback(async (data: Partial<GuildConfig>) => {
     if (!selectedGuildId) throw new Error('Sélectionnez un serveur avant d’enregistrer.');
+    if (saveInFlight.current) throw new Error('Une sauvegarde est déjà en cours.');
+    saveInFlight.current = true;
     setLoading(true);
     try {
       setError(null);
-      const apiConfig = await updateGuildConfigFromBot(selectedGuildId, data);
+      const apiConfig = await updateGuildConfigFromBot(selectedGuildId, data, config.updated_at);
       if (!apiConfig) throw new Error('Sauvegarde sécurisée indisponible.');
       setConfig({ ...defaultConfig, ...apiConfig, guild_id: selectedGuildId });
     } catch (saveError) {
       const message = saveError instanceof Error ? saveError.message : 'Sauvegarde sécurisée indisponible.';
       setError(message);
       throw saveError;
-    } finally { setLoading(false); }
-  }, [selectedGuildId]);
+    } finally { saveInFlight.current = false; setLoading(false); }
+  }, [config.updated_at, selectedGuildId]);
 
   return <GuildContext.Provider value={{ selectedGuildId, config, metadata, error, selectGuild, refreshMetadata, updateConfig, loading }}>{children}</GuildContext.Provider>;
 }

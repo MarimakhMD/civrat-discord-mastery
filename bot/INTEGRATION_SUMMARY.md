@@ -587,3 +587,9 @@ Les selects de configuration migrés utilisent le metadata context dynamique. Le
 ## Fiabilité sauvegarde dashboard
 
 Le `GuildContext` recharge automatiquement la configuration Supabase via Bot API à partir de la guild persistée après refresh. Les modules conservent le même `updateConfig`; après réponse Bot API, le contexte remplace sa configuration par la ligne serveur retournée. Le SaveBar partagé affiche loading, erreur et succès après confirmation API. Les tests réels doivent valider HTTPS/CORS/service role/permissions Discord avant validation production.
+
+---
+
+## Sauvegardes concurrentes de `guild_configs`
+
+`PUT /api/guilds/:guildId/config` exige désormais `expectedUpdatedAt` (`string` ISO de la ligne chargée, ou `null` si elle n’existe pas encore). Le service effectue un `UPDATE ... WHERE guild_id = ... AND updated_at = expectedUpdatedAt`; l’insertion initiale est protégée par la contrainte unique `guild_id`. Si une autre session a enregistré entre-temps, l’API répond `409` sans écrire ni recharger le cache. Cette protection optimiste évite l’écrasement silencieux entre onglets, sans migration destructive ni nouvelle table.

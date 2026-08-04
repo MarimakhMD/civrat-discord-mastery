@@ -149,3 +149,7 @@ The Bot API now exposes authorized overview, stats, channels, categories, roles,
 ## Configuration save reliability
 
 Guild configuration is restored automatically when the selected guild is restored from browser state. The dashboard waits for both authorized Bot API config and live metadata before rendering a selected guild. Every shared `SaveBar` now provides mobile-safe loading, error, reset, and transient success feedback after the Bot API confirms the Supabase write. This does not claim a live deployment test; production validation still requires Bot API HTTPS, Supabase service role, CORS, Discord permissions, and a real save/reload cycle.
+
+## Protection des sauvegardes concurrentes
+
+La configuration utilise désormais un verrou optimiste fondé sur `updated_at`, sans modifier le schéma Supabase : le dashboard transmet la version chargée avec chaque sauvegarde et l’API n’écrit que si cette version est toujours la version courante. Une seconde requête du même onglet est refusée pendant qu’une sauvegarde est en cours. Deux onglets (ou deux administrateurs) ne peuvent donc plus écraser silencieusement une version plus récente : la requête devenue obsolète reçoit HTTP `409` et le dashboard demande d’actualiser avant une nouvelle tentative. Les droits Supabase/Discord et la validation d’allow-list restent appliqués avant ce contrôle.
