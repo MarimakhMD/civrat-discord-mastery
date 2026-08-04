@@ -232,10 +232,17 @@ function createServer(discordClient) {
   app.put('/api/guilds/:guildId/config', async (req, res) => {
     const access = await authorizeGuild(req, res, true); if (!access) return;
     const updates = sanitizeUpdates(req.body?.updates);
-    const expectedUpdatedAt = req.body?.expectedUpdatedAt;
-    if (!updates || !validExpectedUpdatedAt(expectedUpdatedAt)) return res.status(400).json({ error: 'Invalid configuration payload' });
+    if (!updates) return res.status(400).json({ error: 'Invalid configuration payload' });
     try {
       const guildConfigService = require('../services/guildConfig');
+      let expectedUpdatedAt = req.body?.expectedUpdatedAt;
+      // Preserve the previous API contract during a rolling dashboard deployment.
+      // Current dashboards always send this value; legacy callers get a fresh server-side version.
+      if (expectedUpdatedAt === undefined) {
+        guildConfigService.invalidateCache(access.guildId);
+        expectedUpdatedAt = (await guildConfigService.getGuildConfig(access.guildId)).updated_at || null;
+      }
+      if (!validExpectedUpdatedAt(expectedUpdatedAt)) return res.status(400).json({ error: 'Invalid configuration payload' });
       const result = await guildConfigService.updateGuildConfig(access.guildId, updates, expectedUpdatedAt);
       if (result.conflict) return res.status(409).json({ error: 'Configuration modified in another session. Refresh before saving again.' });
       const saved = result.config;
